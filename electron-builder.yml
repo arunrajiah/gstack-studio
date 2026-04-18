@@ -38,6 +38,5 @@ nsis:
   allowToChangeInstallationDirectory: true
 
 # Publishing is handled by the GitHub Actions release job (softprops/action-gh-release).
-# electron-builder must not auto-publish during the build step — the build jobs
-# only have read permissions on contents.
-publish: never
+# The --publish never flag is passed via npm scripts so electron-builder never
+# tries to auto-push artifacts during CI builds.
