@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Play, Square, RotateCw, AlertTriangle, Folder, ChevronRight,
@@ -17,6 +17,18 @@ export default function Dashboard() {
   const [projects, setProjects] = useState<GStackProject[]>([])
   const [wsMenuOpen, setWsMenuOpen] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
+
+  // Auto-start daemon if the user has that option enabled
+  const autoStartAttempted = useRef(false)
+  useEffect(() => {
+    if (loading || state.running || autoStartAttempted.current) return
+    client.config.get().then(cfg => {
+      if (cfg.autoStartDaemon && cfg.gstackPath && cfg.workspacePath) {
+        autoStartAttempted.current = true
+        start()
+      }
+    }).catch(() => {})
+  }, [loading, state.running, start])
 
   useEffect(() => {
     client.projects().then(setProjects).catch(console.error)

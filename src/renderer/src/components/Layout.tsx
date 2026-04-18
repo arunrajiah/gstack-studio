@@ -1,14 +1,31 @@
 import { useState, useEffect } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Titlebar from './Titlebar'
 import ErrorBoundary from './ErrorBoundary'
+import ToastContainer from './ToastContainer'
 import Onboarding from '../pages/Onboarding'
 import { client, AppConfig } from '../lib/gstack-client'
 
 export default function Layout() {
+  const navigate = useNavigate()
   const [config, setConfig] = useState<AppConfig | null>(null)
   const [showOnboarding, setShowOnboarding] = useState(false)
+
+  // Global keyboard shortcuts: Cmd/Ctrl + 1-6
+  useEffect(() => {
+    const ROUTES = ['/dashboard', '/sprint', '/agents', '/browse', '/history', '/settings']
+    function onKey(e: KeyboardEvent) {
+      if (!(e.metaKey || e.ctrlKey)) return
+      const n = parseInt(e.key)
+      if (n >= 1 && n <= ROUTES.length) {
+        e.preventDefault()
+        navigate(ROUTES[n - 1])
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [navigate])
 
   useEffect(() => {
     client.config.get().then(cfg => {
@@ -43,6 +60,9 @@ export default function Layout() {
       {showOnboarding && config !== null && (
         <Onboarding onComplete={handleOnboardingComplete} />
       )}
+
+      {/* Global toast notifications */}
+      <ToastContainer />
     </div>
   )
 }

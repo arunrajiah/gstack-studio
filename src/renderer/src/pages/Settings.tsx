@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Save, Eye, EyeOff, ExternalLink, AlertCircle, CheckCircle2, FolderOpen, X } from 'lucide-react'
+import { Save, Eye, EyeOff, ExternalLink, AlertCircle, CheckCircle2, FolderOpen, X, Zap } from 'lucide-react'
 import { useConfig, useRecentWorkspaces } from '../lib/store'
 import { client, AppConfig } from '../lib/gstack-client'
+import { toast } from '../lib/toast'
 
 export default function Settings() {
   const { config, save } = useConfig()
@@ -11,6 +12,11 @@ export default function Settings() {
   const [showOpenAIKey, setShowOpenAIKey] = useState(false)
   const [saved, setSaved] = useState(false)
   const [errors, setErrors] = useState<Partial<Record<keyof AppConfig, string>>>({})
+  const [appVersion, setAppVersion] = useState<string>('')
+
+  useEffect(() => {
+    client.appVersion().then(setAppVersion).catch(() => {})
+  }, [])
 
   useEffect(() => { setForm(config) }, [config])
 
@@ -28,6 +34,7 @@ export default function Settings() {
     await save(form)
     reloadRecents()
     setSaved(true)
+    toast.success('Settings saved')
     setTimeout(() => setSaved(false), 2500)
   }
 
@@ -151,6 +158,37 @@ export default function Settings() {
           </Field>
         </section>
 
+        {/* Daemon */}
+        <section className="space-y-4">
+          <h2 className="text-sm font-semibold text-zinc-300 border-b border-zinc-800 pb-2">Daemon</h2>
+
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <div className="relative mt-0.5 shrink-0">
+              <input
+                type="checkbox"
+                checked={form.autoStartDaemon ?? false}
+                onChange={e => setForm(f => ({ ...f, autoStartDaemon: e.target.checked }))}
+                className="sr-only peer"
+              />
+              <div className={`w-9 h-5 rounded-full border transition-colors peer-focus-visible:ring-2 ring-indigo-500/50 ${
+                form.autoStartDaemon ? 'bg-indigo-600 border-indigo-500' : 'bg-zinc-800 border-zinc-700'
+              }`} />
+              <div className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                form.autoStartDaemon ? 'translate-x-4' : 'translate-x-0'
+              }`} />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-zinc-300 group-hover:text-zinc-100 transition-colors flex items-center gap-1.5">
+                <Zap size={13} className="text-indigo-400" />
+                Auto-start daemon on launch
+              </p>
+              <p className="text-xs text-zinc-500 mt-0.5">
+                Start the browse server automatically when gstack Studio opens
+              </p>
+            </div>
+          </label>
+        </section>
+
         {/* API Keys */}
         <section className="space-y-4">
           <h2 className="text-sm font-semibold text-zinc-300 border-b border-zinc-800 pb-2">API Keys</h2>
@@ -176,15 +214,23 @@ export default function Settings() {
           </Field>
         </section>
 
-        <button
-          type="submit"
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all ${
-            saved ? 'bg-emerald-600 text-white' : 'bg-indigo-600 hover:bg-indigo-500 text-white'
-          }`}
-        >
-          {saved ? <CheckCircle2 size={14} /> : <Save size={14} />}
-          {saved ? 'Saved!' : 'Save Settings'}
-        </button>
+        <div className="flex items-center justify-between">
+          <button
+            type="submit"
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all ${
+              saved ? 'bg-emerald-600 text-white' : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+            }`}
+          >
+            {saved ? <CheckCircle2 size={14} /> : <Save size={14} />}
+            {saved ? 'Saved!' : 'Save Settings'}
+          </button>
+
+          {appVersion && (
+            <p className="text-xs text-zinc-600 font-mono">
+              gstack Studio v{appVersion}
+            </p>
+          )}
+        </div>
       </form>
     </div>
   )

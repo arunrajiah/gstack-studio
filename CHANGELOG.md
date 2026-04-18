@@ -6,6 +6,29 @@ Format: [Semantic Versioning](https://semver.org) — `Added`, `Changed`, `Fixed
 
 ---
 
+## [0.4.0] — 2026-04-19
+
+### UX polish & power-user features
+
+**Added**
+- **Toast notification system** — non-blocking bottom-right toasts for all key actions: daemon start/stop/restart, settings saved, commands copied, log copy, errors. Built on a zero-dependency event bus (`lib/toast.ts`) so any page can fire a toast with `toast.success/error/info(msg)`.
+- **Browse Console command reference** — collapsible panel listing 30+ browser automation commands organised by category (Navigation, Content, Interaction, Tabs, Storage & Network). Click any row to pre-fill the input and jump straight to typing.
+- **Browse Console command history** — ↑/↓ arrow keys cycle through the last 100 commands, exactly like a real terminal. History is deduplicated.
+- **Copy logs** — Copy button in Browse Console and Agents page live log stream. Copies the full formatted log to clipboard and fires a toast confirmation.
+- **Auto-start daemon setting** — toggle switch in Settings → Daemon section. When enabled, Studio automatically starts the browse server on app launch (if gstack path and workspace are configured).
+- **App version display** — Settings page footer shows current Studio version (`gstack Studio vX.Y.Z`).
+- **Global keyboard shortcuts** — `⌘/Ctrl+1`–`6` navigate directly to Dashboard / Sprint Board / Agents / Browse Console / History / Settings. Shortcuts shown in sidebar icon tooltips.
+
+**Changed**
+- Daemon start/stop/restart now fire toast notifications on success and failure (previously silent in the UI)
+- Browse Console quick-action bar extended from 5 to 6 examples (`url` added)
+- Browse Console header reorganised to show the reference toggle button top-right
+- Sprint Board `SkillCard` copy fires a toast (`/id copied to clipboard`)
+- Agents page `SkillRow` copy fires a toast
+- Sidebar icon tooltips include keyboard shortcut (`Dashboard  ⌘1`, etc.)
+
+---
+
 ## [0.3.0] — 2026-04-18
 
 ### Quality & Polish

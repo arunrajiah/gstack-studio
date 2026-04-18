@@ -3,6 +3,7 @@ import { Bot, Copy, Check, Search, X, Wifi, WifiOff, BookOpen } from 'lucide-rea
 import { useSkills, useDaemon, useDaemonLogs } from '../lib/store'
 import { client, Skill } from '../lib/gstack-client'
 import SkillDocModal from '../components/SkillDocModal'
+import { toast } from '../lib/toast'
 
 type Phase = Skill['phase'] | 'all'
 
@@ -37,6 +38,7 @@ export default function Agents() {
   const [phase, setPhase] = useState<Phase>('all')
   const [search, setSearch] = useState('')
   const [docSkill, setDocSkill] = useState<Skill | null>(null)
+  const [copiedLogs, setCopiedLogs] = useState(false)
   const logEndRef = useRef<HTMLDivElement>(null)
   const [autoScroll, setAutoScroll] = useState(true)
 
@@ -136,6 +138,21 @@ export default function Agents() {
               />
               Auto-scroll
             </label>
+            {logs.length > 0 && (
+              <button
+                onClick={async () => {
+                  await navigator.clipboard.writeText(logs.join('\n'))
+                  setCopiedLogs(true)
+                  toast.success('Logs copied to clipboard')
+                  setTimeout(() => setCopiedLogs(false), 2000)
+                }}
+                title="Copy all logs"
+                className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+              >
+                {copiedLogs ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
+                Copy
+              </button>
+            )}
             <div className={`flex items-center gap-1.5 text-xs font-medium ${state.running ? 'text-emerald-400' : 'text-zinc-500'}`}>
               {state.running ? <Wifi size={12} /> : <WifiOff size={12} />}
               {state.running ? 'Live' : 'Offline'}
@@ -181,6 +198,7 @@ function SkillRow({ skill, onViewDoc }: { skill: Skill; onViewDoc: () => void })
   async function handleCopy() {
     await client.copyCommand(skill.id)
     setCopied(true)
+    toast.success(`/${skill.id} copied to clipboard`)
     setTimeout(() => setCopied(false), 1800)
   }
 

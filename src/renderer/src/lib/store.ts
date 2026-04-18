@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { client, DaemonState, Skill, AppConfig } from './gstack-client'
+import { toast } from './toast'
 
 export function useDaemon() {
   const [state, setState] = useState<DaemonState>({
@@ -16,23 +17,37 @@ export function useDaemon() {
 
   const start = useCallback(async () => {
     setLoading(true)
-    try { setState(await client.daemon.start()) }
-    catch (err) { console.error('[daemon start]', err) }
-    finally { setLoading(false) }
+    try {
+      const s = await client.daemon.start()
+      setState(s)
+      toast.success(s.running ? `Daemon started on port ${s.port}` : 'Daemon started')
+    } catch (err) {
+      console.error('[daemon start]', err)
+      toast.error(`Failed to start daemon: ${err instanceof Error ? err.message : String(err)}`)
+    } finally { setLoading(false) }
   }, [])
 
   const stop = useCallback(async () => {
     setLoading(true)
-    try { setState(await client.daemon.stop()) }
-    catch (err) { console.error('[daemon stop]', err) }
-    finally { setLoading(false) }
+    try {
+      setState(await client.daemon.stop())
+      toast.info('Daemon stopped')
+    } catch (err) {
+      console.error('[daemon stop]', err)
+      toast.error(`Stop failed: ${err instanceof Error ? err.message : String(err)}`)
+    } finally { setLoading(false) }
   }, [])
 
   const restart = useCallback(async () => {
     setLoading(true)
-    try { setState(await client.daemon.restart()) }
-    catch (err) { console.error('[daemon restart]', err) }
-    finally { setLoading(false) }
+    try {
+      const s = await client.daemon.restart()
+      setState(s)
+      toast.success(s.running ? `Daemon restarted on port ${s.port}` : 'Daemon restarted')
+    } catch (err) {
+      console.error('[daemon restart]', err)
+      toast.error(`Restart failed: ${err instanceof Error ? err.message : String(err)}`)
+    } finally { setLoading(false) }
   }, [])
 
   useEffect(() => {
@@ -61,7 +76,8 @@ export function useSkills() {
 
 export function useConfig() {
   const [config, setConfig] = useState<AppConfig>({
-    anthropicApiKey: '', gstackPath: '', workspacePath: '', openaiApiKey: '', recentWorkspaces: []
+    anthropicApiKey: '', gstackPath: '', workspacePath: '', openaiApiKey: '',
+    recentWorkspaces: [], autoStartDaemon: false
   })
 
   useEffect(() => {

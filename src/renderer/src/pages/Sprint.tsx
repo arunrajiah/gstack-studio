@@ -4,6 +4,7 @@ import { Copy, Check, AlertTriangle, BookOpen } from 'lucide-react'
 import { useSkills, useDaemon } from '../lib/store'
 import { Skill, client } from '../lib/gstack-client'
 import SkillDocModal from '../components/SkillDocModal'
+import { toast } from '../lib/toast'
 
 const PHASES: Array<{ id: Skill['phase']; label: string; color: string }> = [
   { id: 'think',   label: 'Think',   color: 'text-violet-400 border-violet-800/50 bg-violet-950/20' },
@@ -97,6 +98,7 @@ function SkillCard({ skill, onViewDoc }: { skill: Skill; onViewDoc: () => void }
   async function handleCopy() {
     await client.copyCommand(skill.id)
     setCopied(true)
+    toast.success(`/${skill.id} copied to clipboard`)
     setTimeout(() => setCopied(false), 1800)
   }
 

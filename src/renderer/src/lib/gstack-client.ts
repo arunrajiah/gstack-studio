@@ -85,6 +85,7 @@ export interface AppConfig {
   workspacePath: string
   openaiApiKey: string
   recentWorkspaces: string[]
+  autoStartDaemon: boolean
 }
 
 export const client = {
