@@ -22,7 +22,12 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      - name: Install dependencies
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: npm ci
       - run: npm run typecheck
 
   # ── Build native packages only on version tags ────────────────────────────
