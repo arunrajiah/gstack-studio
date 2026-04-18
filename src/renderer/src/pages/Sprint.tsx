@@ -89,10 +89,6 @@ export default function Sprint() {
 
 function SkillCard({ skill }: { skill: Skill }) {
   const [copied, setCopied] = useState(false)
-  // available===false only means the template file wasn't found in the gstack install.
-  // Cards are always clickable so users can copy the command regardless.
-  const templateMissing = skill.available === false
-
   async function handleCopy() {
     await client.copyCommand(skill.id)
     setCopied(true)
