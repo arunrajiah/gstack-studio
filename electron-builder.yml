@@ -37,6 +37,7 @@ nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
 
-publish:
-  provider: github
-  releaseType: release
+# Publishing is handled by the GitHub Actions release job (softprops/action-gh-release).
+# electron-builder must not auto-publish during the build step — the build jobs
+# only have read permissions on contents.
+publish: never

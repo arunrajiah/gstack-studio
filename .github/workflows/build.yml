@@ -60,19 +60,13 @@ jobs:
           command: npm ci
 
       # ── macOS ─────────────────────────────────────────────────────────────
-      # Code-signing is optional: set MAC_CERT_P12 + MAC_CERT_PASSWORD secrets
-      # to sign releases; without them the app builds unsigned (fine for dev).
+      # Builds an unsigned .dmg by default (CSC_IDENTITY_AUTO_DISCOVERY=false).
+      # To enable signing: add MAC_CERT_P12 / MAC_CERT_PASSWORD repo secrets
+      # and remove the CSC_IDENTITY_AUTO_DISCOVERY override below.
       - name: Build macOS
         if: matrix.platform == 'mac'
         env:
-          # Only pass signing env vars when the cert secret is actually set.
-          # Passing an empty CSC_LINK causes electron-builder to error.
-          CSC_LINK: ${{ secrets.MAC_CERT_P12 }}
-          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
-          CSC_IDENTITY_AUTO_DISCOVERY: ${{ secrets.MAC_CERT_P12 != '' && 'true' || 'false' }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run package:mac
 
@@ -137,6 +131,8 @@ jobs:
             | Windows 64-bit | `gstack-Studio-*-win.exe` |
             | Linux (AppImage) | `gstack-Studio-*.AppImage` |
             | Linux (Debian) | `gstack-Studio-*.deb` |
+
+            > **macOS note:** This build is unsigned. On first launch, right-click the app and choose **Open** to bypass Gatekeeper, or run `xattr -dr com.apple.quarantine /Applications/gstack\ Studio.app`.
 
             ### Requirements
             - [gstack](https://github.com/garrytan/gstack) installed at `~/.claude/skills/gstack`
