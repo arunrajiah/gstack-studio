@@ -51,27 +51,39 @@ jobs:
           node-version: 20
           cache: npm
 
+      # Retry npm install to handle transient download failures (esp. on Windows)
       - name: Install dependencies
-        run: npm ci
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: npm ci
 
-      # macOS — sign & notarise when certs are present
+      # ── macOS ─────────────────────────────────────────────────────────────
+      # Code-signing is optional: set MAC_CERT_P12 + MAC_CERT_PASSWORD secrets
+      # to sign releases; without them the app builds unsigned (fine for dev).
       - name: Build macOS
         if: matrix.platform == 'mac'
         env:
+          # Only pass signing env vars when the cert secret is actually set.
+          # Passing an empty CSC_LINK causes electron-builder to error.
           CSC_LINK: ${{ secrets.MAC_CERT_P12 }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          CSC_IDENTITY_AUTO_DISCOVERY: ${{ secrets.MAC_CERT_P12 != '' && 'true' || 'false' }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run package:mac
 
+      # ── Windows ───────────────────────────────────────────────────────────
       - name: Build Windows
         if: matrix.platform == 'win'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run package:win
 
+      # ── Linux ─────────────────────────────────────────────────────────────
       - name: Build Linux
         if: matrix.platform == 'linux'
         env:

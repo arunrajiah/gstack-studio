@@ -5,6 +5,10 @@
   "main": "out/main/index.js",
   "homepage": "https://github.com/arunrajiah/gstack-studio",
   "repository": "https://github.com/arunrajiah/gstack-studio",
+  "author": {
+    "name": "gstack Studio Contributors",
+    "email": "noreply@github.com"
+  },
   "license": "MIT",
   "scripts": {
     "dev": "electron-vite dev",
