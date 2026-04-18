@@ -108,6 +108,7 @@ Open the **Sprint Board**, find any agent, and click its card. The slash command
 - [x] **Layer 3** — Live daemon log streaming, Agents command centre with searchable skill browser
 - [x] **v0.3.0** — Onboarding wizard, skill doc viewer, Open in Finder, auto-update, custom title bar, error boundary, app icon
 - [x] **v0.4.0** — Toast notifications, Browse Console history + command reference, auto-start daemon, copy logs, keyboard shortcuts (⌘1–6), app version display
+- [x] **v0.5.0** — Command palette (⌘K), Sprint Board search, History export (JSON/MD), Browse Console script runner
 - [ ] Dark/light theme toggle
 - [ ] Windows / macOS code signing for distribution without Gatekeeper warnings
 - [ ] Direct agent execution (run gstack commands from within Studio)

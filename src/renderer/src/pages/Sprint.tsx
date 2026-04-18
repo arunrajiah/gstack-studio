@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Copy, Check, AlertTriangle, BookOpen } from 'lucide-react'
+import { Copy, Check, AlertTriangle, BookOpen, Search, X } from 'lucide-react'
 import { useSkills, useDaemon } from '../lib/store'
 import { Skill, client } from '../lib/gstack-client'
 import SkillDocModal from '../components/SkillDocModal'
@@ -22,6 +22,18 @@ export default function Sprint() {
   const { state } = useDaemon()
   const navigate = useNavigate()
   const [docSkill, setDocSkill] = useState<Skill | null>(null)
+  const [search, setSearch] = useState('')
+
+  const filteredSkills = useMemo(() => {
+    if (!search.trim()) return skills
+    const q = search.toLowerCase()
+    return skills.filter(s =>
+      s.name.toLowerCase().includes(q) ||
+      s.id.toLowerCase().includes(q) ||
+      s.description.toLowerCase().includes(q) ||
+      s.phase.toLowerCase().includes(q)
+    )
+  }, [skills, search])
 
   if (error) {
     return (
@@ -39,20 +51,41 @@ export default function Sprint() {
 
   return (
     <div className="p-6 space-y-6 max-w-5xl mx-auto">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-zinc-100">Sprint Board</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">23 AI agents — click any card to copy its slash command</p>
+          <p className="text-sm text-zinc-500 mt-0.5">
+            {search.trim()
+              ? `${filteredSkills.length} of ${skills.length} agents matching "${search}"`
+              : '23 AI agents — click any card to copy its slash command'
+            }
+          </p>
         </div>
-        {gstackMissing && (
-          <button
-            onClick={() => navigate('/settings')}
-            className="flex items-center gap-1.5 text-xs text-amber-400 bg-amber-950/30 border border-amber-800/40 rounded-lg px-3 py-1.5 hover:bg-amber-950/50 transition-colors"
-          >
-            <AlertTriangle size={12} />
-            gstack not configured
-          </button>
-        )}
+        <div className="flex items-center gap-2 shrink-0">
+          {gstackMissing && (
+            <button
+              onClick={() => navigate('/settings')}
+              className="flex items-center gap-1.5 text-xs text-amber-400 bg-amber-950/30 border border-amber-800/40 rounded-lg px-3 py-1.5 hover:bg-amber-950/50 transition-colors"
+            >
+              <AlertTriangle size={12} />
+              gstack not configured
+            </button>
+          )}
+          <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-1.5 focus-within:border-indigo-600 transition-colors">
+            <Search size={13} className="text-zinc-600 shrink-0" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Filter skills…"
+              className="w-36 bg-transparent text-sm text-zinc-200 placeholder:text-zinc-600 outline-none"
+            />
+            {search && (
+              <button onClick={() => setSearch('')} className="text-zinc-600 hover:text-zinc-400">
+                <X size={12} />
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Phase pipeline */}
@@ -72,8 +105,11 @@ export default function Sprint() {
 
       {/* Skills by phase */}
       <div className="space-y-5">
+        {filteredSkills.length === 0 && search && (
+          <p className="text-sm text-zinc-500 text-center py-8">No skills match "{search}"</p>
+        )}
         {PHASES.map(phase => {
-          const phaseSkills = skills.filter(s => s.phase === phase.id)
+          const phaseSkills = filteredSkills.filter(s => s.phase === phase.id)
           if (!phaseSkills.length) return null
           return (
             <div key={phase.id}>

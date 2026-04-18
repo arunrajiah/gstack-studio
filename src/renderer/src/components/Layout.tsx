@@ -4,6 +4,7 @@ import Sidebar from './Sidebar'
 import Titlebar from './Titlebar'
 import ErrorBoundary from './ErrorBoundary'
 import ToastContainer from './ToastContainer'
+import CommandPalette from './CommandPalette'
 import Onboarding from '../pages/Onboarding'
 import { client, AppConfig } from '../lib/gstack-client'
 
@@ -11,12 +12,18 @@ export default function Layout() {
   const navigate = useNavigate()
   const [config, setConfig] = useState<AppConfig | null>(null)
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showPalette, setShowPalette] = useState(false)
 
-  // Global keyboard shortcuts: Cmd/Ctrl + 1-6
+  // Global keyboard shortcuts: Cmd/Ctrl+1-6 for navigation, Cmd/Ctrl+K for palette
   useEffect(() => {
     const ROUTES = ['/dashboard', '/sprint', '/agents', '/browse', '/history', '/settings']
     function onKey(e: KeyboardEvent) {
       if (!(e.metaKey || e.ctrlKey)) return
+      if (e.key === 'k') {
+        e.preventDefault()
+        setShowPalette(p => !p)
+        return
+      }
       const n = parseInt(e.key)
       if (n >= 1 && n <= ROUTES.length) {
         e.preventDefault()
@@ -55,6 +62,9 @@ export default function Layout() {
           </ErrorBoundary>
         </main>
       </div>
+
+      {/* Command palette */}
+      {showPalette && <CommandPalette onClose={() => setShowPalette(false)} />}
 
       {/* First-launch onboarding overlay */}
       {showOnboarding && config !== null && (

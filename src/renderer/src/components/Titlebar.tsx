@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Download } from 'lucide-react'
+import { Download, Search } from 'lucide-react'
 import { useDaemon } from '../lib/store'
 import { client } from '../lib/gstack-client'
 import WindowControls from './WindowControls'
@@ -16,13 +16,26 @@ export default function Titlebar() {
     client.updater.onReady(() => setUpdateReady(true))
   }, [])
 
+  function openPalette() {
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }))
+  }
+
   return (
     <div className="titlebar-drag h-10 flex items-center justify-between bg-zinc-950 border-b border-zinc-800/60 shrink-0 select-none">
-      {/* Left: traffic-light spacer on macOS, logo everywhere */}
+      {/* Left: traffic-light spacer on macOS, logo + search trigger */}
       <div className="titlebar-no-drag flex items-center gap-2 pl-4">
         {IS_MAC && <div className="w-16" />}
         <span className="text-indigo-400 font-semibold text-sm tracking-tight">gstack</span>
         <span className="text-zinc-500 text-sm">Studio</span>
+        <button
+          onClick={openPalette}
+          title="Command palette (⌘K)"
+          className="ml-2 flex items-center gap-1.5 px-2 py-0.5 rounded-md border border-zinc-800 bg-zinc-900 hover:border-zinc-600 text-zinc-500 hover:text-zinc-300 transition-colors text-xs"
+        >
+          <Search size={11} />
+          <span className="hidden sm:inline">Search</span>
+          <kbd className="hidden sm:inline font-mono text-zinc-600">⌘K</kbd>
+        </button>
       </div>
 
       {/* Centre: update banner */}

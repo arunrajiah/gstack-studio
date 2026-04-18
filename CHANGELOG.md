@@ -6,6 +6,23 @@ Format: [Semantic Versioning](https://semver.org) — `Added`, `Changed`, `Fixed
 
 ---
 
+## [0.5.0] — 2026-04-19
+
+### Command palette, Sprint search, History export, Script runner
+
+**Added**
+- **Command palette (⌘K / Ctrl+K)** — instant overlay that searches all 23 skills and all 6 navigation pages. ↑/↓ to navigate, Enter to select (copy skill command or navigate), Escape to dismiss. Also reachable via the search button in the title bar. Skills show phase badge, copy icon, and `/id`; pages show their keyboard shortcut.
+- **Sprint Board search** — filter text input in the page header searches skill name, ID, description, and phase across all cards in real time. Empty state shown when no match. Result count displayed in subtitle.
+- **History export** — "JSON" and "MD" download buttons appear next to the search bar when learnings are loaded. JSON exports the raw array; Markdown formats each entry with timestamp, skill badge, message, and any extra fields in a fenced code block.
+- **Browse Console script runner** — new "Script" mode tab (alongside "Terminal"). Multi-line textarea where each line is one command; `#` lines are comments. "Run Script" executes them sequentially, shows progress counter (`N / total`), stops and toasts on error.
+
+**Changed**
+- Browse Console header reorganised: mode tabs (Terminal | Script) added left of the reference toggle
+- Title bar now shows a clickable `Search ⌘K` button that opens the command palette
+- Sprint Board phase pipeline row is hidden when search is active and results span multiple phases (still grouped when shown)
+
+---
+
 ## [0.4.0] — 2026-04-19
 
 ### UX polish & power-user features

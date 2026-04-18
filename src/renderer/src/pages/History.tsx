@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
-import { Clock, BookOpen, ChevronDown, ChevronRight, Folder, Search, X } from 'lucide-react'
+import { Clock, BookOpen, ChevronDown, ChevronRight, Folder, Search, X, Download } from 'lucide-react'
 import { client, GStackProject, Learning } from '../lib/gstack-client'
+import { toast } from '../lib/toast'
 
 export default function History() {
   const location = useLocation()
@@ -32,6 +33,43 @@ export default function History() {
     const q = search.toLowerCase()
     return learnings.filter(e => JSON.stringify(e).toLowerCase().includes(q))
   }, [learnings, search])
+
+  function exportJSON() {
+    const blob = new Blob([JSON.stringify(filtered, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${activeSlug}-learnings.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    toast.success(`Exported ${filtered.length} entries as JSON`)
+  }
+
+  function exportMarkdown() {
+    const lines: string[] = [
+      `# ${activeSlug} — Learning History`,
+      ``,
+      `Exported ${new Date().toLocaleString()} · ${filtered.length} entries`,
+      ``,
+    ]
+    for (const entry of filtered) {
+      lines.push(`---`)
+      if (entry.timestamp) lines.push(`**${new Date(entry.timestamp).toLocaleString()}**`)
+      if (entry.skill)     lines.push(`*Skill: ${entry.skill}*`)
+      if (entry.message)   lines.push(``, entry.message)
+      const extra = Object.entries(entry).filter(([k]) => !['timestamp','skill','message'].includes(k))
+      if (extra.length)    lines.push(``, '```json', JSON.stringify(Object.fromEntries(extra), null, 2), '```')
+      lines.push(``)
+    }
+    const blob = new Blob([lines.join('\n')], { type: 'text/markdown' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${activeSlug}-learnings.md`
+    a.click()
+    URL.revokeObjectURL(url)
+    toast.success(`Exported ${filtered.length} entries as Markdown`)
+  }
 
   return (
     <div className="flex h-full">
@@ -87,6 +125,24 @@ export default function History() {
               <span className="text-xs text-zinc-600 shrink-0">
                 {loadingLearnings ? 'Loading…' : `${filtered.length} / ${learnings.length}`}
               </span>
+              {filtered.length > 0 && !loadingLearnings && (
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={exportJSON}
+                    title="Export as JSON"
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900 hover:border-zinc-600 text-zinc-400 hover:text-zinc-200 transition-colors text-xs"
+                  >
+                    <Download size={12} /> JSON
+                  </button>
+                  <button
+                    onClick={exportMarkdown}
+                    title="Export as Markdown"
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900 hover:border-zinc-600 text-zinc-400 hover:text-zinc-200 transition-colors text-xs"
+                  >
+                    <Download size={12} /> MD
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Entries */}
