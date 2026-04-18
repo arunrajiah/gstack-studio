@@ -30,12 +30,20 @@
 
 | Page | What it does |
 |------|-------------|
-| **Dashboard** | Daemon health, Start / Stop / Restart controls, workspace quick-switcher with recent paths |
-| **Sprint Board** | Visual pipeline (Think → Plan → Build → Review → Test → Ship → Reflect) with all 23 agents. Click any card to copy its `/command` to the clipboard |
-| **Agents** | Searchable skill browser with phase filter + live daemon log stream (stdout/stderr, polls every 2 s) |
+| **Dashboard** | Daemon health, Start / Stop / Restart controls, workspace quick-switcher with recent paths, Open in Finder button |
+| **Sprint Board** | Visual pipeline (Think → Plan → Build → Review → Test → Ship → Reflect) with all 23 agents. Click any card to copy its `/command`; hover for the 📖 doc viewer |
+| **Agents** | Searchable skill browser with phase filter + live daemon log stream (stdout/stderr, polls every 2 s); per-skill doc viewer |
 | **Browse Console** | Live terminal interface to the gstack browse daemon — send any of the 56 HTTP commands and see JSON responses |
 | **History** | Per-project learnings with full-text search, stored in `~/.gstack/projects/*/learnings.jsonl` |
-| **Settings** | Workspace path (with native folder picker), gstack install path, API keys, recent-workspace list |
+| **Settings** | Workspace path (with native folder picker + Open in Finder), gstack install path, API keys, recent-workspace list |
+
+### Additional capabilities
+
+- **First-launch onboarding wizard** — guided 3-step setup appears automatically when gstack path or workspace isn't configured yet
+- **Skill documentation viewer** — reads each skill's `SKILL.md` and renders it inline (headings, bold, code blocks) with a Copy Command button
+- **Auto-update** — checks GitHub Releases on startup; shows a download banner in the title bar when a new version is available
+- **Custom window chrome** (Windows / Linux) — native Min / Max / Close buttons integrated in the app title bar
+- **Error boundary** — each page catches React errors and shows a graceful fallback UI
 
 ### What gstack Studio is NOT
 - It does not execute agents — agents run inside Claude Code as slash commands
@@ -77,7 +85,7 @@ Download the installer for your platform from [Releases](https://github.com/arun
 
 ### 2. Configure your workspace
 
-Open **Settings** and fill in:
+On first launch an **onboarding wizard** guides you through setup automatically. You can also configure paths at any time in **Settings**:
 
 - **Workspace Directory** — the project folder where you run gstack (e.g. `~/my-project`). The daemon will start from this directory.
 - **gstack Install Path** — where gstack is installed (default: `~/.claude/skills/gstack`).
@@ -98,9 +106,10 @@ Open the **Sprint Board**, find any agent, and click its card. The slash command
 - [x] **Layer 1** — Read-only GUI: Sprint Board, Browse Console, History, Settings
 - [x] **Layer 2** — Daemon controls (Stop/Restart), workspace switcher, native folder picker, recent workspaces
 - [x] **Layer 3** — Live daemon log streaming, Agents command centre with searchable skill browser
-- [ ] Auto-update via `electron-updater`
+- [x] **v0.3.0** — Onboarding wizard, skill doc viewer, Open in Finder, auto-update, custom title bar, error boundary, app icon
 - [ ] Dark/light theme toggle
-- [ ] Windows code signing
+- [ ] Windows / macOS code signing for distribution without Gatekeeper warnings
+- [ ] Direct agent execution (run gstack commands from within Studio)
 
 ---
 
@@ -149,24 +158,37 @@ Artifacts go to `dist/`.
 
 ```
 gstack-studio/
+├── scripts/
+│   └── generate-icon.mjs     # Pure Node.js app icon generator (no external deps)
+├── build/
+│   └── icon.png              # Generated 1024×1024 app icon
 ├── src/
-│   ├── main/           # Electron main process (Node.js)
-│   │   ├── index.ts    # App bootstrap, BrowserWindow
-│   │   ├── daemon.ts   # GStackDaemon — spawn/stop browse server
-│   │   └── ipc.ts      # IPC handlers exposed to renderer
+│   ├── main/                 # Electron main process (Node.js)
+│   │   ├── index.ts          # App bootstrap, BrowserWindow, auto-updater
+│   │   ├── daemon.ts         # GStackDaemon — spawn/stop browse server
+│   │   └── ipc.ts            # IPC handlers exposed to renderer
 │   ├── preload/
-│   │   └── index.ts    # contextBridge — exposes window.gstack API
+│   │   └── index.ts          # contextBridge — exposes window.gstack API
 │   └── renderer/
 │       └── src/
-│           ├── App.tsx           # Router + layout shell
+│           ├── App.tsx       # Router + layout shell
+│           ├── components/
+│           │   ├── Layout.tsx        # App shell with onboarding gate
+│           │   ├── Titlebar.tsx      # Drag bar + daemon pill + update banner
+│           │   ├── WindowControls.tsx # Min/Max/Close (Windows/Linux only)
+│           │   ├── Sidebar.tsx       # Navigation
+│           │   ├── ErrorBoundary.tsx # Page-level error fallback
+│           │   └── SkillDocModal.tsx # SKILL.md viewer modal
 │           ├── lib/
 │           │   ├── gstack-client.ts  # window.gstack typed wrapper
-│           │   └── store.ts          # React hooks (useDaemon, useSkills, useConfig)
+│           │   └── store.ts          # React hooks (useDaemon, useSkills, useConfig…)
 │           └── pages/
+│               ├── Onboarding.tsx    # First-launch 3-step setup wizard
 │               ├── Dashboard.tsx
 │               ├── Sprint.tsx
 │               ├── Browse.tsx
 │               ├── History.tsx
+│               ├── Agents.tsx
 │               └── Settings.tsx
 ├── .github/
 │   ├── workflows/

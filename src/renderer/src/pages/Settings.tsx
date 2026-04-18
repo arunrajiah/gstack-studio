@@ -76,6 +76,16 @@ export default function Settings() {
               >
                 <FolderOpen size={15} />
               </button>
+              {form.workspacePath && (
+                <button
+                  type="button"
+                  onClick={() => client.shell.openPath(form.workspacePath)}
+                  title="Open in Finder / Explorer"
+                  className="px-3 py-2 rounded-xl border border-zinc-800 bg-zinc-900 hover:border-zinc-600 hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-zinc-200 shrink-0"
+                >
+                  <ExternalLink size={15} />
+                </button>
+              )}
             </div>
           </Field>
 
@@ -123,6 +133,16 @@ export default function Settings() {
               >
                 <FolderOpen size={15} />
               </button>
+              {form.gstackPath && (
+                <button
+                  type="button"
+                  onClick={() => client.shell.openPath(form.gstackPath)}
+                  title="Open in Finder / Explorer"
+                  className="px-3 py-2 rounded-xl border border-zinc-800 bg-zinc-900 hover:border-zinc-600 hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-zinc-200 shrink-0"
+                >
+                  <ExternalLink size={15} />
+                </button>
+              )}
             </div>
             <div className="flex items-center gap-1.5 text-xs text-zinc-500 mt-1">
               <ExternalLink size={11} />

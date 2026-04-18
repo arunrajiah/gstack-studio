@@ -1,4 +1,4 @@
-import { IpcMain, net, clipboard, dialog } from 'electron'
+import { IpcMain, net, clipboard, dialog, shell, app } from 'electron'
 import { existsSync, readFileSync, mkdirSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { homedir } from 'os'
@@ -91,6 +91,31 @@ export function registerIpcHandlers(ipcMain: IpcMain, daemon: GStackDaemon): voi
     saveConfig({ ...config, workspacePath, recentWorkspaces })
     return { workspacePath, recentWorkspaces }
   })
+
+  // ── Shell / OS integration ────────────────────────────────────────────────
+  /** Open a path in Finder / Explorer / Files */
+  ipcMain.handle('shell:open-path', async (_event, p: string) => shell.openPath(p))
+
+  /** Open a URL in the default browser */
+  ipcMain.handle('shell:open-url', async (_event, url: string) => shell.openExternal(url))
+
+  /** Read a skill's SKILL.md template and return its content */
+  ipcMain.handle('skill:read-doc', async (_event, skillId: string) => {
+    const gstackPath = daemon.gstackPath
+    if (!gstackPath) return null
+    // Try common locations for skill docs
+    const candidates = [
+      join(gstackPath, skillId, 'SKILL.md'),
+      join(gstackPath, skillId.replace(/-/g, '/'), 'SKILL.md'),
+    ]
+    for (const p of candidates) {
+      if (existsSync(p)) return readFileSync(p, 'utf8')
+    }
+    return null
+  })
+
+  /** Return the app version */
+  ipcMain.handle('app:version', async () => app.getVersion())
 
   // ── Config ────────────────────────────────────────────────────────────────
   ipcMain.handle('config:get', async () => getConfig())

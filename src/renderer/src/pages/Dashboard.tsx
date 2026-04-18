@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Play, Square, RotateCw, AlertTriangle, Folder, ChevronRight,
-  Zap, FolderOpen, Clock, ChevronDown
+  Zap, FolderOpen, Clock, ChevronDown, ExternalLink
 } from 'lucide-react'
 import { useDaemon, useSkills, useRecentWorkspaces } from '../lib/store'
 import { client, GStackProject } from '../lib/gstack-client'
@@ -135,6 +135,13 @@ export default function Dashboard() {
           <div className="mt-3 border-t border-zinc-800/60 pt-3 flex items-center gap-2 text-xs text-zinc-500">
             <FolderOpen size={12} className="text-zinc-600 shrink-0" />
             <span className="font-mono truncate flex-1">{state.workspacePath}</span>
+            <button
+              onClick={() => client.shell.openPath(state.workspacePath!)}
+              title="Open in Finder / Explorer"
+              className="shrink-0 text-zinc-600 hover:text-zinc-300 transition-colors"
+            >
+              <ExternalLink size={11} />
+            </button>
 
             <div className="relative shrink-0">
               <button

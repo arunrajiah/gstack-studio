@@ -11,7 +11,7 @@ const NAV = [
 
 export default function Sidebar() {
   return (
-    <aside className="w-14 flex flex-col items-center py-3 gap-1 bg-zinc-950 border-r border-zinc-800/60 shrink-0">
+    <aside className="w-14 flex flex-col items-center py-3 gap-1 bg-zinc-950 border-r border-zinc-800/60 shrink-0 select-none">
       {NAV.map(({ to, icon: Icon, label }) => (
         <NavLink
           key={to}

@@ -8,17 +8,36 @@ declare global {
         restart: () => Promise<DaemonState>
         logs:    () => Promise<string[]>
       }
-      command:     (command: string, args?: string[]) => Promise<unknown>
-      batch:       (commands: Array<{ command: string; args?: string[] }>) => Promise<unknown>
-      projects:    () => Promise<GStackProject[]>
-      learnings:   (slug: string) => Promise<Learning[]>
-      skills:      () => Promise<Skill[]>
-      copyCommand: (skillId: string) => Promise<boolean>
+      command:      (command: string, args?: string[]) => Promise<unknown>
+      batch:        (commands: Array<{ command: string; args?: string[] }>) => Promise<unknown>
+      projects:     () => Promise<GStackProject[]>
+      learnings:    (slug: string) => Promise<Learning[]>
+      skills:       () => Promise<Skill[]>
+      copyCommand:  (skillId: string) => Promise<boolean>
+      readSkillDoc: (skillId: string) => Promise<string | null>
       workspace: {
         browse:  () => Promise<string | null>
         recents: () => Promise<string[]>
         switch:  (path: string) => Promise<{ workspacePath: string; recentWorkspaces: string[] }>
       }
+      window: {
+        minimize:    () => Promise<void>
+        maximize:    () => Promise<void>
+        close:       () => Promise<void>
+        isMaximized: () => Promise<boolean>
+      }
+      updater: {
+        check:       () => Promise<unknown>
+        download:    () => Promise<void>
+        install:     () => Promise<void>
+        onAvailable: (cb: (info: { version: string }) => void) => void
+        onReady:     (cb: () => void) => void
+      }
+      shell: {
+        openPath: (p: string) => Promise<string>
+        openUrl:  (url: string) => Promise<void>
+      }
+      appVersion: () => Promise<string>
       config: {
         get: () => Promise<AppConfig>
         set: (updates: Partial<AppConfig>) => Promise<AppConfig>
@@ -76,17 +95,36 @@ export const client = {
     restart: () => window.gstack.daemon.restart(),
     logs:    () => window.gstack.daemon.logs()
   },
-  command:     (cmd: string, args?: string[]) => window.gstack.command(cmd, args),
-  batch:       (commands: Array<{ command: string; args?: string[] }>) => window.gstack.batch(commands),
-  projects:    () => window.gstack.projects(),
-  learnings:   (slug: string) => window.gstack.learnings(slug),
-  skills:      () => window.gstack.skills(),
-  copyCommand: (skillId: string) => window.gstack.copyCommand(skillId),
+  command:      (cmd: string, args?: string[]) => window.gstack.command(cmd, args),
+  batch:        (commands: Array<{ command: string; args?: string[] }>) => window.gstack.batch(commands),
+  projects:     () => window.gstack.projects(),
+  learnings:    (slug: string) => window.gstack.learnings(slug),
+  skills:       () => window.gstack.skills(),
+  copyCommand:  (skillId: string) => window.gstack.copyCommand(skillId),
+  readSkillDoc: (skillId: string) => window.gstack.readSkillDoc(skillId),
   workspace: {
     browse:  () => window.gstack.workspace.browse(),
     recents: () => window.gstack.workspace.recents(),
     switch:  (path: string) => window.gstack.workspace.switch(path)
   },
+  window: {
+    minimize:    () => window.gstack.window.minimize(),
+    maximize:    () => window.gstack.window.maximize(),
+    close:       () => window.gstack.window.close(),
+    isMaximized: () => window.gstack.window.isMaximized()
+  },
+  updater: {
+    check:       () => window.gstack.updater.check(),
+    download:    () => window.gstack.updater.download(),
+    install:     () => window.gstack.updater.install(),
+    onAvailable: (cb: (info: { version: string }) => void) => window.gstack.updater.onAvailable(cb),
+    onReady:     (cb: () => void) => window.gstack.updater.onReady(cb)
+  },
+  shell: {
+    openPath: (p: string) => window.gstack.shell.openPath(p),
+    openUrl:  (url: string) => window.gstack.shell.openUrl(url)
+  },
+  appVersion: () => window.gstack.appVersion(),
   config: {
     get: () => window.gstack.config.get(),
     set: (updates: Partial<AppConfig>) => window.gstack.config.set(updates as Record<string, unknown>)

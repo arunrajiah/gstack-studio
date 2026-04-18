@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Copy, Check, AlertTriangle } from 'lucide-react'
+import { Copy, Check, AlertTriangle, BookOpen } from 'lucide-react'
 import { useSkills, useDaemon } from '../lib/store'
 import { Skill, client } from '../lib/gstack-client'
+import SkillDocModal from '../components/SkillDocModal'
 
 const PHASES: Array<{ id: Skill['phase']; label: string; color: string }> = [
   { id: 'think',   label: 'Think',   color: 'text-violet-400 border-violet-800/50 bg-violet-950/20' },
@@ -19,6 +20,7 @@ export default function Sprint() {
   const { skills, loading, error } = useSkills()
   const { state } = useDaemon()
   const navigate = useNavigate()
+  const [docSkill, setDocSkill] = useState<Skill | null>(null)
 
   if (error) {
     return (
@@ -64,6 +66,9 @@ export default function Sprint() {
         ))}
       </div>
 
+      {/* Skill doc modal */}
+      {docSkill && <SkillDocModal skill={docSkill} onClose={() => setDocSkill(null)} />}
+
       {/* Skills by phase */}
       <div className="space-y-5">
         {PHASES.map(phase => {
@@ -76,7 +81,7 @@ export default function Sprint() {
               </span>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {phaseSkills.map(skill => (
-                  <SkillCard key={skill.id} skill={skill} />
+                  <SkillCard key={skill.id} skill={skill} onViewDoc={() => setDocSkill(skill)} />
                 ))}
               </div>
             </div>
@@ -87,7 +92,7 @@ export default function Sprint() {
   )
 }
 
-function SkillCard({ skill }: { skill: Skill }) {
+function SkillCard({ skill, onViewDoc }: { skill: Skill; onViewDoc: () => void }) {
   const [copied, setCopied] = useState(false)
   async function handleCopy() {
     await client.copyCommand(skill.id)
@@ -97,17 +102,24 @@ function SkillCard({ skill }: { skill: Skill }) {
 
   return (
     <div
-      onClick={handleCopy}
       className="relative p-3.5 rounded-xl border transition-all group border-zinc-800 bg-zinc-900 hover:border-indigo-700/60 hover:bg-zinc-800/80 cursor-pointer"
+      onClick={handleCopy}
     >
       <div className="flex items-start justify-between mb-2">
         <span className="text-xl">{skill.icon}</span>
-        <span className="opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={e => { e.stopPropagation(); onViewDoc() }}
+            title="View documentation"
+            className="p-0.5 rounded text-zinc-500 hover:text-indigo-300 transition-colors"
+          >
+            <BookOpen size={12} />
+          </button>
           {copied
             ? <Check size={12} className="text-emerald-400" />
             : <Copy size={12} className="text-zinc-500" />
           }
-        </span>
+        </div>
       </div>
 
       <p className="text-sm font-medium text-zinc-200 leading-tight">{skill.name}</p>

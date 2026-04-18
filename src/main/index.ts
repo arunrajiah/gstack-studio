@@ -1,6 +1,7 @@
 import { app, BrowserWindow, shell, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { autoUpdater } from 'electron-updater'
 import { GStackDaemon } from './daemon'
 import { registerIpcHandlers } from './ipc'
 
@@ -15,6 +16,7 @@ function createWindow(): void {
     minHeight: 600,
     show: false,
     autoHideMenuBar: true,
+    icon: join(__dirname, '../../build/icon.png'),
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'hidden',
     backgroundColor: '#09090b',
     webPreferences: {
@@ -25,9 +27,7 @@ function createWindow(): void {
     }
   })
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow!.show()
-  })
+  mainWindow.on('ready-to-show', () => mainWindow!.show())
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
@@ -41,6 +41,40 @@ function createWindow(): void {
   }
 }
 
+// ── Window control IPC (needed for custom titlebar on Windows/Linux) ─────────
+function registerWindowControls(): void {
+  ipcMain.handle('window:minimize',   () => mainWindow?.minimize())
+  ipcMain.handle('window:maximize',   () => {
+    if (mainWindow?.isMaximized()) mainWindow.unmaximize()
+    else mainWindow?.maximize()
+  })
+  ipcMain.handle('window:close',      () => mainWindow?.close())
+  ipcMain.handle('window:is-maximized', () => mainWindow?.isMaximized() ?? false)
+}
+
+// ── Auto-updater ─────────────────────────────────────────────────────────────
+function setupAutoUpdater(): void {
+  autoUpdater.autoDownload = false
+  autoUpdater.autoInstallOnAppQuit = true
+
+  autoUpdater.on('update-available', info => {
+    mainWindow?.webContents.send('update:available', { version: info.version })
+  })
+  autoUpdater.on('update-downloaded', () => {
+    mainWindow?.webContents.send('update:ready')
+  })
+  autoUpdater.on('error', err => {
+    console.error('[updater]', err.message)
+  })
+
+  ipcMain.handle('update:check',   () => autoUpdater.checkForUpdates())
+  ipcMain.handle('update:install', () => autoUpdater.quitAndInstall())
+  ipcMain.handle('update:download', () => autoUpdater.downloadUpdate())
+
+  // Check after 10 s so the app has fully loaded
+  if (!is.dev) setTimeout(() => autoUpdater.checkForUpdates().catch(console.error), 10_000)
+}
+
 app.whenReady().then(async () => {
   electronApp.setAppUserModelId('com.gstack.studio')
 
@@ -49,10 +83,11 @@ app.whenReady().then(async () => {
   })
 
   registerIpcHandlers(ipcMain, daemon)
+  registerWindowControls()
+  setupAutoUpdater()
 
   createWindow()
 
-  // Start daemon in background; renderer will poll status
   daemon.ensureRunning().catch(console.error)
 
   app.on('activate', () => {

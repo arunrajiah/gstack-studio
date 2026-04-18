@@ -66,8 +66,8 @@ jobs:
 
       # ── macOS ─────────────────────────────────────────────────────────────
       # Builds an unsigned .dmg by default (CSC_IDENTITY_AUTO_DISCOVERY=false).
-      # To enable signing: add MAC_CERT_P12 / MAC_CERT_PASSWORD repo secrets
-      # and remove the CSC_IDENTITY_AUTO_DISCOVERY override below.
+      # To enable code-signing: add MAC_CERT_P12 / MAC_CERT_PASSWORD repo
+      # secrets and remove the CSC_IDENTITY_AUTO_DISCOVERY override below.
       - name: Build macOS
         if: matrix.platform == 'mac'
         env:

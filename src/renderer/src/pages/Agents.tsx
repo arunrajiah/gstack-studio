@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
-import { Bot, Copy, Check, Search, X, Wifi, WifiOff } from 'lucide-react'
+import { Bot, Copy, Check, Search, X, Wifi, WifiOff, BookOpen } from 'lucide-react'
 import { useSkills, useDaemon, useDaemonLogs } from '../lib/store'
 import { client, Skill } from '../lib/gstack-client'
+import SkillDocModal from '../components/SkillDocModal'
 
 type Phase = Skill['phase'] | 'all'
 
@@ -35,6 +36,7 @@ export default function Agents() {
 
   const [phase, setPhase] = useState<Phase>('all')
   const [search, setSearch] = useState('')
+  const [docSkill, setDocSkill] = useState<Skill | null>(null)
   const logEndRef = useRef<HTMLDivElement>(null)
   const [autoScroll, setAutoScroll] = useState(true)
 
@@ -104,7 +106,7 @@ export default function Agents() {
           {filtered.length === 0 ? (
             <p className="px-4 py-6 text-xs text-zinc-600 text-center">No skills match</p>
           ) : filtered.map(skill => (
-            <SkillRow key={skill.id} skill={skill} />
+            <SkillRow key={skill.id} skill={skill} onViewDoc={() => setDocSkill(skill)} />
           ))}
         </div>
 
@@ -113,6 +115,9 @@ export default function Agents() {
           {phase !== 'all' && ` in ${PHASE_LABELS[phase]}`}
         </div>
       </div>
+
+      {/* Skill doc modal */}
+      {docSkill && <SkillDocModal skill={docSkill} onClose={() => setDocSkill(null)} />}
 
       {/* ── Right: Live daemon log stream ──────────────────────────────── */}
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -170,7 +175,7 @@ export default function Agents() {
   )
 }
 
-function SkillRow({ skill }: { skill: Skill }) {
+function SkillRow({ skill, onViewDoc }: { skill: Skill; onViewDoc: () => void }) {
   const [copied, setCopied] = useState(false)
 
   async function handleCopy() {
@@ -180,27 +185,39 @@ function SkillRow({ skill }: { skill: Skill }) {
   }
 
   return (
-    <button
-      onClick={handleCopy}
-      className="w-full flex items-start gap-3 px-4 py-2.5 hover:bg-zinc-800/50 transition-colors group text-left"
-    >
-      <span className="text-base shrink-0 mt-0.5">{skill.icon}</span>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <p className="text-sm font-medium text-zinc-200 truncate">{skill.name}</p>
-          <span className={`shrink-0 text-xs px-1.5 py-0.5 rounded-full border ${PHASE_COLORS[skill.phase] ?? ''}`}>
-            {skill.phase}
-          </span>
+    <div className="w-full flex items-start gap-3 px-4 py-2.5 hover:bg-zinc-800/50 transition-colors group">
+      <button onClick={handleCopy} className="flex items-start gap-3 flex-1 min-w-0 text-left">
+        <span className="text-base shrink-0 mt-0.5">{skill.icon}</span>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium text-zinc-200 truncate">{skill.name}</p>
+            <span className={`shrink-0 text-xs px-1.5 py-0.5 rounded-full border ${PHASE_COLORS[skill.phase] ?? ''}`}>
+              {skill.phase}
+            </span>
+          </div>
+          <p className="text-xs text-zinc-500 mt-0.5 leading-snug line-clamp-2">{skill.description}</p>
+          <code className={`text-xs font-mono mt-1 block transition-colors ${copied ? 'text-emerald-400' : 'text-zinc-600 group-hover:text-zinc-400'}`}>
+            /{skill.id}
+          </code>
         </div>
-        <p className="text-xs text-zinc-500 mt-0.5 leading-snug line-clamp-2">{skill.description}</p>
-        <code className={`text-xs font-mono mt-1 block transition-colors ${copied ? 'text-emerald-400' : 'text-zinc-600 group-hover:text-zinc-400'}`}>
-          /{skill.id}
-        </code>
+      </button>
+      <div className="flex items-center gap-1 shrink-0 mt-1">
+        <button
+          onClick={onViewDoc}
+          title="View documentation"
+          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700"
+        >
+          <BookOpen size={12} />
+        </button>
+        <button
+          onClick={handleCopy}
+          title="Copy command"
+          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700"
+        >
+          {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
+        </button>
       </div>
-      <div className="shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} className="text-zinc-500" />}
-      </div>
-    </button>
+    </div>
   )
 }
 
