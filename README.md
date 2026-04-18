@@ -4,9 +4,9 @@
 
   <p>
     <a href="https://github.com/arunrajiah/gstack-studio/releases/latest"><img src="https://img.shields.io/github/v/release/arunrajiah/gstack-studio?style=flat-square&label=latest&color=6366f1" alt="Latest Release" /></a>
-    <a href="https://github.com/arunrajiah/gstack-studio/releases"><img src="https://img.shields.io/github/downloads/arunrajiah/gstack-studio/total?style=flat-square&color=6366f1" alt="Downloads" /></a>
+    <a href="https://github.com/arunrajiah/gstack-studio/releases"><img src="https://img.shields.io/github/downloads/arunrajiah/gstack-studio/total?style=flat-square&color=6366f1&label=downloads" alt="Downloads" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License" /></a>
-    <a href="https://github.com/arunrajiah/gstack-studio/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/arunrajiah/gstack-studio/build.yml?style=flat-square&label=build" alt="Build" /></a>
+    <a href="https://github.com/arunrajiah/gstack-studio/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/arunrajiah/gstack-studio/build.yml?branch=main&style=flat-square&label=build" alt="Build" /></a>
     <a href="https://github.com/garrytan/gstack"><img src="https://img.shields.io/badge/requires-gstack-8b5cf6?style=flat-square" alt="Requires gstack" /></a>
   </p>
 
