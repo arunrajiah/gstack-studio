@@ -30,11 +30,12 @@
 
 | Page | What it does |
 |------|-------------|
-| **Dashboard** | Daemon health, one-click start, quick-action shortcuts for the most-used agents |
+| **Dashboard** | Daemon health, Start / Stop / Restart controls, workspace quick-switcher with recent paths |
 | **Sprint Board** | Visual pipeline (Think → Plan → Build → Review → Test → Ship → Reflect) with all 23 agents. Click any card to copy its `/command` to the clipboard |
+| **Agents** | Searchable skill browser with phase filter + live daemon log stream (stdout/stderr, polls every 2 s) |
 | **Browse Console** | Live terminal interface to the gstack browse daemon — send any of the 56 HTTP commands and see JSON responses |
-| **History** | Browse per-project learnings stored in `~/.gstack/projects/*/learnings.jsonl` |
-| **Settings** | Configure workspace directory, gstack install path, and API keys |
+| **History** | Per-project learnings with full-text search, stored in `~/.gstack/projects/*/learnings.jsonl` |
+| **Settings** | Workspace path (with native folder picker), gstack install path, API keys, recent-workspace list |
 
 ### What gstack Studio is NOT
 - It does not execute agents — agents run inside Claude Code as slash commands
@@ -95,8 +96,8 @@ Open the **Sprint Board**, find any agent, and click its card. The slash command
 ## 🗺️ Roadmap
 
 - [x] **Layer 1** — Read-only GUI: Sprint Board, Browse Console, History, Settings
-- [ ] **Layer 2** — Write path: launch gstack setup wizard from Studio, manage projects
-- [ ] **Layer 3** — Live streaming: SSE output from agents displayed in an AgentPanel
+- [x] **Layer 2** — Daemon controls (Stop/Restart), workspace switcher, native folder picker, recent workspaces
+- [x] **Layer 3** — Live daemon log streaming, Agents command centre with searchable skill browser
 - [ ] Auto-update via `electron-updater`
 - [ ] Dark/light theme toggle
 - [ ] Windows code signing

@@ -24,9 +24,21 @@ interface SavedConfig {
   workspacePath?: string
 }
 
+const MAX_LOGS = 500
+
 export class GStackDaemon {
   private proc: ChildProcess | null = null
   private healthTimer: NodeJS.Timeout | null = null
+  private _logs: string[] = []
+
+  private addLog(line: string): void {
+    this._logs.push(line)
+    if (this._logs.length > MAX_LOGS) this._logs.shift()
+  }
+
+  getLogs(): string[] {
+    return [...this._logs]
+  }
 
   private readSavedConfig(): SavedConfig {
     try {
@@ -37,10 +49,8 @@ export class GStackDaemon {
   }
 
   get gstackPath(): string | null {
-    // User-configured path takes priority
     const saved = this.readSavedConfig().gstackPath
     if (saved && existsSync(saved)) return saved
-
     const candidates = [
       join(homedir(), '.claude', 'skills', 'gstack'),
       join(homedir(), '.gstack', 'skills', 'gstack')
@@ -52,7 +62,6 @@ export class GStackDaemon {
     return this.readSavedConfig().workspacePath || homedir()
   }
 
-  // .gstack/browse.json lives in the workspace, not the Studio CWD
   get browseJsonPath(): string {
     return join(this.workspacePath, '.gstack', 'browse.json')
   }
@@ -85,10 +94,8 @@ export class GStackDaemon {
       gstackPath: this.gstackPath,
       workspacePath: this.workspacePath
     }
-
     const browse = this.readBrowseJson()
     if (!browse) return state
-
     state.port = browse.port
     state.token = browse.token
     state.pid = browse.pid
@@ -99,14 +106,20 @@ export class GStackDaemon {
   async ensureRunning(): Promise<DaemonState> {
     const state = await this.getState()
     if (state.running) return state
-
     const gstackPath = this.gstackPath
     if (!gstackPath) {
       throw new Error(
         'gstack not found. Set the gstack path in Settings or install from https://github.com/garrytan/gstack'
       )
     }
+    return this.start(gstackPath)
+  }
 
+  async restart(): Promise<DaemonState> {
+    this.addLog(`${ts()} [studio] Restarting daemon…`)
+    await this.stop()
+    const gstackPath = this.gstackPath
+    if (!gstackPath) throw new Error('gstack not configured. Set the path in Settings.')
     return this.start(gstackPath)
   }
 
@@ -117,11 +130,12 @@ export class GStackDaemon {
     if (!existsSync(serverScript)) {
       throw new Error(
         `gstack browse server not found at ${serverScript}. ` +
-        `Make sure gstack is installed correctly (expected browse/src/server.ts inside ${gstackPath})`
+        `Expected browse/src/server.ts inside ${gstackPath}`
       )
     }
 
-    // Run the server from the workspace dir so .gstack/browse.json is written there
+    this.addLog(`${ts()} [studio] Starting daemon — workspace: ${this.workspacePath}`)
+
     this.proc = spawn(bunBin, ['run', serverScript], {
       cwd: this.workspacePath,
       detached: false,
@@ -129,22 +143,39 @@ export class GStackDaemon {
       env: { ...process.env }
     })
 
-    this.proc.stderr?.on('data', d => console.error('[gstack daemon]', d.toString()))
+    this.proc.stdout?.on('data', d => {
+      const line = d.toString().trim()
+      if (line) {
+        console.log('[gstack daemon]', line)
+        this.addLog(`${ts()} [out] ${line}`)
+      }
+    })
+
+    this.proc.stderr?.on('data', d => {
+      const line = d.toString().trim()
+      if (line) {
+        console.error('[gstack daemon]', line)
+        this.addLog(`${ts()} [err] ${line}`)
+      }
+    })
+
     this.proc.on('exit', code => {
-      console.log('[gstack daemon] exited with code', code)
+      const msg = `[studio] Daemon exited — code ${code}`
+      console.log(msg)
+      this.addLog(`${ts()} ${msg}`)
       this.proc = null
     })
 
-    // Wait up to 6s for the daemon to write browse.json and become healthy
+    // Wait up to 6 s for browse.json + health OK
     for (let i = 0; i < 30; i++) {
       await sleep(200)
       const state = await this.getState()
       if (state.running) {
+        this.addLog(`${ts()} [studio] Daemon healthy on port ${state.port}`)
         this.startHealthMonitor()
         return state
       }
     }
-
     throw new Error('gstack daemon failed to start within 6 seconds')
   }
 
@@ -153,15 +184,16 @@ export class GStackDaemon {
     this.healthTimer = setInterval(async () => {
       const state = await this.getState()
       if (!state.running && this.gstackPath) {
-        console.log('[gstack daemon] unhealthy — restarting')
+        this.addLog(`${ts()} [studio] Daemon unhealthy — restarting`)
         this.start(this.gstackPath).catch(console.error)
       }
     }, 15_000)
   }
 
   async stop(): Promise<void> {
-    if (this.healthTimer) clearInterval(this.healthTimer)
+    if (this.healthTimer) { clearInterval(this.healthTimer); this.healthTimer = null }
     if (this.proc) {
+      this.addLog(`${ts()} [studio] Stopping daemon`)
       this.proc.kill('SIGTERM')
       this.proc = null
     }
@@ -179,6 +211,10 @@ export class GStackDaemon {
     }
     return 'bun'
   }
+}
+
+function ts(): string {
+  return new Date().toLocaleTimeString('en', { hour12: false })
 }
 
 function sleep(ms: number): Promise<void> {

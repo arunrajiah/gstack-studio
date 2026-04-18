@@ -1,17 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import {
-  LayoutDashboard,
-  Workflow,
-  Globe,
-  History,
-  Settings
-} from 'lucide-react'
+import { LayoutDashboard, Workflow, Globe, History, Bot, Settings } from 'lucide-react'
 
 const NAV = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/sprint',    icon: Workflow,         label: 'Sprint' },
-  { to: '/browse',    icon: Globe,            label: 'Browse' },
-  { to: '/history',  icon: History,          label: 'History' },
+  { to: '/sprint',    icon: Workflow,         label: 'Sprint Board' },
+  { to: '/agents',    icon: Bot,              label: 'Agents' },
+  { to: '/browse',    icon: Globe,            label: 'Browse Console' },
+  { to: '/history',   icon: History,          label: 'History' },
 ]
 
 export default function Sidebar() {

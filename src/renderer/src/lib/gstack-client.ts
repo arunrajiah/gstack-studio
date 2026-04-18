@@ -2,9 +2,11 @@ declare global {
   interface Window {
     gstack: {
       daemon: {
-        status: () => Promise<DaemonState>
-        start:  () => Promise<DaemonState>
-        stop:   () => Promise<void>
+        status:  () => Promise<DaemonState>
+        start:   () => Promise<DaemonState>
+        stop:    () => Promise<DaemonState>
+        restart: () => Promise<DaemonState>
+        logs:    () => Promise<string[]>
       }
       command:     (command: string, args?: string[]) => Promise<unknown>
       batch:       (commands: Array<{ command: string; args?: string[] }>) => Promise<unknown>
@@ -12,6 +14,11 @@ declare global {
       learnings:   (slug: string) => Promise<Learning[]>
       skills:      () => Promise<Skill[]>
       copyCommand: (skillId: string) => Promise<boolean>
+      workspace: {
+        browse:  () => Promise<string | null>
+        recents: () => Promise<string[]>
+        switch:  (path: string) => Promise<{ workspacePath: string; recentWorkspaces: string[] }>
+      }
       config: {
         get: () => Promise<AppConfig>
         set: (updates: Partial<AppConfig>) => Promise<AppConfig>
@@ -58,13 +65,16 @@ export interface AppConfig {
   gstackPath: string
   workspacePath: string
   openaiApiKey: string
+  recentWorkspaces: string[]
 }
 
 export const client = {
   daemon: {
-    status: () => window.gstack.daemon.status(),
-    start:  () => window.gstack.daemon.start(),
-    stop:   () => window.gstack.daemon.stop()
+    status:  () => window.gstack.daemon.status(),
+    start:   () => window.gstack.daemon.start(),
+    stop:    () => window.gstack.daemon.stop(),
+    restart: () => window.gstack.daemon.restart(),
+    logs:    () => window.gstack.daemon.logs()
   },
   command:     (cmd: string, args?: string[]) => window.gstack.command(cmd, args),
   batch:       (commands: Array<{ command: string; args?: string[] }>) => window.gstack.batch(commands),
@@ -72,8 +82,13 @@ export const client = {
   learnings:   (slug: string) => window.gstack.learnings(slug),
   skills:      () => window.gstack.skills(),
   copyCommand: (skillId: string) => window.gstack.copyCommand(skillId),
+  workspace: {
+    browse:  () => window.gstack.workspace.browse(),
+    recents: () => window.gstack.workspace.recents(),
+    switch:  (path: string) => window.gstack.workspace.switch(path)
+  },
   config: {
     get: () => window.gstack.config.get(),
-    set: (updates: Partial<AppConfig>) => window.gstack.config.set(updates as Record<string, string>)
+    set: (updates: Partial<AppConfig>) => window.gstack.config.set(updates as Record<string, unknown>)
   }
 }
