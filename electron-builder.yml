@@ -1,0 +1,42 @@
+appId: com.gstack.studio
+productName: gstack Studio
+copyright: Copyright © 2025 gstack Studio Contributors
+
+directories:
+  buildResources: build
+  output: dist
+
+files:
+  - out/**/*
+  - '!**/.git'
+  - '!**/node_modules/.cache'
+
+mac:
+  category: public.app-category.developer-tools
+  target:
+    - target: dmg
+      arch: [x64, arm64]
+    - target: zip
+      arch: [x64, arm64]
+
+win:
+  target:
+    - target: nsis
+      arch: [x64, arm64]
+  icon: build/icon.ico
+
+linux:
+  target:
+    - target: AppImage
+      arch: [x64]
+    - target: deb
+      arch: [x64]
+  category: Development
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+
+publish:
+  provider: github
+  releaseType: release

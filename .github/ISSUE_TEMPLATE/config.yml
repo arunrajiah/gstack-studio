@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or Discussion
+    url: https://github.com/arunrajiah/gstack-studio/discussions
+    about: Ask questions or share ideas here
+  - name: gstack (the framework)
+    url: https://github.com/garrytan/gstack/issues
+    about: Issues with gstack itself (not the Studio UI) go here

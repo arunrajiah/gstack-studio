@@ -1,0 +1,220 @@
+<div align="center">
+  <h1>gstack Studio</h1>
+  <p><strong>A visual desktop app for <a href="https://github.com/garrytan/gstack">gstack</a> — run all 23 AI engineering agents without touching the CLI.</strong></p>
+
+  <p>
+    <a href="https://github.com/arunrajiah/gstack-studio/releases/latest"><img src="https://img.shields.io/github/v/release/arunrajiah/gstack-studio?style=flat-square&label=latest&color=6366f1" alt="Latest Release" /></a>
+    <a href="https://github.com/arunrajiah/gstack-studio/releases"><img src="https://img.shields.io/github/downloads/arunrajiah/gstack-studio/total?style=flat-square&color=6366f1" alt="Downloads" /></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License" /></a>
+    <a href="https://github.com/arunrajiah/gstack-studio/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/arunrajiah/gstack-studio/build.yml?style=flat-square&label=build" alt="Build" /></a>
+    <a href="https://github.com/garrytan/gstack"><img src="https://img.shields.io/badge/requires-gstack-8b5cf6?style=flat-square" alt="Requires gstack" /></a>
+  </p>
+
+  <p>
+    <a href="#-download">Download</a> ·
+    <a href="#-features">Features</a> ·
+    <a href="#-prerequisites">Prerequisites</a> ·
+    <a href="#-getting-started">Getting Started</a> ·
+    <a href="#-contributing">Contributing</a>
+  </p>
+</div>
+
+---
+
+> **gstack Studio is a companion app for [gstack](https://github.com/garrytan/gstack).**
+> It does not replace gstack — it wraps it in a polished GUI so you can discover agents, copy slash commands, monitor the browse daemon, and review project history, all without memorising CLI commands.
+
+---
+
+## ✨ Features
+
+| Page | What it does |
+|------|-------------|
+| **Dashboard** | Daemon health, one-click start, quick-action shortcuts for the most-used agents |
+| **Sprint Board** | Visual pipeline (Think → Plan → Build → Review → Test → Ship → Reflect) with all 23 agents. Click any card to copy its `/command` to the clipboard |
+| **Browse Console** | Live terminal interface to the gstack browse daemon — send any of the 56 HTTP commands and see JSON responses |
+| **History** | Browse per-project learnings stored in `~/.gstack/projects/*/learnings.jsonl` |
+| **Settings** | Configure workspace directory, gstack install path, and API keys |
+
+### What gstack Studio is NOT
+- It does not execute agents — agents run inside Claude Code as slash commands
+- It does not modify gstack in any way — zero changes to the gstack codebase (Layer 1 integration only)
+- It is not a replacement for the Claude Code CLI
+
+---
+
+## ⬇️ Download
+
+> Pre-built binaries are attached to every [GitHub Release](https://github.com/arunrajiah/gstack-studio/releases).
+
+| Platform | Format | Download |
+|----------|--------|----------|
+| macOS (Apple Silicon) | `.dmg` | [Latest release →](https://github.com/arunrajiah/gstack-studio/releases/latest) |
+| macOS (Intel) | `.dmg` | [Latest release →](https://github.com/arunrajiah/gstack-studio/releases/latest) |
+| Windows (x64) | `.exe` installer | [Latest release →](https://github.com/arunrajiah/gstack-studio/releases/latest) |
+| Linux (x64) | `.AppImage` / `.deb` | [Latest release →](https://github.com/arunrajiah/gstack-studio/releases/latest) |
+
+Or build from source — see [Development](#-development).
+
+---
+
+## 🔑 Prerequisites
+
+1. **[gstack](https://github.com/garrytan/gstack)** installed at `~/.claude/skills/gstack` (or a custom path set in Settings)
+2. **[Bun](https://bun.sh)** — required to run the gstack browse daemon (`brew install bun`)
+3. An **Anthropic API key** if you plan to run agents programmatically
+
+> gstack Studio works on macOS, Windows, and Linux, but the gstack browse daemon currently requires Bun, which must be installed separately.
+
+---
+
+## 🚀 Getting Started
+
+### 1. Install gstack Studio
+
+Download the installer for your platform from [Releases](https://github.com/arunrajiah/gstack-studio/releases) and run it.
+
+### 2. Configure your workspace
+
+Open **Settings** and fill in:
+
+- **Workspace Directory** — the project folder where you run gstack (e.g. `~/my-project`). The daemon will start from this directory.
+- **gstack Install Path** — where gstack is installed (default: `~/.claude/skills/gstack`).
+- **Anthropic API Key** — optional, stored locally in `~/.gstack/studio-config.json`.
+
+### 3. Start the daemon
+
+Go to **Dashboard** and click **Start Daemon**. The status dot turns green when the browse server is live.
+
+### 4. Copy slash commands
+
+Open the **Sprint Board**, find any agent, and click its card. The slash command (e.g. `/review`) is copied to your clipboard — paste it straight into Claude Code.
+
+---
+
+## 🗺️ Roadmap
+
+- [x] **Layer 1** — Read-only GUI: Sprint Board, Browse Console, History, Settings
+- [ ] **Layer 2** — Write path: launch gstack setup wizard from Studio, manage projects
+- [ ] **Layer 3** — Live streaming: SSE output from agents displayed in an AgentPanel
+- [ ] Auto-update via `electron-updater`
+- [ ] Dark/light theme toggle
+- [ ] Windows code signing
+
+---
+
+## 🛠️ Development
+
+### Stack
+
+- **Electron 33** + **electron-vite** — app shell
+- **React 18** + **React Router v6** — renderer UI
+- **Tailwind CSS v3** — styling
+- **TypeScript** throughout
+- **electron-builder** — cross-platform packaging
+
+### Setup
+
+```bash
+# Clone
+git clone https://github.com/arunrajiah/gstack-studio.git
+cd gstack-studio
+
+# Install dependencies
+npm install
+
+# Start dev server (hot reload)
+npm run dev
+```
+
+### Build
+
+```bash
+# Type-check only
+npm run typecheck
+
+# Build all platforms (requires code signing certs for distribution)
+npm run package
+
+# Build for a specific platform
+npm run package:mac
+npm run package:win
+npm run package:linux
+```
+
+Artifacts go to `dist/`.
+
+### Project layout
+
+```
+gstack-studio/
+├── src/
+│   ├── main/           # Electron main process (Node.js)
+│   │   ├── index.ts    # App bootstrap, BrowserWindow
+│   │   ├── daemon.ts   # GStackDaemon — spawn/stop browse server
+│   │   └── ipc.ts      # IPC handlers exposed to renderer
+│   ├── preload/
+│   │   └── index.ts    # contextBridge — exposes window.gstack API
+│   └── renderer/
+│       └── src/
+│           ├── App.tsx           # Router + layout shell
+│           ├── lib/
+│           │   ├── gstack-client.ts  # window.gstack typed wrapper
+│           │   └── store.ts          # React hooks (useDaemon, useSkills, useConfig)
+│           └── pages/
+│               ├── Dashboard.tsx
+│               ├── Sprint.tsx
+│               ├── Browse.tsx
+│               ├── History.tsx
+│               └── Settings.tsx
+├── .github/
+│   ├── workflows/
+│   │   └── build.yml   # CI: type-check on PR, release binaries on tag
+│   └── ISSUE_TEMPLATE/
+├── electron-builder.yml
+├── electron.vite.config.ts
+└── package.json
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions of all kinds — bug fixes, new features, docs improvements, and design feedback.
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+
+**Quick start:**
+
+```bash
+# Fork → clone → branch
+git checkout -b feat/your-feature
+
+# Make changes, then
+npm run typecheck   # must pass
+npm run dev         # manual test
+
+# Commit using Conventional Commits
+git commit -m "feat: add agent filter by phase"
+
+# Push and open a PR against main
+```
+
+---
+
+## 🔗 Related
+
+- [garrytan/gstack](https://github.com/garrytan/gstack) — the AI agent framework this app wraps *(required)*
+- [Anthropic Claude Code](https://docs.anthropic.com/en/docs/claude-code) — the CLI where gstack agents actually run
+
+---
+
+## 📄 License
+
+MIT — see [LICENSE](LICENSE).
+
+---
+
+<div align="center">
+  <sub>Built with ♥ as an open-source companion to <a href="https://github.com/garrytan/gstack">gstack</a>.</sub>
+</div>
