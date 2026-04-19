@@ -1,0 +1,36 @@
+# Auto-labels applied by the labeler action on every PR.
+# Labels must exist in the repo before this takes effect.
+
+bug:
+  - head-branch: ['^fix/', '^bug/']
+
+feature:
+  - head-branch: ['^feat/', '^feature/']
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.md'
+      - 'docs/**'
+
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'package.json'
+      - 'package-lock.json'
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**'
+
+ui:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/renderer/**'
+
+main-process:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/main/**'
+      - 'src/preload/**'
