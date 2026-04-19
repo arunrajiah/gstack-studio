@@ -55,11 +55,8 @@ export function registerIpcHandlers(ipcMain: IpcMain, daemon: GStackDaemon): voi
   // ── Skills ────────────────────────────────────────────────────────────────
   ipcMain.handle('gstack:skills', async () => {
     const gstackPath = daemon.gstackPath
-    if (!gstackPath) return BUILTIN_SKILLS.map(s => ({ ...s, available: false }))
-    return BUILTIN_SKILLS.map(skill => ({
-      ...skill,
-      available: existsSync(join(gstackPath, skill.templatePath))
-    }))
+    if (!gstackPath) return loadSkillsFromDisk(null)
+    return loadSkillsFromDisk(gstackPath)
   })
 
   ipcMain.handle('skill:copy-command', async (_event, skillId: string) => {
@@ -180,38 +177,129 @@ function addToRecents(current: string[], path: string): string[] {
   return [path, ...current.filter(p => p !== path)].slice(0, 5)
 }
 
-// ── Built-in skill catalogue ──────────────────────────────────────────────────
+// ── Dynamic skill loader ──────────────────────────────────────────────────────
+// Reads skills directly from the gstack install on disk so the app stays in
+// sync automatically whenever the user runs /gstack-upgrade.
 
-const BUILTIN_SKILLS = [
-  // THINK
-  { id: 'office-hours',        name: 'Office Hours',        phase: 'think',   description: 'Product interrogation — 6 diagnostic questions, design doc output',           icon: '💬', templatePath: 'office-hours/SKILL.md' },
-  // PLAN
-  { id: 'autoplan',            name: 'Auto Plan',           phase: 'plan',    description: '4-phase automated review: CEO → Design → Engineering → DevEx',               icon: '🗺️', templatePath: 'autoplan/SKILL.md' },
-  { id: 'plan-ceo-review',     name: 'CEO Review',          phase: 'plan',    description: 'Strategic scope analysis — strongest product potential',                      icon: '🎯', templatePath: 'plan/SKILL.md' },
-  { id: 'plan-eng-review',     name: 'Eng Review',          phase: 'plan',    description: 'Architecture, data flow, edge cases, testing strategy',                       icon: '⚙️', templatePath: 'plan/SKILL.md' },
-  { id: 'plan-design-review',  name: 'Design Review',       phase: 'plan',    description: 'Design system audit with 0-10 scoring',                                      icon: '🎨', templatePath: 'design/SKILL.md' },
-  { id: 'design-consultation', name: 'Design Consultation', phase: 'plan',    description: 'Build a complete design system from scratch',                                 icon: '🖌️', templatePath: 'design/SKILL.md' },
-  // BUILD
-  { id: 'design-shotgun',      name: 'Design Shotgun',      phase: 'build',   description: '4-6 UI mockup variants in parallel',                                         icon: '🔫', templatePath: 'design/SKILL.md' },
-  { id: 'design-html',         name: 'Design HTML',         phase: 'build',   description: 'Production-ready HTML/CSS generation',                                       icon: '📐', templatePath: 'design/SKILL.md' },
-  // REVIEW
-  { id: 'review',              name: 'Code Review',         phase: 'review',  description: 'Pre-merge review — catches bugs, auto-fixes obvious issues',                 icon: '🔍', templatePath: 'review/SKILL.md' },
-  { id: 'debug',               name: 'Debug',               phase: 'review',  description: 'Systematic root-cause analysis before applying fixes',                       icon: '🐛', templatePath: 'review/SKILL.md' },
-  { id: 'cso',                 name: 'Security Audit',      phase: 'review',  description: '14-phase security audit: OWASP Top 10, STRIDE, supply chain',               icon: '🔒', templatePath: 'review/SKILL.md' },
-  { id: 'codex',               name: 'Codex Review',        phase: 'review',  description: 'OpenAI cross-model independent review',                                      icon: '🤖', templatePath: 'review/SKILL.md' },
-  // TEST
-  { id: 'qa',                  name: 'QA',                  phase: 'test',    description: 'Browser-based testing — finds bugs, auto-fixes, generates regression tests',  icon: '🧪', templatePath: 'qa/SKILL.md' },
-  { id: 'qa-only',             name: 'QA Report',           phase: 'test',    description: 'QA report only — no code changes',                                           icon: '📋', templatePath: 'qa/SKILL.md' },
-  // SHIP
-  { id: 'ship',                name: 'Ship',                phase: 'ship',    description: 'Run tests, audit coverage, create PR',                                       icon: '🚀', templatePath: 'ship/SKILL.md' },
-  { id: 'land-and-deploy',     name: 'Land & Deploy',       phase: 'ship',    description: 'Merge, deploy to production, verify',                                        icon: '🛬', templatePath: 'ship/SKILL.md' },
-  { id: 'canary',              name: 'Canary',              phase: 'ship',    description: 'Post-deploy monitoring',                                                     icon: '🐦', templatePath: 'ship/SKILL.md' },
-  // REFLECT
-  { id: 'document-release',    name: 'Document Release',    phase: 'reflect', description: 'Post-ship docs sync: README, ARCHITECTURE, CHANGELOG',                      icon: '📝', templatePath: 'document/SKILL.md' },
-  { id: 'retro',               name: 'Retro',               phase: 'reflect', description: 'Weekly retrospective with commit analysis and metrics',                      icon: '🔄', templatePath: 'retro/SKILL.md' },
-  // UTILS
-  { id: 'health',              name: 'Health',              phase: 'utils',   description: 'Code quality dashboard: type errors, lint, tests, dead code',               icon: '❤️', templatePath: 'health/SKILL.md' },
-  { id: 'learn',               name: 'Learn',               phase: 'utils',   description: 'Persist learnings to project memory',                                       icon: '🧠', templatePath: 'learn/SKILL.md' },
-  { id: 'pair-agent',          name: 'Pair Agent',          phase: 'utils',   description: 'Multi-agent coordination via shared browser',                               icon: '👥', templatePath: 'pair/SKILL.md' },
-  { id: 'careful',             name: 'Careful Mode',        phase: 'utils',   description: 'Warnings for destructive operations (rm -rf, DROP TABLE, etc.)',            icon: '⚠️', templatePath: 'careful/SKILL.md' },
-]
+/**
+ * Per-skill decoration: phase placement and icon.
+ * Description and name come from SKILL.md frontmatter at runtime.
+ * Unknown skills fall back to phase=utils, icon=🔧.
+ */
+const SKILL_DECORATION: Record<string, { phase: string; icon: string; displayName?: string }> = {
+  'office-hours':        { phase: 'think',   icon: '💬', displayName: 'Office Hours' },
+  'autoplan':            { phase: 'plan',    icon: '🗺️', displayName: 'Auto Plan' },
+  'plan-ceo-review':     { phase: 'plan',    icon: '🎯', displayName: 'CEO Review' },
+  'plan-eng-review':     { phase: 'plan',    icon: '⚙️', displayName: 'Eng Review' },
+  'plan-design-review':  { phase: 'plan',    icon: '🎨', displayName: 'Design Review' },
+  'plan-devex-review':   { phase: 'plan',    icon: '🔧', displayName: 'DevEx Review' },
+  'design-consultation': { phase: 'plan',    icon: '🖌️', displayName: 'Design Consultation' },
+  'design-shotgun':      { phase: 'build',   icon: '🔫', displayName: 'Design Shotgun' },
+  'design-html':         { phase: 'build',   icon: '📐', displayName: 'Design HTML' },
+  'review':              { phase: 'review',  icon: '🔍', displayName: 'Code Review' },
+  'debug':               { phase: 'review',  icon: '🐛', displayName: 'Debug' },
+  'investigate':         { phase: 'review',  icon: '🔎', displayName: 'Investigate' },
+  'design-review':       { phase: 'review',  icon: '🎨', displayName: 'Design Review' },
+  'devex-review':        { phase: 'review',  icon: '🛠️', displayName: 'DevEx Review' },
+  'cso':                 { phase: 'review',  icon: '🔒', displayName: 'Security Audit' },
+  'codex':               { phase: 'review',  icon: '🤖', displayName: 'Codex Review' },
+  'qa':                  { phase: 'test',    icon: '🧪', displayName: 'QA' },
+  'qa-only':             { phase: 'test',    icon: '📋', displayName: 'QA Report' },
+  'benchmark':           { phase: 'test',    icon: '📊', displayName: 'Benchmark' },
+  'ship':                { phase: 'ship',    icon: '🚀', displayName: 'Ship' },
+  'land-and-deploy':     { phase: 'ship',    icon: '🛬', displayName: 'Land & Deploy' },
+  'canary':              { phase: 'ship',    icon: '🐦', displayName: 'Canary' },
+  'document-release':    { phase: 'reflect', icon: '📝', displayName: 'Document Release' },
+  'retro':               { phase: 'reflect', icon: '🔄', displayName: 'Retro' },
+  'health':              { phase: 'utils',   icon: '❤️', displayName: 'Health' },
+  'learn':               { phase: 'utils',   icon: '🧠', displayName: 'Learn' },
+  'pair-agent':          { phase: 'utils',   icon: '👥', displayName: 'Pair Agent' },
+  'careful':             { phase: 'utils',   icon: '⚠️', displayName: 'Careful Mode' },
+  'freeze':              { phase: 'utils',   icon: '🧊', displayName: 'Freeze' },
+  'unfreeze':            { phase: 'utils',   icon: '🌡️', displayName: 'Unfreeze' },
+  'guard':               { phase: 'utils',   icon: '🛡️', displayName: 'Guard' },
+  'gstack-upgrade':      { phase: 'utils',   icon: '⬆️', displayName: 'gstack Upgrade' },
+  'context-save':        { phase: 'utils',   icon: '💾', displayName: 'Context Save' },
+  'context-restore':     { phase: 'utils',   icon: '⏪', displayName: 'Context Restore' },
+  'open-gstack-browser': { phase: 'utils',   icon: '🌐', displayName: 'Open Browser' },
+  'setup-browser-cookies': { phase: 'utils', icon: '🍪', displayName: 'Setup Cookies' },
+  'setup-deploy':        { phase: 'utils',   icon: '🚢', displayName: 'Setup Deploy' },
+}
+
+/** Dirs inside the gstack repo that are not skills */
+const NON_SKILL_DIRS = new Set([
+  '.github', 'agents', 'bin', 'browse', 'contrib', 'docs', 'extension',
+  'hosts', 'lib', 'model-overlays', 'openclaw', 'scripts', 'supabase',
+  'test', 'plan', 'design',
+])
+
+/** Pull the first non-empty line out of a YAML multiline `|` block */
+function firstLine(block: string): string {
+  return block.split('\n').map(l => l.trim()).filter(Boolean)[0] ?? ''
+}
+
+/** Parse `name` and `description` from a SKILL.md YAML frontmatter block */
+function parseSkillFrontmatter(content: string): { name: string; description: string } {
+  const fm = content.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? ''
+  const name = fm.match(/^name:\s*(.+)$/m)?.[1]?.trim() ?? ''
+  // description is a multiline `|` block — grab everything indented after it
+  const descBlock = fm.match(/^description:\s*\|\r?\n([\s\S]*?)(?=\n\S|\n?$)/m)?.[1] ?? ''
+  const description = firstLine(descBlock)
+  return { name, description }
+}
+
+/** Humanise a kebab-case id when we have no displayName for it */
+function humanise(id: string): string {
+  return id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
+
+function loadSkillsFromDisk(gstackPath: string | null) {
+  if (!gstackPath) {
+    // Return decoration map as fallback stubs (no available flag)
+    return Object.entries(SKILL_DECORATION).map(([id, meta]) => ({
+      id,
+      name: meta.displayName ?? humanise(id),
+      phase: meta.phase,
+      description: '',
+      icon: meta.icon,
+      available: false,
+    }))
+  }
+
+  const { readdirSync, statSync } = require('fs') as typeof import('fs')
+  const skillDirs: string[] = []
+  try {
+    skillDirs.push(
+      ...readdirSync(gstackPath).filter((entry: string) => {
+        if (NON_SKILL_DIRS.has(entry)) return false
+        try { return statSync(join(gstackPath, entry)).isDirectory() } catch { return false }
+      })
+    )
+  } catch { /* gstackPath not readable */ }
+
+  const skills = skillDirs
+    .map(dir => {
+      const skillMdPath = join(gstackPath, dir, 'SKILL.md')
+      if (!existsSync(skillMdPath)) return null
+      let parsed = { name: dir, description: '' }
+      try { parsed = parseSkillFrontmatter(readFileSync(skillMdPath, 'utf8')) } catch { /* ignore */ }
+      const id = parsed.name || dir
+      const deco = SKILL_DECORATION[id] ?? { phase: 'utils', icon: '🔧' }
+      return {
+        id,
+        name: deco.displayName ?? humanise(id),
+        phase: deco.phase,
+        description: parsed.description,
+        icon: deco.icon,
+        available: true,
+      }
+    })
+    .filter((s): s is NonNullable<typeof s> => s !== null)
+
+  // Stable sort: phase order then alpha within phase
+  const PHASE_ORDER = ['think','plan','build','review','test','ship','reflect','utils']
+  return skills.sort((a, b) => {
+    const pi = PHASE_ORDER.indexOf(a.phase) - PHASE_ORDER.indexOf(b.phase)
+    return pi !== 0 ? pi : a.id.localeCompare(b.id)
+  })
+}

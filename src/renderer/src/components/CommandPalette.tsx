@@ -26,7 +26,7 @@ type Item = NavItem | SkillItem
 
 const NAV_ITEMS: NavItem[] = [
   { type: 'nav', label: 'Dashboard',      description: 'Daemon status & quick actions',   to: '/dashboard', icon: <LayoutDashboard size={14} />, shortcut: '⌘1' },
-  { type: 'nav', label: 'Sprint Board',   description: 'All 23 agents by phase',           to: '/sprint',    icon: <Workflow size={14} />,        shortcut: '⌘2' },
+  { type: 'nav', label: 'Sprint Board',   description: 'All agents by phase',           to: '/sprint',    icon: <Workflow size={14} />,        shortcut: '⌘2' },
   { type: 'nav', label: 'Agents',         description: 'Skill browser + live daemon logs', to: '/agents',    icon: <Bot size={14} />,             shortcut: '⌘3' },
   { type: 'nav', label: 'Browse Console', description: 'Send browser automation commands', to: '/browse',    icon: <Globe size={14} />,           shortcut: '⌘4' },
   { type: 'nav', label: 'History',        description: 'Per-project learnings viewer',     to: '/history',   icon: <History size={14} />,         shortcut: '⌘5' },

@@ -57,7 +57,7 @@ export default function Sprint() {
           <p className="text-sm text-zinc-500 mt-0.5">
             {search.trim()
               ? `${filteredSkills.length} of ${skills.length} agents matching "${search}"`
-              : '23 AI agents — click any card to copy its slash command'
+              : `${skills.length} AI agents — click any card to copy its slash command`
             }
           </p>
         </div>

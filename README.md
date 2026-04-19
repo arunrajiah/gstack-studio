@@ -1,6 +1,6 @@
 <div align="center">
   <h1>gstack Studio</h1>
-  <p><strong>A visual desktop app for <a href="https://github.com/garrytan/gstack">gstack</a> — run all 23 AI engineering agents without touching the CLI.</strong></p>
+  <p><strong>A visual desktop app for <a href="https://github.com/garrytan/gstack">gstack</a> — run every AI engineering agent without touching the CLI.</strong></p>
 
   <p>
     <a href="https://github.com/arunrajiah/gstack-studio/releases/latest"><img src="https://img.shields.io/github/v/release/arunrajiah/gstack-studio?style=flat-square&label=latest&color=6366f1" alt="Latest Release" /></a>
@@ -35,8 +35,8 @@
       <br /><sub><b>Dashboard</b> — daemon health, Start/Stop/Restart, quick actions</sub>
     </td>
     <td align="center" width="50%">
-      <img src="docs/screenshots/sprint.png" alt="Sprint Board — all 23 agents organised by phase" />
-      <br /><sub><b>Sprint Board</b> — 23 agents organised by phase, click to copy command</sub>
+      <img src="docs/screenshots/sprint.png" alt="Sprint Board — all agents organised by phase" />
+      <br /><sub><b>Sprint Board</b> — agents organised by phase, click to copy command</sub>
     </td>
   </tr>
   <tr>
@@ -56,7 +56,7 @@
     </td>
     <td align="center" width="50%">
       <img src="docs/screenshots/command-palette.png" alt="Command Palette — ⌘K to instantly search pages and skills" />
-      <br /><sub><b>Command Palette (⌘K)</b> — instant search across pages and all 23 skills</sub>
+      <br /><sub><b>Command Palette (⌘K)</b> — instant search across pages and all skills</sub>
     </td>
   </tr>
 </table>
@@ -68,7 +68,7 @@
 | Page | What it does |
 |------|-------------|
 | **Dashboard** | Daemon health, Start / Stop / Restart controls, workspace quick-switcher with recent paths, Open in Finder button |
-| **Sprint Board** | Visual pipeline (Think → Plan → Build → Review → Test → Ship → Reflect) with all 23 agents. Click any card to copy its `/command`; hover for the 📖 doc viewer |
+| **Sprint Board** | Visual pipeline (Think → Plan → Build → Review → Test → Ship → Reflect) with all agents — auto-syncs with your local gstack install. Click any card to copy its `/command`; hover for the 📖 doc viewer |
 | **Agents** | Searchable skill browser with phase filter + live daemon log stream (stdout/stderr, polls every 2 s); per-skill doc viewer |
 | **Browse Console** | Live terminal interface to the gstack browse daemon — send any of the 56 HTTP commands and see JSON responses |
 | **History** | Per-project learnings with full-text search, stored in `~/.gstack/projects/*/learnings.jsonl` |
