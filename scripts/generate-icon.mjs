@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 /**
  * Generates build/icon.png (1024×1024) using only Node.js built-ins.
- * Design: dark zinc-950 rounded-rect background + three indigo stack bars.
+ * Design: dark zinc-950 background with a "gS" letter-mark monogram.
+ *   • lowercase "g" in indigo-400
+ *   • uppercase "S" in white
  * Run: node scripts/generate-icon.mjs
  */
 import { writeFileSync, mkdirSync } from 'node:fs'
@@ -26,13 +28,11 @@ function px(x, y, r, g, b, a = 255) {
 function roundRect(x0, y0, x1, y1, rx, r, g, b, a = 255) {
   for (let y = y0; y < y1; y++) {
     for (let x = x0; x < x1; x++) {
-      // corner distance test
       let cx = -1, cy = -1
       if      (x < x0 + rx && y < y0 + rx) { cx = x0 + rx; cy = y0 + rx }
       else if (x >= x1 - rx && y < y0 + rx) { cx = x1 - rx; cy = y0 + rx }
       else if (x < x0 + rx && y >= y1 - rx) { cx = x0 + rx; cy = y1 - rx }
       else if (x >= x1 - rx && y >= y1 - rx){ cx = x1 - rx; cy = y1 - rx }
-
       if (cx >= 0) {
         const dx = x - cx, dy = y - cy
         if (dx * dx + dy * dy > rx * rx) continue
@@ -44,16 +44,67 @@ function roundRect(x0, y0, x1, y1, rx, r, g, b, a = 255) {
 
 // ── Icon design ───────────────────────────────────────────────────────────────
 
-// Background: zinc-950 (#09090b) with 180 px radius
+// Background: zinc-950 (#09090b) with 180 px corner radius
 roundRect(0, 0, W, H, 180, 9, 9, 11)
 
-// Three horizontal "stack" bars, left-aligned, indigo shades
-// Bar 1 — indigo-500 #6366f1, full width
-roundRect(152, 318, 872, 426, 50,  99, 102, 241)
-// Bar 2 — indigo-400 #818cf8, ¾ width
-roundRect(152, 458, 712, 566, 50, 129, 140, 248)
-// Bar 3 — indigo-300 #a5b4fc, ½ width
-roundRect(152, 598, 552, 706, 50, 165, 180, 252)
+// ── Pixel-font bitmaps (5 wide × 7 tall) ─────────────────────────────────────
+//
+// Lowercase "g" — double-story form
+const G_BITMAP = [
+  [0,1,1,1,0],  // ·███·
+  [1,0,0,0,1],  // █···█
+  [1,0,0,0,1],  // █···█
+  [0,1,1,1,1],  // ·████
+  [0,0,0,0,1],  // ····█
+  [1,0,0,0,1],  // █···█
+  [0,1,1,1,0],  // ·███·
+]
+
+// Uppercase "S"
+const S_BITMAP = [
+  [0,1,1,1,0],  // ·███·
+  [1,0,0,0,1],  // █···█
+  [1,0,0,0,0],  // █····
+  [0,1,1,1,0],  // ·███·
+  [0,0,0,0,1],  // ····█
+  [1,0,0,0,1],  // █···█
+  [0,1,1,1,0],  // ·███·
+]
+
+// Layout constants
+const CELL     = 72   // px per bitmap cell
+const BLOCK_R  = 10   // corner radius per block
+const PAD      =  5   // gap between adjacent blocks (each side)
+const GAP_COLS =  1   // empty cell columns between "g" and "S"
+
+const COLS     = 5
+const ROWS     = G_BITMAP.length
+
+const totalW  = (COLS * 2 + GAP_COLS) * CELL
+const totalH  = ROWS * CELL
+const startX  = Math.floor((W - totalW) / 2)
+const startY  = Math.floor((H - totalH) / 2)
+
+// Draw a bitmap starting at pixel offset (ox, oy) in given colour
+function drawBitmap(bitmap, ox, oy, r, g, b) {
+  for (let row = 0; row < bitmap.length; row++) {
+    for (let col = 0; col < bitmap[row].length; col++) {
+      if (!bitmap[row][col]) continue
+      const x0 = ox + col * CELL + PAD
+      const y0 = oy + row * CELL + PAD
+      const x1 = x0 + CELL - PAD * 2
+      const y1 = y0 + CELL - PAD * 2
+      roundRect(x0, y0, x1, y1, BLOCK_R, r, g, b)
+    }
+  }
+}
+
+// "g" — indigo-400 (#818cf8)
+drawBitmap(G_BITMAP, startX, startY, 129, 140, 248)
+
+// "S" — white (#ffffff)
+const sOffsetX = startX + (COLS + GAP_COLS) * CELL
+drawBitmap(S_BITMAP, sOffsetX, startY, 255, 255, 255)
 
 // ── PNG encoder ───────────────────────────────────────────────────────────────
 
@@ -84,7 +135,7 @@ ihdr[8] = 8; ihdr[9] = 6; ihdr[10] = 0; ihdr[11] = 0; ihdr[12] = 0
 // Raw scanlines: filter byte 0 + RGBA pixels
 const raw = Buffer.allocUnsafe(H * (1 + W * 4))
 for (let y = 0; y < H; y++) {
-  raw[y * (1 + W * 4)] = 0               // filter: None
+  raw[y * (1 + W * 4)] = 0
   for (let x = 0; x < W; x++) {
     const si = (y * W + x) * 4
     const di = y * (1 + W * 4) + 1 + x * 4
@@ -105,3 +156,5 @@ const png = Buffer.concat([
 mkdirSync(join(__dir, '../build'), { recursive: true })
 writeFileSync(OUT, png)
 console.log(`✓  build/icon.png  (${(png.length / 1024).toFixed(1)} KB)`)
+console.log(`   "gS" monogram: indigo-400 "g" + white "S" on zinc-950 background`)
+console.log(`   Cell size: ${CELL}px · Block radius: ${BLOCK_R}px · Layout: ${totalW}×${totalH}px centered`)

@@ -82,7 +82,7 @@
 
 - **Direct agent execution** — ▶ Run button on every skill opens a real interactive terminal with `claude /skill` (or codex / OpenClaw / Factory / Kiro) — no copy-paste
 - **Agent host auto-detection** — Settings scans common install paths and `$PATH` for all supported hosts; click to select, custom path override available
-- **First-launch onboarding wizard** — guided 3-step setup appears automatically when gstack path or workspace isn't configured yet
+- **First-launch onboarding wizard** — guided 3-step setup with **one-click gstack auto-install**: if gstack isn't found, the Configure step offers to clone it from GitHub automatically
 - **Skill documentation viewer** — reads each skill's `SKILL.md` and renders it inline (headings, bold, code blocks) with a Copy Command button
 - **Auto-update** — checks GitHub Releases on startup; shows a download banner in the title bar when a new version is available
 - **Custom window chrome** (Windows / Linux) — native Min / Max / Close buttons integrated in the app title bar
@@ -112,10 +112,12 @@ Or build from source — see [Development](#-development).
 
 ## 🔑 Prerequisites
 
-1. **[gstack](https://github.com/garrytan/gstack)** installed at `~/.claude/skills/gstack` (or a custom path set in Settings)
-2. **[Bun](https://bun.sh)** — required to run the gstack browse daemon (`brew install bun`)
+1. **[Bun](https://bun.sh)** — required to run the gstack browse daemon (`brew install bun`)
+2. **[git](https://git-scm.com)** — required if you want the onboarding wizard to auto-install gstack
 3. An **Anthropic API key** if you plan to run agents programmatically
 
+> **gstack is optional at launch.** If gstack isn't already installed, the onboarding wizard offers a one-click install that clones it from GitHub automatically.
+>
 > gstack Studio works on macOS, Windows, and Linux, but the gstack browse daemon currently requires Bun, which must be installed separately.
 
 ---
@@ -128,7 +130,12 @@ Download the installer for your platform from [Releases](https://github.com/arun
 
 ### 2. Configure your workspace
 
-On first launch an **onboarding wizard** guides you through setup automatically. You can also configure paths at any time in **Settings**:
+On first launch an **onboarding wizard** guides you through setup automatically.
+
+- If gstack is **already installed**, point the wizard to it.
+- If gstack is **not installed yet**, click **"Install gstack automatically"** — Studio will clone it from GitHub in the background and fill in the path for you.
+
+You can also configure paths at any time in **Settings**:
 
 - **Workspace Directory** — the project folder where you run gstack (e.g. `~/my-project`). The daemon will start from this directory.
 - **gstack Install Path** — where gstack is installed (default: `~/.claude/skills/gstack`).
@@ -154,6 +161,7 @@ Open the **Sprint Board**, find any agent, and click its card. The slash command
 - [x] **v0.5.0** — Command palette (⌘K), Sprint Board search, History export (JSON/MD), Browse Console script runner
 - [x] **v0.6.0** — Dark/light/system theme toggle, dynamic skill loading (auto-syncs with `/gstack-upgrade`)
 - [x] **v0.7.0** — Direct agent execution — ▶ Run any skill in a real terminal; agent host auto-detection (Claude Code, Codex, OpenClaw, Factory, Kiro)
+- [x] **v0.8.0** — gstack auto-install during onboarding (one-click git clone); letter-based "gS" app icon
 - [ ] Windows / macOS code signing for distribution without Gatekeeper warnings
 
 ---

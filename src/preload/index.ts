@@ -15,10 +15,12 @@ contextBridge.exposeInMainWorld('gstack', {
   batch:     (commands: Array<{ command: string; args?: string[] }>) => ipcRenderer.invoke('gstack:batch', commands),
   projects:  () => ipcRenderer.invoke('gstack:projects'),
   learnings: (slug: string) => ipcRenderer.invoke('gstack:learnings', slug),
-  skills:       () => ipcRenderer.invoke('gstack:skills'),
-  copyCommand:  (skillId: string) => ipcRenderer.invoke('skill:copy-command', skillId),
-  readSkillDoc: (skillId: string) => ipcRenderer.invoke('skill:read-doc', skillId),
-  executeSkill: (skillId: string, hostBin: string) => ipcRenderer.invoke('skill:execute', skillId, hostBin),
+  skills:        () => ipcRenderer.invoke('gstack:skills'),
+  copyCommand:   (skillId: string) => ipcRenderer.invoke('skill:copy-command', skillId),
+  readSkillDoc:  (skillId: string) => ipcRenderer.invoke('skill:read-doc', skillId),
+  executeSkill:  (skillId: string, hostBin: string) => ipcRenderer.invoke('skill:execute', skillId, hostBin),
+  checkGstack:   (path: string) => ipcRenderer.invoke('gstack:check', path),
+  installGstack: (targetPath: string) => ipcRenderer.invoke('gstack:install', targetPath),
 
   // ── Workspace ─────────────────────────────────────────────────────────────
   workspace: {

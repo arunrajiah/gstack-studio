@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { CheckCircle2, FolderOpen, ExternalLink, ChevronRight, Zap } from 'lucide-react'
+import { CheckCircle2, FolderOpen, ExternalLink, ChevronRight, Zap, Download, AlertCircle, Loader2 } from 'lucide-react'
 import { client, AppConfig } from '../lib/gstack-client'
 
 interface Props {
@@ -7,11 +7,9 @@ interface Props {
 }
 
 type Step = 'welcome' | 'configure' | 'done'
+type InstallState = 'idle' | 'checking' | 'installing' | 'success' | 'error'
 
-const DEFAULT_GSTACK_PATHS = [
-  `${navigator.platform.includes('Win') ? 'C:\\Users\\<you>' : '~'}/.claude/skills/gstack`,
-  `${navigator.platform.includes('Win') ? 'C:\\Users\\<you>' : '~'}/.gstack/skills/gstack`
-]
+const DEFAULT_GSTACK_PATH = '~/.claude/skills/gstack'
 
 export default function Onboarding({ onComplete }: Props) {
   const [step, setStep] = useState<Step>('welcome')
@@ -20,19 +18,57 @@ export default function Onboarding({ onComplete }: Props) {
   const [autoDetected, setAutoDetected] = useState(false)
   const [saving, setSaving] = useState(false)
 
+  // gstack install state
+  const [installState, setInstallState] = useState<InstallState>('idle')
+  const [installError, setInstallError] = useState('')
+  const [gstackFound, setGstackFound] = useState<boolean | null>(null)
+
   // Load any already-saved partial config
   useEffect(() => {
     client.config.get().then(cfg => {
-      if (cfg.gstackPath)    { setGstackPath(cfg.gstackPath);    setAutoDetected(true) }
+      if (cfg.gstackPath) { setGstackPath(cfg.gstackPath); setAutoDetected(true) }
       if (cfg.workspacePath) setWorkspacePath(cfg.workspacePath)
     }).catch(() => {})
   }, [])
+
+  // Check whether the currently-typed gstack path actually exists
+  useEffect(() => {
+    if (!gstackPath.trim()) { setGstackFound(null); return }
+    setGstackFound(null)
+    const timer = setTimeout(async () => {
+      try {
+        const found = await client.checkGstack(gstackPath.trim())
+        setGstackFound(found)
+      } catch { setGstackFound(false) }
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [gstackPath])
 
   async function browsePath(field: 'gstack' | 'workspace') {
     const path = await client.workspace.browse()
     if (!path) return
     if (field === 'gstack')    setGstackPath(path)
     if (field === 'workspace') setWorkspacePath(path)
+  }
+
+  async function handleInstall() {
+    const targetPath = gstackPath.trim() || DEFAULT_GSTACK_PATH
+    setInstallError('')
+    setInstallState('installing')
+    try {
+      const result = await client.installGstack(targetPath)
+      if (result.success) {
+        setGstackPath(result.path)
+        setGstackFound(true)
+        setInstallState('success')
+      } else {
+        setInstallError(result.error ?? 'Installation failed')
+        setInstallState('error')
+      }
+    } catch (err) {
+      setInstallError(String(err))
+      setInstallState('error')
+    }
   }
 
   async function handleFinish() {
@@ -47,6 +83,8 @@ export default function Onboarding({ onComplete }: Props) {
     await client.config.set(updates)
     onComplete(updates)
   }
+
+  const canContinue = gstackPath.trim() && workspacePath.trim() && installState !== 'installing'
 
   return (
     <div className="fixed inset-0 z-50 bg-zinc-100/95 dark:bg-zinc-950/95 backdrop-blur-sm flex items-center justify-center p-6">
@@ -76,7 +114,7 @@ export default function Onboarding({ onComplete }: Props) {
 
             <div className="space-y-3">
               {[
-                { icon: '🗺️', title: 'Sprint Board',    desc: 'Browse all 23 AI agents and copy slash commands instantly' },
+                { icon: '🗺️', title: 'Sprint Board',    desc: 'Browse all AI agents and copy slash commands instantly' },
                 { icon: '🤖', title: 'Agents',          desc: 'Search skills and stream live daemon output' },
                 { icon: '🌐', title: 'Browse Console',  desc: 'Send HTTP commands to the gstack browse daemon' },
                 { icon: '📖', title: 'History',         desc: 'Review per-project learnings with search' },
@@ -93,8 +131,8 @@ export default function Onboarding({ onComplete }: Props) {
 
             <div className="bg-amber-950/30 border border-amber-800/40 rounded-xl p-3 text-xs text-zinc-400 space-y-1">
               <p className="font-medium text-amber-300">Prerequisites</p>
-              <p>• <a onClick={() => client.shell.openUrl('https://github.com/garrytan/gstack')} className="text-indigo-400 cursor-pointer hover:underline">gstack</a> installed at <code className="font-mono text-zinc-300">~/.claude/skills/gstack</code></p>
               <p>• <a onClick={() => client.shell.openUrl('https://bun.sh')} className="text-indigo-400 cursor-pointer hover:underline">Bun</a> for running the browse daemon</p>
+              <p className="text-zinc-500">gstack can be installed automatically in the next step if you don't have it yet.</p>
             </div>
 
             <button
@@ -124,8 +162,8 @@ export default function Onboarding({ onComplete }: Props) {
                 <div className="flex gap-2">
                   <input
                     value={gstackPath}
-                    onChange={e => setGstackPath(e.target.value)}
-                    placeholder={DEFAULT_GSTACK_PATHS[0]}
+                    onChange={e => { setGstackPath(e.target.value); setInstallState('idle'); setInstallError('') }}
+                    placeholder={DEFAULT_GSTACK_PATH}
                     className="flex-1 bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-sm font-mono text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-500 dark:placeholder:text-zinc-600 focus:outline-none focus:border-indigo-600 transition-colors"
                   />
                   <button
@@ -136,7 +174,70 @@ export default function Onboarding({ onComplete }: Props) {
                     <FolderOpen size={15} />
                   </button>
                 </div>
-                {autoDetected && <p className="text-xs text-emerald-400 flex items-center gap-1"><CheckCircle2 size={11} /> Auto-detected from previous session</p>}
+
+                {/* Status / auto-detected feedback */}
+                {autoDetected && gstackFound !== false && (
+                  <p className="text-xs text-emerald-400 flex items-center gap-1">
+                    <CheckCircle2 size={11} /> Auto-detected from previous session
+                  </p>
+                )}
+                {gstackPath.trim() && gstackFound === true && !autoDetected && (
+                  <p className="text-xs text-emerald-400 flex items-center gap-1">
+                    <CheckCircle2 size={11} /> gstack found at this path
+                  </p>
+                )}
+
+                {/* Install panel — shown when path is empty OR gstack not found there */}
+                {((!gstackPath.trim() && installState === 'idle') ||
+                  (gstackFound === false && installState !== 'success')) && (
+                  <div className="mt-2 p-3 rounded-xl bg-zinc-200/60 dark:bg-zinc-800/60 border border-zinc-300 dark:border-zinc-700 space-y-2">
+                    {installState === 'idle' || installState === 'checking' ? (
+                      <>
+                        <p className="text-xs text-zinc-400 flex items-center gap-1.5">
+                          <AlertCircle size={12} className="text-amber-400 shrink-0" />
+                          {gstackFound === false
+                            ? `gstack not found at that path.`
+                            : `gstack not configured yet.`}
+                        </p>
+                        <button
+                          onClick={handleInstall}
+                          className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-medium text-white transition-colors"
+                        >
+                          <Download size={12} />
+                          Install gstack automatically
+                          <span className="text-indigo-300 ml-1 font-normal">
+                            ({gstackPath.trim() || DEFAULT_GSTACK_PATH})
+                          </span>
+                        </button>
+                      </>
+                    ) : installState === 'installing' ? (
+                      <div className="flex items-center gap-2 text-xs text-zinc-400">
+                        <Loader2 size={13} className="animate-spin text-indigo-400 shrink-0" />
+                        <span>Installing gstack — cloning from GitHub…</span>
+                      </div>
+                    ) : installState === 'error' ? (
+                      <>
+                        <p className="text-xs text-red-400 flex items-start gap-1.5">
+                          <AlertCircle size={12} className="shrink-0 mt-0.5" />
+                          {installError || 'Installation failed.'}
+                        </p>
+                        <button
+                          onClick={handleInstall}
+                          className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-zinc-600 text-xs text-zinc-400 hover:text-zinc-200 hover:border-zinc-400 transition-colors"
+                        >
+                          Retry
+                        </button>
+                      </>
+                    ) : null}
+                  </div>
+                )}
+
+                {/* Success banner */}
+                {installState === 'success' && (
+                  <p className="text-xs text-emerald-400 flex items-center gap-1">
+                    <CheckCircle2 size={11} /> gstack installed successfully
+                  </p>
+                )}
               </div>
 
               {/* Workspace path */}
@@ -172,10 +273,14 @@ export default function Onboarding({ onComplete }: Props) {
               </button>
               <button
                 onClick={() => setStep('done')}
-                disabled={!gstackPath.trim() || !workspacePath.trim()}
+                disabled={!canContinue}
                 className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium transition-colors"
               >
-                Continue <ChevronRight size={14} />
+                {installState === 'installing' ? (
+                  <><Loader2 size={13} className="animate-spin" /> Installing…</>
+                ) : (
+                  <>Continue <ChevronRight size={14} /></>
+                )}
               </button>
             </div>
           </div>

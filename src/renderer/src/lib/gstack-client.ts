@@ -16,6 +16,8 @@ declare global {
       copyCommand:   (skillId: string) => Promise<boolean>
       readSkillDoc:  (skillId: string) => Promise<string | null>
       executeSkill:  (skillId: string, hostBin: string) => Promise<void>
+      checkGstack:   (path: string) => Promise<boolean>
+      installGstack: (targetPath: string) => Promise<{ success: boolean; path: string; error?: string }>
       workspace: {
         browse:  () => Promise<string | null>
         recents: () => Promise<string[]>
@@ -118,6 +120,8 @@ export const client = {
   copyCommand:   (skillId: string) => window.gstack.copyCommand(skillId),
   readSkillDoc:  (skillId: string) => window.gstack.readSkillDoc(skillId),
   executeSkill:  (skillId: string, hostBin: string) => window.gstack.executeSkill(skillId, hostBin),
+  checkGstack:   (path: string) => window.gstack.checkGstack(path),
+  installGstack: (targetPath: string) => window.gstack.installGstack(targetPath),
   workspace: {
     browse:  () => window.gstack.workspace.browse(),
     recents: () => window.gstack.workspace.recents(),

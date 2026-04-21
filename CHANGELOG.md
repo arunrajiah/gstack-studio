@@ -6,6 +6,24 @@ Format: [Semantic Versioning](https://semver.org) — `Added`, `Changed`, `Fixed
 
 ---
 
+## [0.8.0] — 2026-04-21
+
+### gstack auto-install + "gS" app icon
+
+**Added**
+- **gstack auto-install during onboarding** — the Configure step now checks whether gstack is present at the typed path (debounced 400 ms). If it isn't found, an inline panel appears offering a one-click **"Install gstack automatically"** button. Clicking it runs `git clone --depth 1 https://github.com/garrytan/gstack <path>` in the background via `spawn`. A spinner shows during cloning; on success the path field is auto-populated; on failure the full error message and a Retry button are shown. The Continue button stays disabled while installation is in progress.
+- **`gstack:check` IPC handler** — returns `true` if a directory exists and contains at least one `SKILL.md`, confirming it is a valid gstack install.
+- **`gstack:install` IPC handler** — accepts a `targetPath`, creates parent directories, and spawns `git clone --depth 1`. Returns `{ success, path, error? }`.
+- `client.checkGstack()` and `client.installGstack()` renderer client wrappers.
+- **Letter-based "gS" app icon** — replaced the three-bar design with a pixel-art **gS monogram**: lowercase _g_ in indigo-400 and uppercase _S_ in white, on the same zinc-950 rounded-rect background. Each letter is a 5×7 bitmap rendered as rounded-corner blocks (72 px cells, 10 px radius). Icon regenerated at 1 024×1 024 px with no external dependencies.
+
+**Changed**
+- Onboarding welcome step no longer lists gstack as a hard prerequisite — the wizard offers to install it automatically.
+- README prerequisites updated: gstack is now optional at first launch; git is listed as a requirement for auto-install.
+- `scripts/generate-icon.mjs` fully rewritten to use the new "gS" pixel-font approach.
+
+---
+
 ## [0.7.0] — 2026-04-21
 
 ### Direct agent execution

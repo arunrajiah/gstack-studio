@@ -1,8 +1,8 @@
 import { IpcMain, net, clipboard, dialog, shell, app } from 'electron'
 import { existsSync, readFileSync, mkdirSync, writeFileSync } from 'fs'
-import { join } from 'path'
+import { join, dirname } from 'path'
 import { homedir, platform } from 'os'
-import { execFile, exec } from 'child_process'
+import { execFile, exec, spawn } from 'child_process'
 import { GStackDaemon } from './daemon'
 
 export function registerIpcHandlers(ipcMain: IpcMain, daemon: GStackDaemon): void {
@@ -142,6 +142,57 @@ export function registerIpcHandlers(ipcMain: IpcMain, daemon: GStackDaemon): voi
     const merged = { ...getConfig(), ...updates } as AppConfig
     saveConfig(merged)
     return merged
+  })
+
+  // ── gstack install helpers ────────────────────────────────────────────────
+
+  /**
+   * Check whether a path looks like a valid gstack install.
+   * Returns true if the directory exists and contains at least one SKILL.md.
+   */
+  ipcMain.handle('gstack:check', async (_event, gstackPath: string) => {
+    if (!gstackPath || !existsSync(gstackPath)) return false
+    try {
+      const { readdirSync } = await import('fs')
+      const entries = readdirSync(gstackPath)
+      return entries.some(e => {
+        try {
+          return existsSync(join(gstackPath, e, 'SKILL.md'))
+        } catch { return false }
+      })
+    } catch { return false }
+  })
+
+  /**
+   * Clone gstack from GitHub into targetPath.
+   * Uses a shallow clone (--depth 1) for speed.
+   * Returns { success: true, path } or { success: false, error: string }.
+   */
+  ipcMain.handle('gstack:install', async (_event, targetPath: string) => {
+    const resolvedPath = targetPath.replace(/^~/, homedir())
+    try {
+      mkdirSync(dirname(resolvedPath), { recursive: true })
+    } catch { /* parent may already exist */ }
+
+    return new Promise<{ success: boolean; path: string; error?: string }>(resolve => {
+      const child = spawn(
+        'git',
+        ['clone', '--depth', '1', 'https://github.com/garrytan/gstack', resolvedPath],
+        { stdio: 'pipe' }
+      )
+      const errBuf: string[] = []
+      child.stderr?.on('data', (d: Buffer) => errBuf.push(d.toString()))
+      child.on('close', code => {
+        if (code === 0) {
+          resolve({ success: true, path: resolvedPath })
+        } else {
+          resolve({ success: false, path: resolvedPath, error: errBuf.join('').trim() || `git exited with code ${code}` })
+        }
+      })
+      child.on('error', err => {
+        resolve({ success: false, path: resolvedPath, error: `git not found: ${err.message}. Install git and try again.` })
+      })
+    })
   })
 }
 
