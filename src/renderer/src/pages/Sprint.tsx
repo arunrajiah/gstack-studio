@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Copy, Check, AlertTriangle, BookOpen, Search, X } from 'lucide-react'
-import { useSkills, useDaemon } from '../lib/store'
+import { Copy, Check, AlertTriangle, BookOpen, Search, X, Play } from 'lucide-react'
+import { useSkills, useDaemon, useConfig } from '../lib/store'
 import { Skill, client } from '../lib/gstack-client'
 import SkillDocModal from '../components/SkillDocModal'
 import { toast } from '../lib/toast'
@@ -20,6 +20,7 @@ const PHASES: Array<{ id: Skill['phase']; label: string; color: string }> = [
 export default function Sprint() {
   const { skills, loading, error } = useSkills()
   const { state } = useDaemon()
+  const { config } = useConfig()
   const navigate = useNavigate()
   const [docSkill, setDocSkill] = useState<Skill | null>(null)
   const [search, setSearch] = useState('')
@@ -118,7 +119,7 @@ export default function Sprint() {
               </span>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {phaseSkills.map(skill => (
-                  <SkillCard key={skill.id} skill={skill} onViewDoc={() => setDocSkill(skill)} />
+                  <SkillCard key={skill.id} skill={skill} hostBin={config.hostBin} onViewDoc={() => setDocSkill(skill)} onNavigateSettings={() => navigate('/settings')} />
                 ))}
               </div>
             </div>
@@ -129,13 +130,38 @@ export default function Sprint() {
   )
 }
 
-function SkillCard({ skill, onViewDoc }: { skill: Skill; onViewDoc: () => void }) {
+function SkillCard({ skill, hostBin, onViewDoc, onNavigateSettings }: {
+  skill: Skill
+  hostBin: string
+  onViewDoc: () => void
+  onNavigateSettings: () => void
+}) {
   const [copied, setCopied] = useState(false)
+  const [running, setRunning] = useState(false)
+
   async function handleCopy() {
     await client.copyCommand(skill.id)
     setCopied(true)
     toast.success(`/${skill.id} copied to clipboard`)
     setTimeout(() => setCopied(false), 1800)
+  }
+
+  async function handleRun(e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!hostBin) {
+      toast.error('No agent host configured — set one in Settings')
+      onNavigateSettings()
+      return
+    }
+    setRunning(true)
+    try {
+      await client.executeSkill(skill.id, hostBin)
+      toast.success(`Opened /${skill.id} in terminal`)
+    } catch (err) {
+      toast.error(`Failed to open terminal: ${String(err)}`)
+    } finally {
+      setRunning(false)
+    }
   }
 
   return (
@@ -152,6 +178,14 @@ function SkillCard({ skill, onViewDoc }: { skill: Skill; onViewDoc: () => void }
             className="p-0.5 rounded text-zinc-500 hover:text-indigo-300 transition-colors"
           >
             <BookOpen size={12} />
+          </button>
+          <button
+            onClick={handleRun}
+            title="Run in terminal"
+            disabled={running}
+            className="p-0.5 rounded text-zinc-500 hover:text-emerald-400 transition-colors disabled:opacity-50"
+          >
+            <Play size={12} className={running ? 'animate-pulse text-emerald-400' : ''} />
           </button>
           {copied
             ? <Check size={12} className="text-emerald-400" />

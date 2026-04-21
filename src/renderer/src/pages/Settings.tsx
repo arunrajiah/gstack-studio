@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Save, Eye, EyeOff, ExternalLink, AlertCircle, CheckCircle2, FolderOpen, X, Zap, Sun, Moon, Monitor } from 'lucide-react'
+import { Save, Eye, EyeOff, ExternalLink, AlertCircle, CheckCircle2, FolderOpen, X, Zap, Sun, Moon, Monitor, Terminal, RefreshCw, Check } from 'lucide-react'
 import { useConfig, useRecentWorkspaces } from '../lib/store'
-import { client, AppConfig } from '../lib/gstack-client'
+import { client, AppConfig, DetectedHost } from '../lib/gstack-client'
 import { toast } from '../lib/toast'
 
 export default function Settings() {
@@ -13,10 +13,31 @@ export default function Settings() {
   const [saved, setSaved] = useState(false)
   const [errors, setErrors] = useState<Partial<Record<keyof AppConfig, string>>>({})
   const [appVersion, setAppVersion] = useState<string>('')
+  const [detectedHosts, setDetectedHosts] = useState<DetectedHost[]>([])
+  const [detectingHosts, setDetectingHosts] = useState(false)
 
   useEffect(() => {
     client.appVersion().then(setAppVersion).catch(() => {})
+    detectHosts()
   }, [])
+
+  async function detectHosts() {
+    setDetectingHosts(true)
+    try {
+      const hosts = await client.host.detect()
+      setDetectedHosts(hosts)
+      // Auto-select first available host if none configured
+      setForm(f => {
+        if (!f.hostBin) {
+          const first = hosts.find(h => h.available)
+          return first ? { ...f, hostBin: first.bin } : f
+        }
+        return f
+      })
+    } catch { /* ignore */ } finally {
+      setDetectingHosts(false)
+    }
+  }
 
   useEffect(() => { setForm(config) }, [config])
 
@@ -223,6 +244,93 @@ export default function Settings() {
               </p>
             </div>
           </label>
+        </section>
+
+        {/* Agent Host */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2">
+            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">Agent Host</h2>
+            <button
+              type="button"
+              onClick={detectHosts}
+              disabled={detectingHosts}
+              className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw size={11} className={detectingHosts ? 'animate-spin' : ''} />
+              {detectingHosts ? 'Scanning…' : 'Re-scan'}
+            </button>
+          </div>
+
+          <p className="text-xs text-zinc-500">
+            Select which AI coding host to open when you click ▶ on a skill. gstack Studio opens a real terminal window with the command ready to run.
+          </p>
+
+          {/* Detected hosts */}
+          {detectedHosts.length > 0 && (
+            <div className="space-y-1.5">
+              {detectedHosts.map(host => (
+                <label
+                  key={host.id}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border cursor-pointer transition-colors ${
+                    form.hostBin === host.bin
+                      ? 'border-indigo-600/60 bg-indigo-950/20'
+                      : host.available
+                        ? 'border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700'
+                        : 'border-zinc-200/50 dark:border-zinc-800/50 bg-zinc-50/50 dark:bg-zinc-900/50 opacity-50 cursor-not-allowed'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="hostBin"
+                    value={host.bin}
+                    checked={form.hostBin === host.bin}
+                    onChange={() => host.available && setForm(f => ({ ...f, hostBin: host.bin }))}
+                    disabled={!host.available}
+                    className="sr-only"
+                  />
+                  <div className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                    form.hostBin === host.bin ? 'border-indigo-500 bg-indigo-500' : 'border-zinc-400 dark:border-zinc-600'
+                  }`}>
+                    {form.hostBin === host.bin && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                  </div>
+                  <Terminal size={13} className={host.available ? 'text-zinc-500' : 'text-zinc-600'} />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-medium ${form.hostBin === host.bin ? 'text-indigo-300' : 'text-zinc-700 dark:text-zinc-300'}`}>
+                      {host.label}
+                    </p>
+                    <p className="text-xs text-zinc-500 font-mono truncate">{host.bin}</p>
+                  </div>
+                  {host.available
+                    ? <span className="text-xs text-emerald-400 flex items-center gap-1 shrink-0"><Check size={10} /> found</span>
+                    : <span className="text-xs text-zinc-600 shrink-0">not found</span>
+                  }
+                </label>
+              ))}
+            </div>
+          )}
+
+          {/* Custom host path override */}
+          <Field label="Custom host path" hint="Override — paste any binary path if your host isn't auto-detected above">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={form.hostBin}
+                onChange={e => setForm(f => ({ ...f, hostBin: e.target.value }))}
+                placeholder="/usr/local/bin/claude"
+                className={inputClass(false) + ' flex-1'}
+              />
+              {form.hostBin && (
+                <button
+                  type="button"
+                  onClick={() => setForm(f => ({ ...f, hostBin: '' }))}
+                  title="Clear"
+                  className="px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors text-zinc-500 dark:text-zinc-400 shrink-0"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+          </Field>
         </section>
 
         {/* API Keys */}

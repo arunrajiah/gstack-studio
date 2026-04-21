@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
-import { Bot, Copy, Check, Search, X, Wifi, WifiOff, BookOpen } from 'lucide-react'
-import { useSkills, useDaemon, useDaemonLogs } from '../lib/store'
+import { Bot, Copy, Check, Search, X, Wifi, WifiOff, BookOpen, Play } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useSkills, useDaemon, useDaemonLogs, useConfig } from '../lib/store'
 import { client, Skill } from '../lib/gstack-client'
 import SkillDocModal from '../components/SkillDocModal'
 import { toast } from '../lib/toast'
@@ -33,6 +34,8 @@ const PHASE_COLORS: Record<string, string> = {
 export default function Agents() {
   const { skills } = useSkills()
   const { state } = useDaemon()
+  const { config } = useConfig()
+  const navigate = useNavigate()
   const logs = useDaemonLogs(true)
 
   const [phase, setPhase] = useState<Phase>('all')
@@ -108,7 +111,7 @@ export default function Agents() {
           {filtered.length === 0 ? (
             <p className="px-4 py-6 text-xs text-zinc-600 text-center">No skills match</p>
           ) : filtered.map(skill => (
-            <SkillRow key={skill.id} skill={skill} onViewDoc={() => setDocSkill(skill)} />
+            <SkillRow key={skill.id} skill={skill} hostBin={config.hostBin} onViewDoc={() => setDocSkill(skill)} onNavigateSettings={() => navigate('/settings')} />
           ))}
         </div>
 
@@ -192,14 +195,38 @@ export default function Agents() {
   )
 }
 
-function SkillRow({ skill, onViewDoc }: { skill: Skill; onViewDoc: () => void }) {
+function SkillRow({ skill, hostBin, onViewDoc, onNavigateSettings }: {
+  skill: Skill
+  hostBin: string
+  onViewDoc: () => void
+  onNavigateSettings: () => void
+}) {
   const [copied, setCopied] = useState(false)
+  const [running, setRunning] = useState(false)
 
   async function handleCopy() {
     await client.copyCommand(skill.id)
     setCopied(true)
     toast.success(`/${skill.id} copied to clipboard`)
     setTimeout(() => setCopied(false), 1800)
+  }
+
+  async function handleRun(e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!hostBin) {
+      toast.error('No agent host configured — set one in Settings')
+      onNavigateSettings()
+      return
+    }
+    setRunning(true)
+    try {
+      await client.executeSkill(skill.id, hostBin)
+      toast.success(`Opened /${skill.id} in terminal`)
+    } catch (err) {
+      toast.error(`Failed to open terminal: ${String(err)}`)
+    } finally {
+      setRunning(false)
+    }
   }
 
   return (
@@ -226,6 +253,14 @@ function SkillRow({ skill, onViewDoc }: { skill: Skill; onViewDoc: () => void })
           className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-300 dark:hover:bg-zinc-700"
         >
           <BookOpen size={12} />
+        </button>
+        <button
+          onClick={handleRun}
+          title="Run in terminal"
+          disabled={running}
+          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded text-zinc-500 hover:text-emerald-400 hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors disabled:opacity-50"
+        >
+          <Play size={12} className={running ? 'animate-pulse text-emerald-400' : ''} />
         </button>
         <button
           onClick={handleCopy}

@@ -72,14 +72,16 @@
 | Page | What it does |
 |------|-------------|
 | **Dashboard** | Daemon health, Start / Stop / Restart controls, workspace quick-switcher with recent paths, Open in Finder button |
-| **Sprint Board** | Visual pipeline (Think → Plan → Build → Review → Test → Ship → Reflect) with all agents — auto-syncs with your local gstack install. Click any card to copy its `/command`; hover for the 📖 doc viewer |
-| **Agents** | Searchable skill browser with phase filter + live daemon log stream (stdout/stderr, polls every 2 s); per-skill doc viewer |
+| **Sprint Board** | Visual pipeline (Think → Plan → Build → Review → Test → Ship → Reflect) with all agents — auto-syncs with your local gstack install. Click any card to copy its `/command`; hover for 📖 doc viewer or ▶ run directly in terminal |
+| **Agents** | Searchable skill browser with phase filter + live daemon log stream (stdout/stderr, polls every 2 s); per-skill doc viewer and ▶ run in terminal |
 | **Browse Console** | Live terminal interface to the gstack browse daemon — send any of the 56 HTTP commands and see JSON responses |
 | **History** | Per-project learnings with full-text search, stored in `~/.gstack/projects/*/learnings.jsonl` |
 | **Settings** | Workspace path (with native folder picker + Open in Finder), gstack install path, API keys, recent-workspace list |
 
 ### Additional capabilities
 
+- **Direct agent execution** — ▶ Run button on every skill opens a real interactive terminal with `claude /skill` (or codex / OpenClaw / Factory / Kiro) — no copy-paste
+- **Agent host auto-detection** — Settings scans common install paths and `$PATH` for all supported hosts; click to select, custom path override available
 - **First-launch onboarding wizard** — guided 3-step setup appears automatically when gstack path or workspace isn't configured yet
 - **Skill documentation viewer** — reads each skill's `SKILL.md` and renders it inline (headings, bold, code blocks) with a Copy Command button
 - **Auto-update** — checks GitHub Releases on startup; shows a download banner in the title bar when a new version is available
@@ -151,8 +153,8 @@ Open the **Sprint Board**, find any agent, and click its card. The slash command
 - [x] **v0.4.0** — Toast notifications, Browse Console history + command reference, auto-start daemon, copy logs, keyboard shortcuts (⌘1–6), app version display
 - [x] **v0.5.0** — Command palette (⌘K), Sprint Board search, History export (JSON/MD), Browse Console script runner
 - [x] **v0.6.0** — Dark/light/system theme toggle, dynamic skill loading (auto-syncs with `/gstack-upgrade`)
+- [x] **v0.7.0** — Direct agent execution — ▶ Run any skill in a real terminal; agent host auto-detection (Claude Code, Codex, OpenClaw, Factory, Kiro)
 - [ ] Windows / macOS code signing for distribution without Gatekeeper warnings
-- [ ] Direct agent execution (run gstack commands from within Studio)
 
 ---
 

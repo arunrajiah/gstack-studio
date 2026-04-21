@@ -1,7 +1,8 @@
 import { IpcMain, net, clipboard, dialog, shell, app } from 'electron'
 import { existsSync, readFileSync, mkdirSync, writeFileSync } from 'fs'
 import { join } from 'path'
-import { homedir } from 'os'
+import { homedir, platform } from 'os'
+import { execFile, exec } from 'child_process'
 import { GStackDaemon } from './daemon'
 
 export function registerIpcHandlers(ipcMain: IpcMain, daemon: GStackDaemon): void {
@@ -114,6 +115,25 @@ export function registerIpcHandlers(ipcMain: IpcMain, daemon: GStackDaemon): voi
   /** Return the app version */
   ipcMain.handle('app:version', async () => app.getVersion())
 
+  // ── Host detection & execution ────────────────────────────────────────────
+  /** Detect installed AI coding hosts and return their resolved paths */
+  ipcMain.handle('host:detect', async () => detectHosts())
+
+  /**
+   * Run a skill in a terminal window using the configured host.
+   * Opens a real interactive terminal so the user can watch and respond.
+   */
+  ipcMain.handle('skill:execute', async (_event, skillId: string, hostBin: string) => {
+    const cfg = getConfig()
+    const cwd = cfg.workspacePath || homedir()
+    const cmd = `/${skillId}`
+
+    // Copy command to clipboard as a backup
+    clipboard.writeText(cmd)
+
+    return openTerminalWithCommand(cwd, hostBin, cmd)
+  })
+
   // ── Config ────────────────────────────────────────────────────────────────
   ipcMain.handle('config:get', async () => getConfig())
 
@@ -149,6 +169,8 @@ export interface AppConfig {
   openaiApiKey: string
   recentWorkspaces: string[]
   theme: 'dark' | 'light' | 'system'
+  /** Resolved path to the preferred AI coding host binary (claude, codex, etc.) */
+  hostBin: string
 }
 
 function configPath(): string { return join(homedir(), '.gstack', 'studio-config.json') }
@@ -163,11 +185,12 @@ function getConfig(): AppConfig {
         workspacePath:    raw.workspacePath     ?? '',
         openaiApiKey:     raw.openaiApiKey      ?? '',
         recentWorkspaces: raw.recentWorkspaces  ?? [],
-        theme:            (raw.theme as AppConfig['theme']) ?? 'dark'
+        theme:            (raw.theme as AppConfig['theme']) ?? 'dark',
+        hostBin:          raw.hostBin           ?? ''
       }
     }
   } catch { /* ignore */ }
-  return { anthropicApiKey: '', gstackPath: '', workspacePath: '', openaiApiKey: '', recentWorkspaces: [], theme: 'dark' }
+  return { anthropicApiKey: '', gstackPath: '', workspacePath: '', openaiApiKey: '', recentWorkspaces: [], theme: 'dark', hostBin: '' }
 }
 
 function saveConfig(config: AppConfig): void {
@@ -177,6 +200,145 @@ function saveConfig(config: AppConfig): void {
 
 function addToRecents(current: string[], path: string): string[] {
   return [path, ...current.filter(p => p !== path)].slice(0, 5)
+}
+
+// ── Host detection ────────────────────────────────────────────────────────────
+
+export interface DetectedHost {
+  id: string
+  label: string
+  bin: string
+  available: boolean
+}
+
+const HOST_CANDIDATES: Array<{ id: string; label: string; bins: string[] }> = [
+  {
+    id: 'claude-code',
+    label: 'Claude Code',
+    bins: [
+      join(homedir(), '.local', 'bin', 'claude'),
+      '/usr/local/bin/claude',
+      '/opt/homebrew/bin/claude',
+      'claude',
+    ],
+  },
+  {
+    id: 'codex',
+    label: 'Codex',
+    bins: [
+      join(homedir(), '.local', 'bin', 'codex'),
+      '/usr/local/bin/codex',
+      '/opt/homebrew/bin/codex',
+      'codex',
+    ],
+  },
+  {
+    id: 'openclaw',
+    label: 'OpenClaw',
+    bins: [
+      join(homedir(), '.local', 'bin', 'openclaw'),
+      '/usr/local/bin/openclaw',
+      'openclaw',
+    ],
+  },
+  {
+    id: 'factory',
+    label: 'Factory',
+    bins: [
+      join(homedir(), '.local', 'bin', 'factory'),
+      '/usr/local/bin/factory',
+      'factory',
+    ],
+  },
+  {
+    id: 'kiro',
+    label: 'Kiro',
+    bins: [
+      join(homedir(), '.local', 'bin', 'kiro'),
+      '/usr/local/bin/kiro',
+      'kiro',
+    ],
+  },
+]
+
+function resolveHostBin(bins: string[]): string | null {
+  for (const b of bins) {
+    if (b !== bins[bins.length - 1] && existsSync(b)) return b
+  }
+  // For the bare name, check PATH via `which`
+  try {
+    const { execSync } = require('child_process') as typeof import('child_process')
+    const result = execSync(`which ${bins[bins.length - 1]} 2>/dev/null`, { encoding: 'utf8' }).trim()
+    if (result) return result
+  } catch { /* not in PATH */ }
+  return null
+}
+
+function detectHosts(): DetectedHost[] {
+  return HOST_CANDIDATES.map(({ id, label, bins }) => {
+    const bin = resolveHostBin(bins)
+    return { id, label, bin: bin ?? bins[0], available: bin !== null }
+  })
+}
+
+// ── Terminal launcher ─────────────────────────────────────────────────────────
+
+function escShell(s: string): string {
+  return s.replace(/'/g, "'\\''")
+}
+
+function openTerminalWithCommand(cwd: string, hostBin: string, skillCmd: string): Promise<void> {
+  const p = platform()
+  // The full shell command to run inside the terminal
+  const shellCmd = `cd '${escShell(cwd)}' && '${escShell(hostBin)}' '${escShell(skillCmd)}'`
+
+  return new Promise((resolve, reject) => {
+    if (p === 'darwin') {
+      // Try iTerm2 first, fall back to Terminal.app
+      const script = `
+        set cmd to "cd '${escShell(cwd)}' && '${escShell(hostBin)}' '${escShell(skillCmd)}'"
+        tell application "System Events"
+          set iTermRunning to (name of processes) contains "iTerm2"
+        end tell
+        if iTermRunning then
+          tell application "iTerm2"
+            activate
+            set newWindow to (create window with default profile)
+            tell current session of newWindow to write text cmd
+          end tell
+        else
+          tell application "Terminal"
+            activate
+            do script cmd
+          end tell
+        end if
+      `
+      exec(`osascript -e '${script.replace(/'/g, "'\\''")}'`, err => {
+        if (err) { reject(err) } else { resolve() }
+      })
+    } else if (p === 'win32') {
+      const winCmd = `cd /d "${cwd}" && "${hostBin}" "${skillCmd}"`
+      exec(`start cmd.exe /K "${winCmd}"`, err => {
+        if (err) { reject(err) } else { resolve() }
+      })
+    } else {
+      // Linux — try common terminal emulators in order
+      const terminals = [
+        ['gnome-terminal', '--', 'bash', '-c', `${shellCmd}; exec bash`],
+        ['xterm', '-e', `bash -c '${escShell(shellCmd)}; exec bash'`],
+        ['konsole', '--hold', '-e', 'bash', '-c', shellCmd],
+        ['xfce4-terminal', '--hold', '-e', `bash -c '${escShell(shellCmd)}'`],
+      ]
+      const tryNext = (i: number) => {
+        if (i >= terminals.length) { reject(new Error('No terminal emulator found')); return }
+        const [cmd, ...args] = terminals[i]
+        execFile(cmd, args, { cwd }, err => {
+          if (err) { tryNext(i + 1) } else { resolve() }
+        })
+      }
+      tryNext(0)
+    }
+  })
 }
 
 // ── Dynamic skill loader ──────────────────────────────────────────────────────

@@ -6,6 +6,24 @@ Format: [Semantic Versioning](https://semver.org) — `Added`, `Changed`, `Fixed
 
 ---
 
+## [0.7.0] — 2026-04-21
+
+### Direct agent execution
+
+**Added**
+- **▶ Run button on every skill** — Sprint Board cards and Agents page rows now show a play button on hover. Clicking it opens a real interactive terminal window with `<host> /<skill>` ready to run — no copy-paste needed.
+- **Agent Host settings section** — new section in Settings auto-detects installed AI coding hosts (Claude Code, Codex, OpenClaw, Factory, Kiro) by scanning common install paths and `$PATH`. Shows each host with a found / not found badge. Click to select; hosts that aren't installed are greyed out. Includes a custom binary path override field for edge cases.
+- **Cross-platform terminal launcher** — macOS uses iTerm2 if running, otherwise Terminal.app (via AppleScript); Windows opens `cmd.exe /K`; Linux tries gnome-terminal → xterm → konsole → xfce4-terminal in order.
+- **`host:detect` IPC handler** — scans filesystem + `which` to resolve the actual binary path for each supported host. Returns `DetectedHost[]` with `id`, `label`, `bin`, `available` fields.
+- **`skill:execute` IPC handler** — accepts skill ID + host binary, opens terminal, and also copies the command to clipboard as a fallback.
+- `DetectedHost` type and `client.host.detect()` / `client.executeSkill()` methods added to the renderer client layer.
+
+**Changed**
+- If no host is configured and Run is clicked, a toast error appears and Settings opens automatically so the user can pick one.
+- `AppConfig` gains a `hostBin` field (persisted in `~/.gstack/studio-config.json`) — migrates transparently from older configs.
+
+---
+
 ## [0.6.0] — 2026-04-21
 
 ### Dark/light theme + dynamic skill loading

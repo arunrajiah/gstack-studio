@@ -12,9 +12,10 @@ declare global {
       batch:        (commands: Array<{ command: string; args?: string[] }>) => Promise<unknown>
       projects:     () => Promise<GStackProject[]>
       learnings:    (slug: string) => Promise<Learning[]>
-      skills:       () => Promise<Skill[]>
-      copyCommand:  (skillId: string) => Promise<boolean>
-      readSkillDoc: (skillId: string) => Promise<string | null>
+      skills:        () => Promise<Skill[]>
+      copyCommand:   (skillId: string) => Promise<boolean>
+      readSkillDoc:  (skillId: string) => Promise<string | null>
+      executeSkill:  (skillId: string, hostBin: string) => Promise<void>
       workspace: {
         browse:  () => Promise<string | null>
         recents: () => Promise<string[]>
@@ -38,6 +39,9 @@ declare global {
         openUrl:  (url: string) => Promise<void>
       }
       appVersion: () => Promise<string>
+      host: {
+        detect: () => Promise<DetectedHost[]>
+      }
       config: {
         get: () => Promise<AppConfig>
         set: (updates: Partial<AppConfig>) => Promise<AppConfig>
@@ -87,6 +91,15 @@ export interface AppConfig {
   recentWorkspaces: string[]
   autoStartDaemon: boolean
   theme: 'dark' | 'light' | 'system'
+  /** Resolved path to the preferred AI coding host binary (claude, codex, etc.) */
+  hostBin: string
+}
+
+export interface DetectedHost {
+  id: string
+  label: string
+  bin: string
+  available: boolean
 }
 
 export const client = {
@@ -101,9 +114,10 @@ export const client = {
   batch:        (commands: Array<{ command: string; args?: string[] }>) => window.gstack.batch(commands),
   projects:     () => window.gstack.projects(),
   learnings:    (slug: string) => window.gstack.learnings(slug),
-  skills:       () => window.gstack.skills(),
-  copyCommand:  (skillId: string) => window.gstack.copyCommand(skillId),
-  readSkillDoc: (skillId: string) => window.gstack.readSkillDoc(skillId),
+  skills:        () => window.gstack.skills(),
+  copyCommand:   (skillId: string) => window.gstack.copyCommand(skillId),
+  readSkillDoc:  (skillId: string) => window.gstack.readSkillDoc(skillId),
+  executeSkill:  (skillId: string, hostBin: string) => window.gstack.executeSkill(skillId, hostBin),
   workspace: {
     browse:  () => window.gstack.workspace.browse(),
     recents: () => window.gstack.workspace.recents(),
@@ -127,6 +141,9 @@ export const client = {
     openUrl:  (url: string) => window.gstack.shell.openUrl(url)
   },
   appVersion: () => window.gstack.appVersion(),
+  host: {
+    detect: () => window.gstack.host.detect(),
+  },
   config: {
     get: () => window.gstack.config.get(),
     set: (updates: Partial<AppConfig>) => window.gstack.config.set(updates as Record<string, unknown>)
