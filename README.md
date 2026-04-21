@@ -11,6 +11,10 @@
   </p>
 
   <p>
+    <a href="https://github.com/sponsors/arunrajiah"><img src="https://img.shields.io/badge/sponsor-%E2%9D%A4-ea4aaa?style=flat-square&logo=github-sponsors" alt="Sponsor" /></a>
+  </p>
+
+  <p>
     <a href="#-download">Download</a> ·
     <a href="#-features">Features</a> ·
     <a href="#-prerequisites">Prerequisites</a> ·

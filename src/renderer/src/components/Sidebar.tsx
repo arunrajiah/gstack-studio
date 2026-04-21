@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Workflow, Globe, History, Bot, Settings } from 'lucide-react'
+import { LayoutDashboard, Workflow, Globe, History, Bot, Settings, Heart } from 'lucide-react'
 
 const NAV = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard',      shortcut: '⌘1' },
@@ -30,6 +30,16 @@ export default function Sidebar() {
       ))}
 
       <div className="flex-1" />
+
+      <a
+        href="https://github.com/sponsors/arunrajiah"
+        target="_blank"
+        rel="noreferrer"
+        title="Sponsor this project"
+        className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors titlebar-no-drag text-zinc-500 hover:text-pink-400 hover:bg-zinc-800"
+      >
+        <Heart size={18} />
+      </a>
 
       <NavLink
         to="/settings"
