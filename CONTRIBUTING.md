@@ -142,7 +142,7 @@ chore: bump electron to 34
 ### Bugs
 
 Use the **Bug Report** issue template. Include:
-- gstack Studio version (shown in About or the window title bar)
+- gstack Studio version (shown at the bottom of the Settings page)
 - OS and architecture (e.g. macOS 14 Apple Silicon)
 - gstack version (`git -C ~/.claude/skills/gstack log --oneline -1`)
 - Steps to reproduce
@@ -173,13 +173,18 @@ If you need a new capability in the renderer, add an IPC handler in `src/main/ip
 
 The preload file compiles to CJS (CommonJS). Do **not** add `"type": "module"` to `package.json` — this breaks Electron's ability to load the preload script.
 
-### Layer 1 constraint
+### gstack boundary
 
-gstack Studio currently makes **zero changes** to the gstack codebase. It reads gstack's existing files and starts the existing browse server. PRs that require modifying gstack itself are out of scope until Layer 2 work begins.
+gstack Studio wraps gstack — it never modifies the gstack codebase itself. It:
+- Reads skill definitions from `~/.claude/skills/gstack/*/SKILL.md`
+- Starts the existing browse server via `bun`
+- Opens a terminal to run slash commands via the user's chosen AI coding host (Claude Code, Codex, etc.)
+
+PRs that require modifying gstack itself are always out of scope. Changes to the gstack install path are surfaced by the user in Settings.
 
 ### Config file
 
-User config is stored at `~/.gstack/studio-config.json`. When testing locally, you can edit this file directly to reset settings.
+User config is stored at `~/.gstack/studio-config.json`. When testing locally, you can edit this file directly to reset settings. The current config fields are: `workspacePath`, `gstackPath`, `anthropicApiKey`, `openaiApiKey`, `recentWorkspaces`, `autoStartDaemon`, `theme`, `hostBin`.
 
 ---
 

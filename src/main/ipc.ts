@@ -115,6 +115,7 @@ export function registerIpcHandlers(ipcMain: IpcMain, daemon: GStackDaemon): voi
   /** Return the app version */
   ipcMain.handle('app:version', async () => app.getVersion())
 
+
   // ── Host detection & execution ────────────────────────────────────────────
   /** Detect installed AI coding hosts and return their resolved paths */
   ipcMain.handle('host:detect', async () => detectHosts())

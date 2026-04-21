@@ -62,6 +62,7 @@ contextBridge.exposeInMainWorld('gstack', {
     detect: () => ipcRenderer.invoke('host:detect'),
   },
 
+
   // ── Config ────────────────────────────────────────────────────────────────
   config: {
     get: () => ipcRenderer.invoke('config:get'),
