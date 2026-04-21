@@ -39,14 +39,14 @@
       <br /><sub><b>Dashboard</b> — daemon health, Start/Stop/Restart, quick actions</sub>
     </td>
     <td align="center" width="50%">
-      <img src="docs/screenshots/sprint.png" alt="Sprint Board — all agents organised by phase" />
-      <br /><sub><b>Sprint Board</b> — agents organised by phase, click to copy command</sub>
+      <img src="docs/screenshots/sprint.png" alt="Sprint Board — all agents organised by phase, click to copy or run in terminal" />
+      <br /><sub><b>Sprint Board</b> — agents by phase, click to copy command or ▶ run in terminal</sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <img src="docs/screenshots/agents.png" alt="Agents — searchable skill browser with live daemon log stream" />
-      <br /><sub><b>Agents</b> — skill browser with live daemon log stream</sub>
+      <img src="docs/screenshots/agents.png" alt="Agents — searchable skill browser with live daemon log stream and run button" />
+      <br /><sub><b>Agents</b> — skill browser with live daemon log stream, ▶ run any skill</sub>
     </td>
     <td align="center" width="50%">
       <img src="docs/screenshots/browse.png" alt="Browse Console — live HTTP terminal for the gstack browse daemon" />
@@ -55,8 +55,8 @@
   </tr>
   <tr>
     <td align="center" width="50%">
-      <img src="docs/screenshots/settings.png" alt="Settings — workspace, gstack path, API keys, auto-start" />
-      <br /><sub><b>Settings</b> — workspace, gstack path, API keys, auto-start daemon</sub>
+      <img src="docs/screenshots/settings.png" alt="Settings — workspace, gstack path, agent host auto-detection, API keys" />
+      <br /><sub><b>Settings</b> — workspace, gstack path, agent host picker, API keys</sub>
     </td>
     <td align="center" width="50%">
       <img src="docs/screenshots/command-palette.png" alt="Command Palette — ⌘K to instantly search pages and skills" />
