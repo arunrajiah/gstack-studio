@@ -59,7 +59,7 @@ export default function Dashboard() {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-100">Dashboard</h1>
+        <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">Dashboard</h1>
         <p className="text-sm text-zinc-500 mt-0.5">Your AI engineering team, ready to sprint</p>
       </div>
 
@@ -71,9 +71,9 @@ export default function Dashboard() {
           </div>
           {gstackMissing && (
             <p className="text-xs text-zinc-400">
-              gstack not found at <code className="font-mono text-zinc-300">~/.claude/skills/gstack</code>.{' '}
+              gstack not found at <code className="font-mono text-zinc-700 dark:text-zinc-300">~/.claude/skills/gstack</code>.{' '}
               <button onClick={() => navigate('/settings')} className="text-amber-400 underline">Set path in Settings</button>
-              {' '}or install from <span className="font-mono text-zinc-300">github.com/garrytan/gstack</span>
+              {' '}or install from <span className="font-mono text-zinc-700 dark:text-zinc-300">github.com/garrytan/gstack</span>
             </p>
           )}
           {workspaceMissing && (
@@ -87,7 +87,7 @@ export default function Dashboard() {
 
       {/* Daemon card */}
       <div className={`rounded-xl border p-4 transition-colors ${
-        state.running ? 'border-emerald-800/40 bg-emerald-950/20' : 'border-zinc-800 bg-zinc-900'
+        state.running ? 'border-emerald-800/40 bg-emerald-950/20' : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900'
       }`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -114,7 +114,7 @@ export default function Dashboard() {
                   onClick={restart}
                   disabled={busy}
                   title="Restart daemon"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-40 text-xs font-medium transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 disabled:opacity-40 text-xs font-medium transition-colors"
                 >
                   <RotateCw size={12} className={busy ? 'animate-spin' : ''} />
                   Restart
@@ -144,13 +144,13 @@ export default function Dashboard() {
 
         {/* Workspace row with quick-switcher */}
         {state.workspacePath && (
-          <div className="mt-3 border-t border-zinc-800/60 pt-3 flex items-center gap-2 text-xs text-zinc-500">
+          <div className="mt-3 border-t border-zinc-200/60 dark:border-zinc-800/60 pt-3 flex items-center gap-2 text-xs text-zinc-500">
             <FolderOpen size={12} className="text-zinc-600 shrink-0" />
             <span className="font-mono truncate flex-1">{state.workspacePath}</span>
             <button
               onClick={() => client.shell.openPath(state.workspacePath!)}
               title="Open in Finder / Explorer"
-              className="shrink-0 text-zinc-600 hover:text-zinc-300 transition-colors"
+              className="shrink-0 text-zinc-500 dark:text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
             >
               <ExternalLink size={11} />
             </button>
@@ -158,7 +158,7 @@ export default function Dashboard() {
             <div className="relative shrink-0">
               <button
                 onClick={() => setWsMenuOpen(o => !o)}
-                className="flex items-center gap-1 text-zinc-500 hover:text-zinc-300 transition-colors"
+                className="flex items-center gap-1 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
               >
                 <Clock size={11} /> switch <ChevronDown size={10} />
               </button>
@@ -166,16 +166,16 @@ export default function Dashboard() {
               {wsMenuOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setWsMenuOpen(false)} />
-                  <div className="absolute right-0 top-6 z-50 w-72 rounded-xl border border-zinc-700 bg-zinc-900 shadow-xl py-1">
-                    <p className="px-3 py-1.5 text-xs text-zinc-500 font-medium border-b border-zinc-800">Recent workspaces</p>
+                  <div className="absolute right-0 top-6 z-50 w-72 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 shadow-xl py-1">
+                    <p className="px-3 py-1.5 text-xs text-zinc-500 font-medium border-b border-zinc-200 dark:border-zinc-800">Recent workspaces</p>
                     {recents.length === 0 ? (
-                      <p className="px-3 py-2 text-xs text-zinc-600">No recent workspaces yet</p>
+                      <p className="px-3 py-2 text-xs text-zinc-500 dark:text-zinc-600">No recent workspaces yet</p>
                     ) : recents.map(p => (
                       <button
                         key={p}
                         onClick={() => handleSwitchWorkspace(p)}
-                        className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-zinc-800 transition-colors text-left ${
-                          p === state.workspacePath ? 'text-indigo-400' : 'text-zinc-300'
+                        className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors text-left ${
+                          p === state.workspacePath ? 'text-indigo-400' : 'text-zinc-700 dark:text-zinc-300'
                         }`}
                       >
                         <Folder size={11} className="shrink-0" />
@@ -183,16 +183,16 @@ export default function Dashboard() {
                         {p === state.workspacePath && <span className="ml-auto text-indigo-500">active</span>}
                       </button>
                     ))}
-                    <div className="border-t border-zinc-800 mt-1 pt-1">
+                    <div className="border-t border-zinc-200 dark:border-zinc-800 mt-1 pt-1">
                       <button
                         onClick={handleBrowseWorkspace}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
                       >
                         <FolderOpen size={11} /> Browse for folder…
                       </button>
                       <button
                         onClick={() => { setWsMenuOpen(false); navigate('/settings') }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
                       >
                         Manage in Settings →
                       </button>
@@ -210,7 +210,7 @@ export default function Dashboard() {
         <div>
           <div className="flex items-center gap-2 mb-3">
             <Zap size={14} className="text-indigo-400" />
-            <h2 className="text-sm font-medium text-zinc-300">Quick Actions</h2>
+            <h2 className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Quick Actions</h2>
             <span className="text-xs text-zinc-600">— click to copy slash command</span>
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -224,7 +224,7 @@ export default function Dashboard() {
         <div>
           <div className="flex items-center gap-2 mb-3">
             <Folder size={14} className="text-zinc-400" />
-            <h2 className="text-sm font-medium text-zinc-300">Projects</h2>
+            <h2 className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Projects</h2>
             <span className="text-xs text-zinc-600">from ~/.gstack/projects</span>
           </div>
           <div className="space-y-1.5">
@@ -232,12 +232,12 @@ export default function Dashboard() {
               <button
                 key={project.slug}
                 onClick={() => navigate('/history', { state: { slug: project.slug } })}
-                className="w-full flex items-center justify-between p-3 rounded-xl border border-zinc-800 bg-zinc-900 hover:border-zinc-700 hover:bg-zinc-800/80 transition-all group"
+                className="w-full flex items-center justify-between p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-200/80 dark:hover:bg-zinc-800/80 transition-all group"
               >
                 <div className="flex items-center gap-3">
-                  <Folder size={14} className="text-zinc-500 group-hover:text-zinc-300 shrink-0" />
+                  <Folder size={14} className="text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 shrink-0" />
                   <div className="text-left">
-                    <p className="text-sm font-medium text-zinc-200">{project.slug}</p>
+                    <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{project.slug}</p>
                     <p className="text-xs text-zinc-500">
                       {[project.hasLearnings && 'learnings', project.designs && 'designs']
                         .filter(Boolean).join(' · ') || 'no data yet'}
@@ -266,11 +266,11 @@ function QuickActionCard({ skill }: { skill: import('../lib/gstack-client').Skil
   return (
     <button
       onClick={handleCopy}
-      className="flex items-center gap-3 p-3 rounded-xl border border-zinc-800 bg-zinc-900 hover:border-zinc-700 hover:bg-zinc-800/80 transition-all text-left group"
+      className="flex items-center gap-3 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-200/80 dark:hover:bg-zinc-800/80 transition-all text-left group"
     >
       <span className="text-lg shrink-0">{skill.icon}</span>
       <div className="min-w-0">
-        <p className="text-sm font-medium text-zinc-200 group-hover:text-white truncate">{skill.name}</p>
+        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200 group-hover:text-zinc-900 dark:group-hover:text-white truncate">{skill.name}</p>
         <p className={`text-xs truncate transition-colors ${copied ? 'text-emerald-400' : 'text-zinc-500'}`}>
           {copied ? 'Copied!' : `/${skill.id}`}
         </p>

@@ -11,7 +11,7 @@ const NAV = [
 
 export default function Sidebar() {
   return (
-    <aside className="w-14 flex flex-col items-center py-3 gap-1 bg-zinc-950 border-r border-zinc-800/60 shrink-0 select-none">
+    <aside className="w-14 flex flex-col items-center py-3 gap-1 bg-white dark:bg-zinc-950 border-r border-zinc-200/60 dark:border-zinc-800/60 shrink-0 select-none">
       {NAV.map(({ to, icon: Icon, label, shortcut }) => (
         <NavLink
           key={to}
@@ -21,7 +21,7 @@ export default function Sidebar() {
             `w-9 h-9 flex items-center justify-center rounded-lg transition-colors titlebar-no-drag ${
               isActive
                 ? 'bg-indigo-600 text-white'
-                : 'text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800'
+                : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800'
             }`
           }
         >
@@ -36,7 +36,7 @@ export default function Sidebar() {
         target="_blank"
         rel="noreferrer"
         title="Sponsor this project"
-        className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors titlebar-no-drag text-zinc-500 hover:text-pink-400 hover:bg-zinc-800"
+        className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors titlebar-no-drag text-zinc-500 hover:text-pink-400 hover:bg-zinc-200 dark:hover:bg-zinc-800"
       >
         <Heart size={18} />
       </a>
@@ -48,7 +48,7 @@ export default function Sidebar() {
           `w-9 h-9 flex items-center justify-center rounded-lg transition-colors titlebar-no-drag ${
             isActive
               ? 'bg-indigo-600 text-white'
-              : 'text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800'
+              : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800'
           }`
         }
       >

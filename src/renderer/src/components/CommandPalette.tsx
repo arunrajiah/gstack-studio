@@ -125,13 +125,13 @@ export default function CommandPalette({ onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-[200] bg-zinc-950/80 backdrop-blur-sm flex items-start justify-center pt-[15vh]"
+      className="fixed inset-0 z-[200] bg-zinc-100/80 dark:bg-zinc-950/80 backdrop-blur-sm flex items-start justify-center pt-[15vh]"
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="w-full max-w-xl bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[60vh]">
+      <div className="w-full max-w-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[60vh]">
 
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-800">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800">
           <Search size={16} className="text-zinc-500 shrink-0" />
           <input
             ref={inputRef}
@@ -139,21 +139,21 @@ export default function CommandPalette({ onClose }: Props) {
             onChange={e => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Search pages and skills…"
-            className="flex-1 bg-transparent text-sm text-zinc-200 placeholder:text-zinc-500 outline-none"
+            className="flex-1 bg-transparent text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-500 outline-none"
           />
-          <kbd className="hidden sm:block text-xs text-zinc-600 bg-zinc-800 px-1.5 py-0.5 rounded">esc</kbd>
+          <kbd className="hidden sm:block text-xs text-zinc-500 dark:text-zinc-600 bg-zinc-200 dark:bg-zinc-800 px-1.5 py-0.5 rounded">esc</kbd>
         </div>
 
         {/* Results */}
         <div ref={listRef} className="overflow-y-auto flex-1">
           {allItems.length === 0 && (
-            <p className="px-4 py-8 text-sm text-zinc-600 text-center">No results for "{query}"</p>
+            <p className="px-4 py-8 text-sm text-zinc-500 dark:text-zinc-600 text-center">No results for "{query}"</p>
           )}
 
           {/* Pages group */}
           {navGroup.length > 0 && (
             <div>
-              <p className="px-4 pt-3 pb-1 text-xs font-medium text-zinc-600 uppercase tracking-wider">Pages</p>
+              <p className="px-4 pt-3 pb-1 text-xs font-medium text-zinc-500 dark:text-zinc-600 uppercase tracking-wider">Pages</p>
               {navGroup.map(item => {
                 const idx = globalIdx++
                 const active = idx === cursor
@@ -164,21 +164,21 @@ export default function CommandPalette({ onClose }: Props) {
                     onClick={() => selectItem(item)}
                     onMouseEnter={() => setCursor(idx)}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 transition-colors text-left ${
-                      active ? 'bg-indigo-600/15' : 'hover:bg-zinc-800/60'
+                      active ? 'bg-indigo-600/15' : 'hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
                     }`}
                   >
                     <span className={`shrink-0 ${active ? 'text-indigo-400' : 'text-zinc-500'}`}>
                       {item.icon}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium ${active ? 'text-indigo-300' : 'text-zinc-200'}`}>
+                      <p className={`text-sm font-medium ${active ? 'text-indigo-300' : 'text-zinc-800 dark:text-zinc-200'}`}>
                         {item.label}
                       </p>
                       <p className="text-xs text-zinc-500 truncate">{item.description}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <kbd className="text-xs text-zinc-600 bg-zinc-800 px-1.5 py-0.5 rounded">{item.shortcut}</kbd>
-                      <ChevronRight size={12} className={active ? 'text-indigo-400' : 'text-zinc-600'} />
+                      <kbd className="text-xs text-zinc-500 dark:text-zinc-600 bg-zinc-200 dark:bg-zinc-800 px-1.5 py-0.5 rounded">{item.shortcut}</kbd>
+                      <ChevronRight size={12} className={active ? 'text-indigo-400' : 'text-zinc-500 dark:text-zinc-600'} />
                     </div>
                   </button>
                 )
@@ -189,7 +189,7 @@ export default function CommandPalette({ onClose }: Props) {
           {/* Skills group */}
           {skillGroup.length > 0 && (
             <div>
-              <p className="px-4 pt-3 pb-1 text-xs font-medium text-zinc-600 uppercase tracking-wider">
+              <p className="px-4 pt-3 pb-1 text-xs font-medium text-zinc-500 dark:text-zinc-600 uppercase tracking-wider">
                 Skills — click to copy command
               </p>
               {skillGroup.map(item => {
@@ -203,21 +203,21 @@ export default function CommandPalette({ onClose }: Props) {
                     onClick={() => selectItem(item)}
                     onMouseEnter={() => setCursor(idx)}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 transition-colors text-left ${
-                      active ? 'bg-indigo-600/15' : 'hover:bg-zinc-800/60'
+                      active ? 'bg-indigo-600/15' : 'hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
                     }`}
                   >
                     <span className="text-base shrink-0">{item.skill.icon}</span>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium ${active ? 'text-indigo-300' : 'text-zinc-200'}`}>
+                      <p className={`text-sm font-medium ${active ? 'text-indigo-300' : 'text-zinc-800 dark:text-zinc-200'}`}>
                         {item.skill.name}
                       </p>
                       <p className="text-xs text-zinc-500 truncate">{item.skill.description}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <code className="text-xs font-mono text-zinc-600">/{item.skill.id}</code>
+                      <code className="text-xs font-mono text-zinc-500 dark:text-zinc-600">/{item.skill.id}</code>
                       {copied
                         ? <Check size={13} className="text-emerald-400" />
-                        : <Copy size={13} className={active ? 'text-zinc-400' : 'text-zinc-600'} />
+                        : <Copy size={13} className={active ? 'text-zinc-400' : 'text-zinc-500 dark:text-zinc-600'} />
                       }
                     </div>
                   </button>
@@ -230,10 +230,10 @@ export default function CommandPalette({ onClose }: Props) {
         </div>
 
         {/* Footer hint */}
-        <div className="border-t border-zinc-800 px-4 py-2 flex items-center gap-4 text-xs text-zinc-600">
-          <span><kbd className="bg-zinc-800 px-1 rounded">↑↓</kbd> navigate</span>
-          <span><kbd className="bg-zinc-800 px-1 rounded">↵</kbd> select</span>
-          <span><kbd className="bg-zinc-800 px-1 rounded">esc</kbd> close</span>
+        <div className="border-t border-zinc-200 dark:border-zinc-800 px-4 py-2 flex items-center gap-4 text-xs text-zinc-500 dark:text-zinc-600">
+          <span><kbd className="bg-zinc-200 dark:bg-zinc-800 px-1 rounded">↑↓</kbd> navigate</span>
+          <span><kbd className="bg-zinc-200 dark:bg-zinc-800 px-1 rounded">↵</kbd> select</span>
+          <span><kbd className="bg-zinc-200 dark:bg-zinc-800 px-1 rounded">esc</kbd> close</span>
           <span className="ml-auto">{allItems.length} result{allItems.length !== 1 ? 's' : ''}</span>
         </div>
       </div>

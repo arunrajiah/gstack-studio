@@ -58,7 +58,7 @@ function ToastItem({
   return (
     <div
       className={`pointer-events-auto relative flex items-start gap-2.5 min-w-[260px] max-w-sm
-        bg-zinc-900 border ${s.ring} rounded-xl shadow-2xl px-3.5 py-3 text-sm
+        bg-zinc-50 dark:bg-zinc-900 border ${s.ring} rounded-xl shadow-2xl px-3.5 py-3 text-sm
         transition-all duration-250
         ${item.leaving ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}
     >
@@ -66,11 +66,11 @@ function ToastItem({
       <div className={`absolute left-0 top-3 bottom-3 w-0.5 rounded-full ${s.bar}`} />
 
       {s.icon}
-      <p className="flex-1 text-zinc-200 leading-snug text-xs">{item.message}</p>
+      <p className="flex-1 text-zinc-800 dark:text-zinc-200 leading-snug text-xs">{item.message}</p>
 
       <button
         onClick={onDismiss}
-        className="text-zinc-600 hover:text-zinc-300 transition-colors shrink-0 mt-0.5"
+        className="text-zinc-500 dark:text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors shrink-0 mt-0.5"
       >
         <X size={12} />
       </button>

@@ -10,14 +10,14 @@ export default function WindowControls() {
     <div className="flex items-center titlebar-no-drag select-none">
       <button
         onClick={() => client.window.minimize()}
-        className="h-10 w-12 flex items-center justify-center text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+        className="h-10 w-12 flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
         title="Minimize"
       >
         <Minus size={14} />
       </button>
       <button
         onClick={() => client.window.maximize()}
-        className="h-10 w-12 flex items-center justify-center text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+        className="h-10 w-12 flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
         title="Maximize / Restore"
       >
         <Square size={11} />

@@ -77,7 +77,7 @@ export function useSkills() {
 export function useConfig() {
   const [config, setConfig] = useState<AppConfig>({
     anthropicApiKey: '', gstackPath: '', workspacePath: '', openaiApiKey: '',
-    recentWorkspaces: [], autoStartDaemon: false
+    recentWorkspaces: [], autoStartDaemon: false, theme: 'dark'
   })
 
   useEffect(() => {

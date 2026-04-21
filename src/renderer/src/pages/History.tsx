@@ -74,10 +74,10 @@ export default function History() {
   return (
     <div className="flex h-full">
       {/* Project sidebar */}
-      <div className="w-52 border-r border-zinc-800/60 overflow-y-auto py-4 shrink-0">
+      <div className="w-52 border-r border-zinc-200/60 dark:border-zinc-800/60 overflow-y-auto py-4 shrink-0">
         <p className="px-4 text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">Projects</p>
         {projects.length === 0 ? (
-          <p className="px-4 text-xs text-zinc-600">No projects yet</p>
+          <p className="px-4 text-xs text-zinc-500 dark:text-zinc-600">No projects yet</p>
         ) : projects.map(p => (
           <button
             key={p.slug}
@@ -85,7 +85,7 @@ export default function History() {
             className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors ${
               activeSlug === p.slug
                 ? 'bg-indigo-600/10 text-indigo-400 border-r-2 border-indigo-500'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
+                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50'
             }`}
           >
             <Folder size={13} className="shrink-0" />
@@ -107,14 +107,14 @@ export default function History() {
         ) : (
           <>
             {/* Search bar */}
-            <div className="px-6 py-3 border-b border-zinc-800/60 flex items-center gap-3">
-              <div className="flex items-center gap-2 flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-1.5 focus-within:border-indigo-600 transition-colors">
-                <Search size={13} className="text-zinc-600 shrink-0" />
+            <div className="px-6 py-3 border-b border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-3">
+              <div className="flex items-center gap-2 flex-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-1.5 focus-within:border-indigo-600 transition-colors">
+                <Search size={13} className="text-zinc-500 dark:text-zinc-600 shrink-0" />
                 <input
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Search learnings…"
-                  className="flex-1 bg-transparent text-sm text-zinc-200 placeholder:text-zinc-600 outline-none"
+                  className="flex-1 bg-transparent text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-500 dark:placeholder:text-zinc-600 outline-none"
                 />
                 {search && (
                   <button onClick={() => setSearch('')} className="text-zinc-600 hover:text-zinc-400">
@@ -130,14 +130,14 @@ export default function History() {
                   <button
                     onClick={exportJSON}
                     title="Export as JSON"
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900 hover:border-zinc-600 text-zinc-400 hover:text-zinc-200 transition-colors text-xs"
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-600 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors text-xs"
                   >
                     <Download size={12} /> JSON
                   </button>
                   <button
                     onClick={exportMarkdown}
                     title="Export as Markdown"
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900 hover:border-zinc-600 text-zinc-400 hover:text-zinc-200 transition-colors text-xs"
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-600 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors text-xs"
                   >
                     <Download size={12} /> MD
                   </button>
@@ -157,7 +157,7 @@ export default function History() {
                 <>
                   <div className="flex items-center gap-2 mb-4">
                     <BookOpen size={14} className="text-zinc-400" />
-                    <h2 className="text-sm font-medium text-zinc-300">{activeSlug}</h2>
+                    <h2 className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{activeSlug}</h2>
                     {search && <span className="text-xs text-indigo-400">{filtered.length} match{filtered.length !== 1 ? 'es' : ''}</span>}
                   </div>
                   {filtered.map((entry, i) => <LearningRow key={i} entry={entry} highlight={search} />)}
@@ -177,10 +177,10 @@ function LearningRow({ entry, highlight }: { entry: Learning; highlight: string 
   const preview = entry.message ?? entry.skill ?? (keys[0] ? String(entry[keys[0]]) : 'entry')
 
   return (
-    <div className="border border-zinc-800 rounded-xl overflow-hidden">
+    <div className="border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-zinc-800/40 transition-colors text-left"
+        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-zinc-200/40 dark:hover:bg-zinc-800/40 transition-colors text-left"
       >
         {open
           ? <ChevronDown size={13} className="text-zinc-500 shrink-0" />
@@ -192,7 +192,7 @@ function LearningRow({ entry, highlight }: { entry: Learning; highlight: string 
             {new Date(entry.timestamp).toLocaleString()}
           </span>
         )}
-        <span className={`text-sm text-zinc-300 truncate ${highlight && String(preview).toLowerCase().includes(highlight.toLowerCase()) ? 'text-amber-300' : ''}`}>
+        <span className={`text-sm truncate ${highlight && String(preview).toLowerCase().includes(highlight.toLowerCase()) ? 'text-amber-300' : 'text-zinc-700 dark:text-zinc-300'}`}>
           {String(preview)}
         </span>
         {entry.skill && (
@@ -202,7 +202,7 @@ function LearningRow({ entry, highlight }: { entry: Learning; highlight: string 
         )}
       </button>
       {open && (
-        <pre className="px-4 pb-4 text-xs text-zinc-400 font-mono whitespace-pre-wrap overflow-auto border-t border-zinc-800/60 bg-zinc-950/40 max-h-64">
+        <pre className="px-4 pb-4 text-xs text-zinc-500 dark:text-zinc-400 font-mono whitespace-pre-wrap overflow-auto border-t border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-100/40 dark:bg-zinc-950/40 max-h-64">
           {JSON.stringify(entry, null, 2)}
         </pre>
       )}

@@ -148,6 +148,7 @@ export interface AppConfig {
   workspacePath: string
   openaiApiKey: string
   recentWorkspaces: string[]
+  theme: 'dark' | 'light' | 'system'
 }
 
 function configPath(): string { return join(homedir(), '.gstack', 'studio-config.json') }
@@ -161,11 +162,12 @@ function getConfig(): AppConfig {
         gstackPath:       raw.gstackPath       ?? '',
         workspacePath:    raw.workspacePath     ?? '',
         openaiApiKey:     raw.openaiApiKey      ?? '',
-        recentWorkspaces: raw.recentWorkspaces  ?? []
+        recentWorkspaces: raw.recentWorkspaces  ?? [],
+        theme:            (raw.theme as AppConfig['theme']) ?? 'dark'
       }
     }
   } catch { /* ignore */ }
-  return { anthropicApiKey: '', gstackPath: '', workspacePath: '', openaiApiKey: '', recentWorkspaces: [] }
+  return { anthropicApiKey: '', gstackPath: '', workspacePath: '', openaiApiKey: '', recentWorkspaces: [], theme: 'dark' }
 }
 
 function saveConfig(config: AppConfig): void {

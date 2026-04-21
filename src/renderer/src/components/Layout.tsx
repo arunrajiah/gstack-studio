@@ -52,7 +52,7 @@ export default function Layout() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-zinc-950 text-zinc-100">
+    <div className="flex flex-col h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       <Titlebar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />

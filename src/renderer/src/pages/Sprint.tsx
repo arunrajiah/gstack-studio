@@ -53,7 +53,7 @@ export default function Sprint() {
     <div className="p-6 space-y-6 max-w-5xl mx-auto">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-100">Sprint Board</h1>
+          <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">Sprint Board</h1>
           <p className="text-sm text-zinc-500 mt-0.5">
             {search.trim()
               ? `${filteredSkills.length} of ${skills.length} agents matching "${search}"`
@@ -71,13 +71,13 @@ export default function Sprint() {
               gstack not configured
             </button>
           )}
-          <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-1.5 focus-within:border-indigo-600 transition-colors">
+          <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-1.5 focus-within:border-indigo-600 transition-colors">
             <Search size={13} className="text-zinc-600 shrink-0" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Filter skills…"
-              className="w-36 bg-transparent text-sm text-zinc-200 placeholder:text-zinc-600 outline-none"
+              className="w-36 bg-transparent text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-500 dark:placeholder:text-zinc-600 outline-none"
             />
             {search && (
               <button onClick={() => setSearch('')} className="text-zinc-600 hover:text-zinc-400">
@@ -95,7 +95,7 @@ export default function Sprint() {
             <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${phase.color}`}>
               {phase.label}
             </span>
-            {i < arr.length - 1 && <span className="text-zinc-700">→</span>}
+            {i < arr.length - 1 && <span className="text-zinc-400 dark:text-zinc-700">→</span>}
           </div>
         ))}
       </div>
@@ -140,7 +140,7 @@ function SkillCard({ skill, onViewDoc }: { skill: Skill; onViewDoc: () => void }
 
   return (
     <div
-      className="relative p-3.5 rounded-xl border transition-all group border-zinc-800 bg-zinc-900 hover:border-indigo-700/60 hover:bg-zinc-800/80 cursor-pointer"
+      className="relative p-3.5 rounded-xl border transition-all group border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-indigo-700/60 hover:bg-zinc-200/80 dark:hover:bg-zinc-800/80 cursor-pointer"
       onClick={handleCopy}
     >
       <div className="flex items-start justify-between mb-2">
@@ -160,11 +160,11 @@ function SkillCard({ skill, onViewDoc }: { skill: Skill; onViewDoc: () => void }
         </div>
       </div>
 
-      <p className="text-sm font-medium text-zinc-200 leading-tight">{skill.name}</p>
+      <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200 leading-tight">{skill.name}</p>
       <p className="text-xs text-zinc-500 mt-1 leading-snug line-clamp-2">{skill.description}</p>
 
       <div className="mt-2.5 flex items-center justify-between">
-        <code className={`text-xs font-mono transition-colors ${copied ? 'text-emerald-400' : 'text-zinc-600 group-hover:text-zinc-400'}`}>
+        <code className={`text-xs font-mono transition-colors ${copied ? 'text-emerald-400' : 'text-zinc-500 dark:text-zinc-600 group-hover:text-zinc-700 dark:group-hover:text-zinc-400'}`}>
           /{skill.id}
         </code>
         {copied && <span className="text-xs text-emerald-400">Copied!</span>}

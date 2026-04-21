@@ -49,8 +49,8 @@ export default function Onboarding({ onComplete }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-zinc-950/95 backdrop-blur-sm flex items-center justify-center p-6">
-      <div className="w-full max-w-lg bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-zinc-100/95 dark:bg-zinc-950/95 backdrop-blur-sm flex items-center justify-center p-6">
+      <div className="w-full max-w-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
 
         {/* Progress dots */}
         <div className="flex gap-1.5 px-6 pt-5">
@@ -58,7 +58,7 @@ export default function Onboarding({ onComplete }: Props) {
             <div key={s} className={`h-1 flex-1 rounded-full transition-colors ${
               s === step ? 'bg-indigo-500' :
               (step === 'configure' && s === 'welcome') || step === 'done' ? 'bg-indigo-800' :
-              'bg-zinc-800'
+              'bg-zinc-200 dark:bg-zinc-800'
             }`} />
           ))}
         </div>
@@ -69,7 +69,7 @@ export default function Onboarding({ onComplete }: Props) {
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold text-indigo-400">gstack</span>
-                <span className="text-2xl font-bold text-zinc-200">Studio</span>
+                <span className="text-2xl font-bold text-zinc-800 dark:text-zinc-200">Studio</span>
               </div>
               <p className="text-sm text-zinc-400">Visual command centre for the gstack AI agent framework</p>
             </div>
@@ -81,10 +81,10 @@ export default function Onboarding({ onComplete }: Props) {
                 { icon: '🌐', title: 'Browse Console',  desc: 'Send HTTP commands to the gstack browse daemon' },
                 { icon: '📖', title: 'History',         desc: 'Review per-project learnings with search' },
               ].map(f => (
-                <div key={f.title} className="flex items-start gap-3 p-3 rounded-xl bg-zinc-800/50">
+                <div key={f.title} className="flex items-start gap-3 p-3 rounded-xl bg-zinc-200/50 dark:bg-zinc-800/50">
                   <span className="text-lg">{f.icon}</span>
                   <div>
-                    <p className="text-sm font-medium text-zinc-200">{f.title}</p>
+                    <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{f.title}</p>
                     <p className="text-xs text-zinc-500">{f.desc}</p>
                   </div>
                 </div>
@@ -110,14 +110,14 @@ export default function Onboarding({ onComplete }: Props) {
         {step === 'configure' && (
           <div className="p-6 space-y-5">
             <div>
-              <h2 className="text-base font-semibold text-zinc-100">Configure your setup</h2>
+              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Configure your setup</h2>
               <p className="text-xs text-zinc-500 mt-0.5">Tell Studio where gstack is installed and which project to work in</p>
             </div>
 
             <div className="space-y-4">
               {/* gstack path */}
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-zinc-300">
+                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   gstack Install Path <span className="text-red-400">*</span>
                 </label>
                 <p className="text-xs text-zinc-500">Default: <code className="font-mono text-zinc-400">~/.claude/skills/gstack</code></p>
@@ -126,12 +126,12 @@ export default function Onboarding({ onComplete }: Props) {
                     value={gstackPath}
                     onChange={e => setGstackPath(e.target.value)}
                     placeholder={DEFAULT_GSTACK_PATHS[0]}
-                    className="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm font-mono text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-600 transition-colors"
+                    className="flex-1 bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-sm font-mono text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-500 dark:placeholder:text-zinc-600 focus:outline-none focus:border-indigo-600 transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => browsePath('gstack')}
-                    className="px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:border-zinc-600 text-zinc-400 hover:text-zinc-200 transition-colors"
+                    className="px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-950 hover:border-zinc-300 dark:hover:border-zinc-600 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
                   >
                     <FolderOpen size={15} />
                   </button>
@@ -141,7 +141,7 @@ export default function Onboarding({ onComplete }: Props) {
 
               {/* Workspace path */}
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-zinc-300">
+                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Workspace Directory <span className="text-red-400">*</span>
                 </label>
                 <p className="text-xs text-zinc-500">Your project folder — daemon writes <code className="font-mono text-zinc-400">.gstack/browse.json</code> here</p>
@@ -150,12 +150,12 @@ export default function Onboarding({ onComplete }: Props) {
                     value={workspacePath}
                     onChange={e => setWorkspacePath(e.target.value)}
                     placeholder="/Users/you/my-project"
-                    className="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-sm font-mono text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-600 transition-colors"
+                    className="flex-1 bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-sm font-mono text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-500 dark:placeholder:text-zinc-600 focus:outline-none focus:border-indigo-600 transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => browsePath('workspace')}
-                    className="px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:border-zinc-600 text-zinc-400 hover:text-zinc-200 transition-colors"
+                    className="px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-950 hover:border-zinc-300 dark:hover:border-zinc-600 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
                   >
                     <FolderOpen size={15} />
                   </button>
@@ -166,7 +166,7 @@ export default function Onboarding({ onComplete }: Props) {
             <div className="flex gap-3">
               <button
                 onClick={() => setStep('welcome')}
-                className="px-4 py-2 rounded-xl border border-zinc-800 text-sm text-zinc-400 hover:text-zinc-200 transition-colors"
+                className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
               >
                 Back
               </button>
@@ -189,23 +189,23 @@ export default function Onboarding({ onComplete }: Props) {
                 <Zap size={22} className="text-emerald-400" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-zinc-100">You're all set!</h2>
+                <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">You're all set!</h2>
                 <p className="text-xs text-zinc-500 mt-1">Studio will start the daemon and take you to the Dashboard</p>
               </div>
             </div>
 
             <div className="space-y-2 text-xs">
-              <div className="flex items-start gap-2 p-3 rounded-xl bg-zinc-800/50">
+              <div className="flex items-start gap-2 p-3 rounded-xl bg-zinc-200/50 dark:bg-zinc-800/50">
                 <CheckCircle2 size={13} className="text-emerald-400 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-zinc-300 font-medium">gstack path</p>
+                  <p className="text-zinc-700 dark:text-zinc-300 font-medium">gstack path</p>
                   <p className="text-zinc-500 font-mono truncate">{gstackPath}</p>
                 </div>
               </div>
-              <div className="flex items-start gap-2 p-3 rounded-xl bg-zinc-800/50">
+              <div className="flex items-start gap-2 p-3 rounded-xl bg-zinc-200/50 dark:bg-zinc-800/50">
                 <CheckCircle2 size={13} className="text-emerald-400 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-zinc-300 font-medium">Workspace</p>
+                  <p className="text-zinc-700 dark:text-zinc-300 font-medium">Workspace</p>
                   <p className="text-zinc-500 font-mono truncate">{workspacePath}</p>
                 </div>
               </div>
@@ -214,7 +214,7 @@ export default function Onboarding({ onComplete }: Props) {
             <div className="flex gap-3">
               <button
                 onClick={() => setStep('configure')}
-                className="px-4 py-2 rounded-xl border border-zinc-800 text-sm text-zinc-400 hover:text-zinc-200 transition-colors"
+                className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
               >
                 Back
               </button>

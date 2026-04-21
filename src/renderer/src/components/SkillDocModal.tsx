@@ -38,18 +38,18 @@ export default function SkillDocModal({ skill, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-6"
+      className="fixed inset-0 z-50 bg-zinc-100/80 dark:bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-6"
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="w-full max-w-2xl max-h-[80vh] bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      <div className="w-full max-w-2xl max-h-[80vh] bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-start justify-between px-5 py-4 border-b border-zinc-800 shrink-0">
+        <div className="flex items-start justify-between px-5 py-4 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
           <div className="flex items-center gap-3">
             <span className="text-2xl">{skill.icon}</span>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-semibold text-zinc-100">{skill.name}</h2>
+                <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{skill.name}</h2>
                 <code className="text-xs font-mono text-zinc-500">/{skill.id}</code>
               </div>
               <p className="text-xs text-zinc-500 mt-0.5 leading-snug">{skill.description}</p>
@@ -66,7 +66,7 @@ export default function SkillDocModal({ skill, onClose }: Props) {
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+              className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
             >
               <X size={16} />
             </button>
@@ -76,7 +76,7 @@ export default function SkillDocModal({ skill, onClose }: Props) {
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-5">
           {loading && (
-            <div className="flex items-center justify-center gap-2 py-12 text-zinc-500">
+            <div className="flex items-center justify-center gap-2 py-12 text-zinc-500 dark:text-zinc-500">
               <Loader2 size={16} className="animate-spin" />
               <span className="text-sm">Loading documentation…</span>
             </div>
@@ -97,7 +97,7 @@ export default function SkillDocModal({ skill, onClose }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3 border-t border-zinc-800 shrink-0 flex items-center gap-2 text-xs text-zinc-600">
+        <div className="px-5 py-3 border-t border-zinc-200 dark:border-zinc-800 shrink-0 flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-600">
           <BookOpen size={11} />
           <span>SKILL.md · {skill.phase} phase</span>
         </div>
@@ -129,8 +129,8 @@ function MarkdownView({ content }: { content: string }) {
       }
       elements.push(
         <div key={i} className="my-3">
-          {lang && <p className="text-xs text-zinc-600 font-mono mb-1">{lang}</p>}
-          <pre className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 overflow-x-auto text-xs font-mono text-zinc-300 leading-relaxed">
+          {lang && <p className="text-xs text-zinc-500 dark:text-zinc-600 font-mono mb-1">{lang}</p>}
+          <pre className="bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 overflow-x-auto text-xs font-mono text-zinc-700 dark:text-zinc-300 leading-relaxed">
             {codeLines.join('\n')}
           </pre>
         </div>
@@ -141,23 +141,23 @@ function MarkdownView({ content }: { content: string }) {
 
     // H1
     if (line.startsWith('# ')) {
-      elements.push(<h1 key={i} className="text-lg font-bold text-zinc-100 mt-5 mb-2 first:mt-0">{inline(line.slice(2))}</h1>)
+      elements.push(<h1 key={i} className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mt-5 mb-2 first:mt-0">{inline(line.slice(2))}</h1>)
       i++; continue
     }
     // H2
     if (line.startsWith('## ')) {
-      elements.push(<h2 key={i} className="text-base font-semibold text-zinc-200 mt-4 mb-1.5">{inline(line.slice(3))}</h2>)
+      elements.push(<h2 key={i} className="text-base font-semibold text-zinc-800 dark:text-zinc-200 mt-4 mb-1.5">{inline(line.slice(3))}</h2>)
       i++; continue
     }
     // H3
     if (line.startsWith('### ')) {
-      elements.push(<h3 key={i} className="text-sm font-semibold text-zinc-300 mt-3 mb-1">{inline(line.slice(4))}</h3>)
+      elements.push(<h3 key={i} className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mt-3 mb-1">{inline(line.slice(4))}</h3>)
       i++; continue
     }
 
     // HR
     if (/^---+$/.test(line.trim())) {
-      elements.push(<hr key={i} className="border-zinc-800 my-4" />)
+      elements.push(<hr key={i} className="border-zinc-200 dark:border-zinc-800 my-4" />)
       i++; continue
     }
 
@@ -171,7 +171,7 @@ function MarkdownView({ content }: { content: string }) {
       elements.push(
         <ul key={i} className="my-2 space-y-1 pl-4">
           {items.map((item, j) => (
-            <li key={j} className="text-sm text-zinc-300 leading-relaxed list-disc list-inside">
+            <li key={j} className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed list-disc list-inside">
               {inline(item)}
             </li>
           ))}
@@ -186,7 +186,7 @@ function MarkdownView({ content }: { content: string }) {
     }
 
     // Normal paragraph
-    elements.push(<p key={i} className="text-sm text-zinc-300 leading-relaxed my-1.5">{inline(line)}</p>)
+    elements.push(<p key={i} className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed my-1.5">{inline(line)}</p>)
     i++
   }
 
@@ -206,9 +206,9 @@ function inline(text: string): React.ReactNode {
     if (match.index > last) parts.push(text.slice(last, match.index))
     const m = match[0]
     if (m.startsWith('**')) {
-      parts.push(<strong key={key++} className="font-semibold text-zinc-100">{m.slice(2, -2)}</strong>)
+      parts.push(<strong key={key++} className="font-semibold text-zinc-900 dark:text-zinc-100">{m.slice(2, -2)}</strong>)
     } else {
-      parts.push(<code key={key++} className="font-mono text-xs bg-zinc-800 text-zinc-300 px-1.5 py-0.5 rounded">{m.slice(1, -1)}</code>)
+      parts.push(<code key={key++} className="font-mono text-xs bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-1.5 py-0.5 rounded">{m.slice(1, -1)}</code>)
     }
     last = match.index + m.length
   }

@@ -62,21 +62,21 @@ export default function Agents() {
     <div className="flex h-full overflow-hidden">
 
       {/* ── Left: Skill browser ─────────────────────────────────────────── */}
-      <div className="w-72 flex flex-col border-r border-zinc-800/60 shrink-0">
-        <div className="px-4 pt-4 pb-3 border-b border-zinc-800/60 space-y-3">
+      <div className="w-72 flex flex-col border-r border-zinc-200/60 dark:border-zinc-800/60 shrink-0">
+        <div className="px-4 pt-4 pb-3 border-b border-zinc-200/60 dark:border-zinc-800/60 space-y-3">
           <div>
-            <h1 className="text-base font-semibold text-zinc-100">Agents</h1>
+            <h1 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Agents</h1>
             <p className="text-xs text-zinc-500 mt-0.5">Click any skill to copy its command</p>
           </div>
 
           {/* Search */}
-          <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-1.5 focus-within:border-indigo-600 transition-colors">
-            <Search size={12} className="text-zinc-600 shrink-0" />
+          <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-1.5 focus-within:border-indigo-600 transition-colors">
+            <Search size={12} className="text-zinc-500 dark:text-zinc-600 shrink-0" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search skills…"
-              className="flex-1 bg-transparent text-xs text-zinc-200 placeholder:text-zinc-600 outline-none"
+              className="flex-1 bg-transparent text-xs text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-500 dark:placeholder:text-zinc-600 outline-none"
             />
             {search && (
               <button onClick={() => setSearch('')} className="text-zinc-600 hover:text-zinc-400">
@@ -94,7 +94,7 @@ export default function Agents() {
                 className={`px-2 py-0.5 rounded-full text-xs font-medium transition-colors ${
                   phase === p
                     ? 'bg-indigo-600 text-white'
-                    : 'text-zinc-500 hover:text-zinc-300 bg-zinc-800/60 hover:bg-zinc-700/60'
+                    : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-800/60 hover:bg-zinc-300/60 dark:hover:bg-zinc-700/60'
                 }`}
               >
                 {PHASE_LABELS[p]}
@@ -112,7 +112,7 @@ export default function Agents() {
           ))}
         </div>
 
-        <div className="px-4 py-2 border-t border-zinc-800/60 text-xs text-zinc-600">
+        <div className="px-4 py-2 border-t border-zinc-200/60 dark:border-zinc-800/60 text-xs text-zinc-500 dark:text-zinc-600">
           {filtered.length} skill{filtered.length !== 1 ? 's' : ''}
           {phase !== 'all' && ` in ${PHASE_LABELS[phase]}`}
         </div>
@@ -123,9 +123,9 @@ export default function Agents() {
 
       {/* ── Right: Live daemon log stream ──────────────────────────────── */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="px-6 py-3 border-b border-zinc-800/60 flex items-center justify-between">
+        <div className="px-6 py-3 border-b border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-semibold text-zinc-200">Live Daemon Output</h2>
+            <h2 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Live Daemon Output</h2>
             <p className="text-xs text-zinc-500 mt-0.5">stdout + stderr from the gstack browse server</p>
           </div>
           <div className="flex items-center gap-3">
@@ -147,7 +147,7 @@ export default function Agents() {
                   setTimeout(() => setCopiedLogs(false), 2000)
                 }}
                 title="Copy all logs"
-                className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+                className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
               >
                 {copiedLogs ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
                 Copy
@@ -184,7 +184,7 @@ export default function Agents() {
           <div ref={logEndRef} />
         </div>
 
-        <div className="px-6 py-2 border-t border-zinc-800/60 text-xs text-zinc-600">
+        <div className="px-6 py-2 border-t border-zinc-200/60 dark:border-zinc-800/60 text-xs text-zinc-500 dark:text-zinc-600">
           {logs.length} line{logs.length !== 1 ? 's' : ''} · polling every 2 s
         </div>
       </div>
@@ -203,18 +203,18 @@ function SkillRow({ skill, onViewDoc }: { skill: Skill; onViewDoc: () => void })
   }
 
   return (
-    <div className="w-full flex items-start gap-3 px-4 py-2.5 hover:bg-zinc-800/50 transition-colors group">
+    <div className="w-full flex items-start gap-3 px-4 py-2.5 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50 transition-colors group">
       <button onClick={handleCopy} className="flex items-start gap-3 flex-1 min-w-0 text-left">
         <span className="text-base shrink-0 mt-0.5">{skill.icon}</span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="text-sm font-medium text-zinc-200 truncate">{skill.name}</p>
+            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200 truncate">{skill.name}</p>
             <span className={`shrink-0 text-xs px-1.5 py-0.5 rounded-full border ${PHASE_COLORS[skill.phase] ?? ''}`}>
               {skill.phase}
             </span>
           </div>
           <p className="text-xs text-zinc-500 mt-0.5 leading-snug line-clamp-2">{skill.description}</p>
-          <code className={`text-xs font-mono mt-1 block transition-colors ${copied ? 'text-emerald-400' : 'text-zinc-600 group-hover:text-zinc-400'}`}>
+          <code className={`text-xs font-mono mt-1 block transition-colors ${copied ? 'text-emerald-400' : 'text-zinc-500 dark:text-zinc-600 group-hover:text-zinc-700 dark:group-hover:text-zinc-400'}`}>
             /{skill.id}
           </code>
         </div>
@@ -223,14 +223,14 @@ function SkillRow({ skill, onViewDoc }: { skill: Skill; onViewDoc: () => void })
         <button
           onClick={onViewDoc}
           title="View documentation"
-          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700"
+          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-300 dark:hover:bg-zinc-700"
         >
           <BookOpen size={12} />
         </button>
         <button
           onClick={handleCopy}
           title="Copy command"
-          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-700"
+          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-300 dark:hover:bg-zinc-700"
         >
           {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
         </button>
@@ -248,8 +248,8 @@ function LogLine({ line }: { line: string }) {
     <div className={`leading-5 ${
       isErr    ? 'text-red-400' :
       isStudio ? 'text-indigo-300' :
-      isOut    ? 'text-zinc-300' :
-                 'text-zinc-400'
+      isOut    ? 'text-zinc-700 dark:text-zinc-300' :
+                 'text-zinc-500 dark:text-zinc-400'
     }`}>
       {line}
     </div>

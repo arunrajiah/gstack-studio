@@ -191,18 +191,18 @@ export default function Browse() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-zinc-800/60 flex items-start justify-between">
+      <div className="px-6 py-4 border-b border-zinc-200/60 dark:border-zinc-800/60 flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-100">Browse Console</h1>
+          <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">Browse Console</h1>
           <p className="text-sm text-zinc-500 mt-0.5">Browser automation via the gstack daemon</p>
         </div>
         <div className="flex items-center gap-2">
           {/* Mode tabs */}
-          <div className="flex items-center rounded-lg border border-zinc-800 overflow-hidden text-xs">
+          <div className="flex items-center rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden text-xs">
             <button
               onClick={() => setMode('terminal')}
               className={`flex items-center gap-1.5 px-3 py-1.5 transition-colors ${
-                mode === 'terminal' ? 'bg-zinc-700 text-zinc-200' : 'bg-zinc-900 text-zinc-500 hover:text-zinc-300'
+                mode === 'terminal' ? 'bg-zinc-300 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200' : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
             >
               <Terminal size={12} /> Terminal
@@ -210,7 +210,7 @@ export default function Browse() {
             <button
               onClick={() => setMode('script')}
               className={`flex items-center gap-1.5 px-3 py-1.5 transition-colors ${
-                mode === 'script' ? 'bg-zinc-700 text-zinc-200' : 'bg-zinc-900 text-zinc-500 hover:text-zinc-300'
+                mode === 'script' ? 'bg-zinc-300 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200' : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
             >
               <FileCode size={12} /> Script
@@ -221,7 +221,7 @@ export default function Browse() {
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs transition-colors ${
               showRef
                 ? 'border-indigo-700/60 bg-indigo-900/20 text-indigo-300'
-                : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-zinc-200 hover:border-zinc-600'
+                : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:border-zinc-300 dark:hover:border-zinc-600'
             }`}
           >
             <BookOpen size={12} />
@@ -233,11 +233,11 @@ export default function Browse() {
 
       {/* Command reference panel */}
       {showRef && (
-        <div className="border-b border-zinc-800/60 px-6 py-4 overflow-y-auto max-h-72 bg-zinc-900/30">
+        <div className="border-b border-zinc-200/60 dark:border-zinc-800/60 px-6 py-4 overflow-y-auto max-h-72 bg-zinc-100/30 dark:bg-zinc-900/30">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {COMMAND_REFERENCE.map(group => (
               <div key={group.category}>
-                <p className="text-xs font-semibold text-zinc-400 mb-1.5">{group.category}</p>
+                <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5">{group.category}</p>
                 <div className="space-y-0.5">
                   {group.commands.map(c => (
                     <button
@@ -249,10 +249,10 @@ export default function Browse() {
                         inputRef.current?.focus()
                       }}
                       title={c.desc}
-                      className="w-full flex items-center gap-2 px-2 py-1 rounded hover:bg-zinc-800/60 transition-colors text-left group"
+                      className="w-full flex items-center gap-2 px-2 py-1 rounded hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60 transition-colors text-left group"
                     >
                       <code className="text-xs font-mono text-indigo-400 shrink-0 w-28 truncate">{c.cmd}</code>
-                      <span className="text-xs text-zinc-500 truncate group-hover:text-zinc-300 transition-colors">{c.desc}</span>
+                      <span className="text-xs text-zinc-500 truncate group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors">{c.desc}</span>
                     </button>
                   ))}
                 </div>
@@ -264,7 +264,7 @@ export default function Browse() {
 
       {/* Quick examples */}
       {!showRef && (
-        <div className="px-6 py-2.5 border-b border-zinc-800/60 flex items-center gap-2 overflow-x-auto">
+        <div className="px-6 py-2.5 border-b border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-2 overflow-x-auto">
           <span className="text-xs text-zinc-600 shrink-0">Quick:</span>
           {[
             { cmd: 'goto', args: ['https://example.com'] },
@@ -278,7 +278,7 @@ export default function Browse() {
               key={ex.cmd}
               disabled={!state.running}
               onClick={() => runCommand([ex.cmd, ...(ex.args ?? [])].join(' '))}
-              className="shrink-0 px-2.5 py-1 text-xs rounded-lg border border-zinc-800 bg-zinc-900 hover:border-zinc-700 text-zinc-400 hover:text-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-mono"
+              className="shrink-0 px-2.5 py-1 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-mono"
             >
               {ex.cmd}
             </button>
@@ -303,7 +303,7 @@ export default function Browse() {
           <div key={entry.id} className={`flex gap-3 ${
             entry.type === 'command' ? 'text-indigo-400' :
             entry.type === 'error'   ? 'text-red-400' :
-                                       'text-zinc-300'
+                                       'text-zinc-700 dark:text-zinc-300'
           }`}>
             <span className="text-zinc-700 shrink-0">{entry.time}</span>
             <span className="shrink-0">
@@ -322,9 +322,9 @@ export default function Browse() {
 
       {/* Input area — Terminal or Script mode */}
       {mode === 'terminal' ? (
-        <form onSubmit={handleSubmit} className="px-6 py-4 border-t border-zinc-800/60 flex gap-3">
-          <div className="flex-1 flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 focus-within:border-indigo-600 transition-colors">
-            <span className="text-zinc-600 font-mono text-sm">❯</span>
+        <form onSubmit={handleSubmit} className="px-6 py-4 border-t border-zinc-200/60 dark:border-zinc-800/60 flex gap-3">
+          <div className="flex-1 flex items-center gap-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 focus-within:border-indigo-600 transition-colors">
+            <span className="text-zinc-500 dark:text-zinc-600 font-mono text-sm">❯</span>
             <input
               ref={inputRef}
               value={input}
@@ -332,7 +332,7 @@ export default function Browse() {
               onKeyDown={handleKeyDown}
               placeholder={state.running ? 'goto https://… · screenshot · text   (↑/↓ history)' : 'Start the daemon first'}
               disabled={!state.running}
-              className="flex-1 bg-transparent text-sm text-zinc-200 placeholder:text-zinc-600 outline-none font-mono"
+              className="flex-1 bg-transparent text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-500 dark:placeholder:text-zinc-600 outline-none font-mono"
             />
           </div>
           <div className="flex gap-2">
@@ -341,7 +341,7 @@ export default function Browse() {
                 type="button"
                 onClick={copyLogs}
                 title="Copy all logs"
-                className="px-3 py-2 rounded-xl border border-zinc-800 bg-zinc-900 hover:border-zinc-700 text-zinc-500 hover:text-zinc-300 transition-colors"
+                className="px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
               >
                 {copiedLogs ? <Check size={15} className="text-emerald-400" /> : <Copy size={15} />}
               </button>
@@ -350,7 +350,7 @@ export default function Browse() {
               type="button"
               onClick={() => setLogs([])}
               title="Clear log"
-              className="px-3 py-2 rounded-xl border border-zinc-800 bg-zinc-900 hover:border-zinc-700 text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
             >
               <Trash2 size={15} />
             </button>
@@ -366,7 +366,7 @@ export default function Browse() {
         </form>
       ) : (
         /* Script mode */
-        <div className="border-t border-zinc-800/60 p-4 flex flex-col gap-3">
+        <div className="border-t border-zinc-200/60 dark:border-zinc-800/60 p-4 flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <p className="text-xs text-zinc-500">
               One command per line · lines starting with <code className="font-mono text-zinc-400">#</code> are comments
@@ -383,13 +383,13 @@ export default function Browse() {
             placeholder={`# Example script\ngoto https://example.com\nscreenshot\ntext\nlinks`}
             disabled={!state.running || running}
             rows={5}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2.5 text-sm font-mono text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-600 transition-colors resize-y disabled:opacity-50"
+            className="w-full bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2.5 text-sm font-mono text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-500 dark:placeholder:text-zinc-600 focus:outline-none focus:border-indigo-600 transition-colors resize-y disabled:opacity-50"
           />
           <div className="flex items-center gap-2 justify-end">
             <button
               onClick={() => setLogs([])}
               title="Clear log"
-              className="px-3 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900 hover:border-zinc-700 text-zinc-500 hover:text-zinc-300 transition-colors text-xs flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors text-xs flex items-center gap-1.5"
             >
               <Trash2 size={12} /> Clear log
             </button>

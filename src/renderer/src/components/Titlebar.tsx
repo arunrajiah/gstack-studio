@@ -21,7 +21,7 @@ export default function Titlebar() {
   }
 
   return (
-    <div className="titlebar-drag h-10 flex items-center justify-between bg-zinc-950 border-b border-zinc-800/60 shrink-0 select-none">
+    <div className="titlebar-drag h-10 flex items-center justify-between bg-white dark:bg-zinc-950 border-b border-zinc-200/60 dark:border-zinc-800/60 shrink-0 select-none">
       {/* Left: traffic-light spacer on macOS, logo + search trigger */}
       <div className="titlebar-no-drag flex items-center gap-2 pl-4">
         {IS_MAC && <div className="w-16" />}
@@ -30,11 +30,11 @@ export default function Titlebar() {
         <button
           onClick={openPalette}
           title="Command palette (⌘K)"
-          className="ml-2 flex items-center gap-1.5 px-2 py-0.5 rounded-md border border-zinc-800 bg-zinc-900 hover:border-zinc-600 text-zinc-500 hover:text-zinc-300 transition-colors text-xs"
+          className="ml-2 flex items-center gap-1.5 px-2 py-0.5 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-600 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors text-xs"
         >
           <Search size={11} />
           <span className="hidden sm:inline">Search</span>
-          <kbd className="hidden sm:inline font-mono text-zinc-600">⌘K</kbd>
+          <kbd className="hidden sm:inline font-mono text-zinc-500 dark:text-zinc-600">⌘K</kbd>
         </button>
       </div>
 
@@ -62,9 +62,9 @@ export default function Titlebar() {
       {/* Right: daemon pill + window controls */}
       <div className="flex items-center gap-2 pr-2">
         <div className={`titlebar-no-drag flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs ${
-          state.running ? 'bg-emerald-500/10 text-emerald-400' : 'bg-zinc-800 text-zinc-500'
+          state.running ? 'bg-emerald-500/10 text-emerald-400' : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-500'
         }`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${state.running ? 'bg-emerald-400' : 'bg-zinc-600'}`} />
+          <span className={`w-1.5 h-1.5 rounded-full ${state.running ? 'bg-emerald-400' : 'bg-zinc-400 dark:bg-zinc-600'}`} />
           {state.running ? `Daemon :${state.port}` : 'Daemon offline'}
         </div>
 

@@ -86,6 +86,7 @@ export interface AppConfig {
   openaiApiKey: string
   recentWorkspaces: string[]
   autoStartDaemon: boolean
+  theme: 'dark' | 'light' | 'system'
 }
 
 export const client = {

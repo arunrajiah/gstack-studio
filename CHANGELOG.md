@@ -6,6 +6,21 @@ Format: [Semantic Versioning](https://semver.org) — `Added`, `Changed`, `Fixed
 
 ---
 
+## [0.6.0] — 2026-04-21
+
+### Dark/light theme + dynamic skill loading
+
+**Added**
+- **Dark / Light / System theme toggle** — Appearance section in Settings with a three-way segmented control (Dark · Light · System). System mode follows `prefers-color-scheme` and updates live when the OS switches. Preference stored in `~/.gstack/studio-config.json`. Theme class applied synchronously before first render to eliminate flash.
+- **Dynamic skill loading** — Sprint Board and Agents page now scan `~/.claude/skills/gstack/` at runtime and parse each `SKILL.md` frontmatter for live name and description. New skills from `/gstack-upgrade` appear automatically with no app update required. Unknown skills default to the Utils phase with a wrench icon.
+
+**Changed**
+- All zinc background, text, and border classes now carry light-mode defaults alongside `dark:` variants — every page and component is fully themed
+- Sprint Board subtitle shows the real installed skill count instead of the hardcoded "23"
+- Command Palette description updated to remove hardcoded count
+
+---
+
 ## [0.5.0] — 2026-04-19
 
 ### Command palette, Sprint search, History export, Script runner
