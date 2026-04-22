@@ -162,7 +162,9 @@ Open the **Sprint Board**, find any agent, and click its card. The slash command
 - [x] **v0.6.0** — Dark/light/system theme toggle, dynamic skill loading (auto-syncs with `/gstack-upgrade`)
 - [x] **v0.7.0** — Direct agent execution — ▶ Run any skill in a real terminal; agent host auto-detection (Claude Code, Codex, OpenClaw, Factory, Kiro)
 - [x] **v0.8.0** — gstack auto-install during onboarding (one-click git clone); letter-based "gS" app icon
-- [ ] Windows / macOS code signing for distribution without Gatekeeper warnings
+- [ ] **v0.9.0** — UX polish: Bun presence check in onboarding wizard; daemon auto-restart on workspace switch; silent daemon-crash notification
+- [ ] **v1.0.0** — Windows / macOS code signing for Gatekeeper / SmartScreen-free distribution
+- [ ] **Future** — Embedded terminal panel (xterm.js); run history log per workspace; multi-workspace side-by-side
 
 ---
 

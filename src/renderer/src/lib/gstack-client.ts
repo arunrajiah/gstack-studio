@@ -18,6 +18,7 @@ declare global {
       executeSkill:  (skillId: string, hostBin: string) => Promise<void>
       checkGstack:   (path: string) => Promise<boolean>
       installGstack: (targetPath: string) => Promise<{ success: boolean; path: string; error?: string }>
+      checkBun:      () => Promise<{ found: boolean; path: string | null }>
       workspace: {
         browse:  () => Promise<string | null>
         recents: () => Promise<string[]>
@@ -122,6 +123,7 @@ export const client = {
   executeSkill:  (skillId: string, hostBin: string) => window.gstack.executeSkill(skillId, hostBin),
   checkGstack:   (path: string) => window.gstack.checkGstack(path),
   installGstack: (targetPath: string) => window.gstack.installGstack(targetPath),
+  checkBun:      () => window.gstack.checkBun(),
   workspace: {
     browse:  () => window.gstack.workspace.browse(),
     recents: () => window.gstack.workspace.recents(),

@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld('gstack', {
   executeSkill:  (skillId: string, hostBin: string) => ipcRenderer.invoke('skill:execute', skillId, hostBin),
   checkGstack:   (path: string) => ipcRenderer.invoke('gstack:check', path),
   installGstack: (targetPath: string) => ipcRenderer.invoke('gstack:install', targetPath),
+  checkBun:      () => ipcRenderer.invoke('bun:check'),
 
   // ── Workspace ─────────────────────────────────────────────────────────────
   workspace: {

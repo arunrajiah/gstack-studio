@@ -23,12 +23,17 @@ export default function Onboarding({ onComplete }: Props) {
   const [installError, setInstallError] = useState('')
   const [gstackFound, setGstackFound] = useState<boolean | null>(null)
 
-  // Load any already-saved partial config
+  // Bun presence
+  const [bunFound, setBunFound] = useState<boolean | null>(null)
+
+  // Load any already-saved partial config + check Bun on mount
   useEffect(() => {
     client.config.get().then(cfg => {
       if (cfg.gstackPath) { setGstackPath(cfg.gstackPath); setAutoDetected(true) }
       if (cfg.workspacePath) setWorkspacePath(cfg.workspacePath)
     }).catch(() => {})
+
+    client.checkBun().then(r => setBunFound(r.found)).catch(() => setBunFound(false))
   }, [])
 
   // Check whether the currently-typed gstack path actually exists
@@ -129,10 +134,29 @@ export default function Onboarding({ onComplete }: Props) {
               ))}
             </div>
 
-            <div className="bg-amber-950/30 border border-amber-800/40 rounded-xl p-3 text-xs text-zinc-400 space-y-1">
+            <div className="bg-amber-950/30 border border-amber-800/40 rounded-xl p-3 text-xs text-zinc-400 space-y-2">
               <p className="font-medium text-amber-300">Prerequisites</p>
-              <p>• <a onClick={() => client.shell.openUrl('https://bun.sh')} className="text-indigo-400 cursor-pointer hover:underline">Bun</a> for running the browse daemon</p>
-              <p className="text-zinc-500">gstack can be installed automatically in the next step if you don't have it yet.</p>
+              {/* Bun status */}
+              <div className="flex items-center justify-between">
+                <p>
+                  <a onClick={() => client.shell.openUrl('https://bun.sh')} className="text-indigo-400 cursor-pointer hover:underline">Bun</a>
+                  {' '}— required to run the browse daemon
+                </p>
+                {bunFound === null ? (
+                  <span className="text-zinc-500 flex items-center gap-1"><Loader2 size={10} className="animate-spin" /> checking…</span>
+                ) : bunFound ? (
+                  <span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 size={11} /> found</span>
+                ) : (
+                  <span className="text-red-400 flex items-center gap-1"><AlertCircle size={11} /> not found</span>
+                )}
+              </div>
+              {bunFound === false && (
+                <p className="text-red-400/80">
+                  Install Bun first:{' '}
+                  <code className="font-mono text-zinc-300">curl -fsSL https://bun.sh/install | bash</code>
+                </p>
+              )}
+              <p className="text-zinc-500">gstack can be installed automatically in the next step.</p>
             </div>
 
             <button
@@ -151,6 +175,22 @@ export default function Onboarding({ onComplete }: Props) {
               <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Configure your setup</h2>
               <p className="text-xs text-zinc-500 mt-0.5">Tell Studio where gstack is installed and which project to work in</p>
             </div>
+
+            {/* Bun missing warning */}
+            {bunFound === false && (
+              <div className="flex items-start gap-2 p-3 rounded-xl bg-red-950/20 border border-red-800/40 text-xs text-red-400">
+                <AlertCircle size={13} className="shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <p className="font-medium">Bun is not installed</p>
+                  <p className="text-red-400/70">The daemon requires Bun to run. Install it before starting:</p>
+                  <code className="font-mono text-zinc-300 block mt-1">curl -fsSL https://bun.sh/install | bash</code>
+                  <button
+                    onClick={() => client.shell.openUrl('https://bun.sh')}
+                    className="text-indigo-400 hover:underline mt-1 block"
+                  >bun.sh →</button>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-4">
               {/* gstack path */}

@@ -144,6 +144,25 @@ export function registerIpcHandlers(ipcMain: IpcMain, daemon: GStackDaemon): voi
     return merged
   })
 
+  // ── Bun check ─────────────────────────────────────────────────────────────
+  /** Check whether Bun is installed and return its resolved path. */
+  ipcMain.handle('bun:check', async () => {
+    const bunPaths = [
+      join(homedir(), '.bun', 'bin', 'bun'),
+      '/usr/local/bin/bun',
+      '/opt/homebrew/bin/bun',
+    ]
+    for (const b of bunPaths) {
+      if (existsSync(b)) return { found: true, path: b }
+    }
+    try {
+      const { execSync } = require('child_process') as typeof import('child_process')
+      const result = execSync('which bun 2>/dev/null', { encoding: 'utf8' }).trim()
+      if (result) return { found: true, path: result }
+    } catch { /* not in PATH */ }
+    return { found: false, path: null }
+  })
+
   // ── gstack install helpers ────────────────────────────────────────────────
 
   /**

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { client, DaemonState, Skill, AppConfig } from './gstack-client'
 import { toast } from './toast'
 
@@ -9,9 +9,23 @@ export function useDaemon() {
   })
   const [loading, setLoading] = useState(true)
 
+  // Crash detection: track whether the daemon was running on the last poll,
+  // and whether a stop/restart was requested explicitly by the user.
+  const wasRunning      = useRef(false)
+  const intentionalStop = useRef(false)
+
   const refresh = useCallback(async () => {
-    try { setState(await client.daemon.status()) }
-    catch { /* ignore */ }
+    try {
+      const s = await client.daemon.status()
+      // Fire a crash toast only when the daemon disappears without user action
+      if (wasRunning.current && !s.running && !intentionalStop.current) {
+        toast.error('Daemon stopped unexpectedly — restart from Dashboard or check logs')
+      }
+      wasRunning.current = s.running
+      if (!s.running) intentionalStop.current = false
+      setState(s)
+    }
+    catch { /* ignore transient network errors */ }
     finally { setLoading(false) }
   }, [])
 
@@ -19,6 +33,7 @@ export function useDaemon() {
     setLoading(true)
     try {
       const s = await client.daemon.start()
+      wasRunning.current = s.running
       setState(s)
       toast.success(s.running ? `Daemon started on port ${s.port}` : 'Daemon started')
     } catch (err) {
@@ -29,10 +44,14 @@ export function useDaemon() {
 
   const stop = useCallback(async () => {
     setLoading(true)
+    intentionalStop.current = true   // mark before the IPC call
     try {
-      setState(await client.daemon.stop())
+      const s = await client.daemon.stop()
+      wasRunning.current = s.running
+      setState(s)
       toast.info('Daemon stopped')
     } catch (err) {
+      intentionalStop.current = false  // reset if stop itself failed
       console.error('[daemon stop]', err)
       toast.error(`Stop failed: ${err instanceof Error ? err.message : String(err)}`)
     } finally { setLoading(false) }
@@ -40,11 +59,14 @@ export function useDaemon() {
 
   const restart = useCallback(async () => {
     setLoading(true)
+    intentionalStop.current = true   // daemon will transiently stop during restart
     try {
       const s = await client.daemon.restart()
+      wasRunning.current = s.running
       setState(s)
       toast.success(s.running ? `Daemon restarted on port ${s.port}` : 'Daemon restarted')
     } catch (err) {
+      intentionalStop.current = false
       console.error('[daemon restart]', err)
       toast.error(`Restart failed: ${err instanceof Error ? err.message : String(err)}`)
     } finally { setLoading(false) }
