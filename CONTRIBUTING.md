@@ -38,7 +38,8 @@ Be kind, constructive, and inclusive. We follow the [Contributor Covenant](https
 ### Prerequisites
 
 - **Node.js 20+** and **npm**
-- **[gstack](https://github.com/garrytan/gstack)** installed locally (needed to test daemon integration)
+- **[git](https://git-scm.com)** — used by the onboarding auto-install flow
+- **[gstack](https://github.com/garrytan/gstack)** — optional; needed to test daemon and skill-loading features. The onboarding wizard can install it automatically, or point Settings at an existing clone
 - **[Bun](https://bun.sh)** (needed to run the gstack browse daemon during testing)
 
 ### Clone and install

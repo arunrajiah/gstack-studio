@@ -220,6 +220,7 @@ export interface AppConfig {
   workspacePath: string
   openaiApiKey: string
   recentWorkspaces: string[]
+  autoStartDaemon: boolean
   theme: 'dark' | 'light' | 'system'
   /** Resolved path to the preferred AI coding host binary (claude, codex, etc.) */
   hostBin: string
@@ -237,12 +238,13 @@ function getConfig(): AppConfig {
         workspacePath:    raw.workspacePath     ?? '',
         openaiApiKey:     raw.openaiApiKey      ?? '',
         recentWorkspaces: raw.recentWorkspaces  ?? [],
+        autoStartDaemon:  raw.autoStartDaemon   ?? false,
         theme:            (raw.theme as AppConfig['theme']) ?? 'dark',
         hostBin:          raw.hostBin           ?? ''
       }
     }
   } catch { /* ignore */ }
-  return { anthropicApiKey: '', gstackPath: '', workspacePath: '', openaiApiKey: '', recentWorkspaces: [], theme: 'dark', hostBin: '' }
+  return { anthropicApiKey: '', gstackPath: '', workspacePath: '', openaiApiKey: '', recentWorkspaces: [], autoStartDaemon: false, theme: 'dark', hostBin: '' }
 }
 
 function saveConfig(config: AppConfig): void {

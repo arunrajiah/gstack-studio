@@ -7,7 +7,7 @@
     <a href="https://github.com/arunrajiah/gstack-studio/releases"><img src="https://img.shields.io/github/downloads/arunrajiah/gstack-studio/total?style=flat-square&color=6366f1&label=downloads" alt="Downloads" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License" /></a>
     <a href="https://github.com/arunrajiah/gstack-studio/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/arunrajiah/gstack-studio/build.yml?branch=main&style=flat-square&label=build" alt="Build" /></a>
-    <a href="https://github.com/garrytan/gstack"><img src="https://img.shields.io/badge/requires-gstack-8b5cf6?style=flat-square" alt="Requires gstack" /></a>
+    <a href="https://github.com/garrytan/gstack"><img src="https://img.shields.io/badge/gstack-optional-8b5cf6?style=flat-square" alt="gstack optional (auto-installable)" /></a>
   </p>
 
   <p>
@@ -74,9 +74,9 @@
 | **Dashboard** | Daemon health, Start / Stop / Restart controls, workspace quick-switcher with recent paths, Open in Finder button |
 | **Sprint Board** | Visual pipeline (Think → Plan → Build → Review → Test → Ship → Reflect) with all agents — auto-syncs with your local gstack install. Click any card to copy its `/command`; hover for 📖 doc viewer or ▶ run directly in terminal |
 | **Agents** | Searchable skill browser with phase filter + live daemon log stream (stdout/stderr, polls every 2 s); per-skill doc viewer and ▶ run in terminal |
-| **Browse Console** | Live terminal interface to the gstack browse daemon — send any of the 56 HTTP commands and see JSON responses |
+| **Browse Console** | Live terminal interface to the gstack browse daemon — send any of the 29 HTTP commands and see JSON responses |
 | **History** | Per-project learnings with full-text search, stored in `~/.gstack/projects/*/learnings.jsonl` |
-| **Settings** | Workspace path (with native folder picker + Open in Finder), gstack install path, API keys, recent-workspace list |
+| **Settings** | Workspace path (with native folder picker + Open in Finder), gstack install path, Agent Host selector (auto-detects Claude Code / Codex / OpenClaw / Factory / Kiro), Dark/Light/System theme toggle, auto-start daemon toggle, API keys, recent-workspace list |
 
 ### Additional capabilities
 
@@ -89,9 +89,9 @@
 - **Error boundary** — each page catches React errors and shows a graceful fallback UI
 
 ### What gstack Studio is NOT
-- It does not execute agents — agents run inside Claude Code as slash commands
+- It does not replace the Claude Code CLI — agents still run inside your chosen AI coding host (Claude Code, Codex, etc.). The ▶ Run button simply opens a pre-filled terminal for you
 - It does not modify gstack in any way — zero changes to the gstack codebase (Layer 1 integration only)
-- It is not a replacement for the Claude Code CLI
+- It is not a standalone AI coding assistant
 
 ---
 
@@ -280,7 +280,7 @@ git commit -m "feat: add agent filter by phase"
 
 ## 🔗 Related
 
-- [garrytan/gstack](https://github.com/garrytan/gstack) — the AI agent framework this app wraps *(required)*
+- [garrytan/gstack](https://github.com/garrytan/gstack) — the AI agent framework this app wraps *(optional — auto-installable during onboarding)*
 - [Anthropic Claude Code](https://docs.anthropic.com/en/docs/claude-code) — the CLI where gstack agents actually run
 
 ---
