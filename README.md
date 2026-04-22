@@ -7,7 +7,7 @@
     <a href="https://github.com/arunrajiah/gstack-studio/releases"><img src="https://img.shields.io/github/downloads/arunrajiah/gstack-studio/total?style=flat-square&color=6366f1&label=downloads" alt="Downloads" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License" /></a>
     <a href="https://github.com/arunrajiah/gstack-studio/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/arunrajiah/gstack-studio/build.yml?branch=main&style=flat-square&label=build" alt="Build" /></a>
-    <a href="https://github.com/garrytan/gstack"><img src="https://img.shields.io/badge/gstack-optional-8b5cf6?style=flat-square" alt="gstack optional (auto-installable)" /></a>
+    <a href="https://github.com/garrytan/gstack"><img src="https://img.shields.io/badge/requires-gstack-8b5cf6?style=flat-square" alt="Requires gstack" /></a>
   </p>
 
   <p>
@@ -116,7 +116,7 @@ Or build from source — see [Development](#-development).
 2. **[git](https://git-scm.com)** — required if you want the onboarding wizard to auto-install gstack
 3. An **Anthropic API key** if you plan to run agents programmatically
 
-> **gstack is optional at launch.** If gstack isn't already installed, the onboarding wizard offers a one-click install that clones it from GitHub automatically.
+> gstack is **required** — without it there are no agents, no daemon, and no Browse Console. However, you don't need to install it before launching the app. If gstack isn't already present, the onboarding wizard installs it for you with one click.
 >
 > gstack Studio works on macOS, Windows, and Linux, but the gstack browse daemon currently requires Bun, which must be installed separately.
 
@@ -280,7 +280,7 @@ git commit -m "feat: add agent filter by phase"
 
 ## 🔗 Related
 
-- [garrytan/gstack](https://github.com/garrytan/gstack) — the AI agent framework this app wraps *(optional — auto-installable during onboarding)*
+- [garrytan/gstack](https://github.com/garrytan/gstack) — the AI agent framework this app wraps *(required — auto-installable via the onboarding wizard)*
 - [Anthropic Claude Code](https://docs.anthropic.com/en/docs/claude-code) — the CLI where gstack agents actually run
 
 ---

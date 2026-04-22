@@ -39,7 +39,7 @@ Be kind, constructive, and inclusive. We follow the [Contributor Covenant](https
 
 - **Node.js 20+** and **npm**
 - **[git](https://git-scm.com)** — used by the onboarding auto-install flow
-- **[gstack](https://github.com/garrytan/gstack)** — optional; needed to test daemon and skill-loading features. The onboarding wizard can install it automatically, or point Settings at an existing clone
+- **[gstack](https://github.com/garrytan/gstack)** — required to test daemon and skill-loading features. Run `git clone --depth 1 https://github.com/garrytan/gstack ~/.claude/skills/gstack` or let the onboarding wizard do it for you
 - **[Bun](https://bun.sh)** (needed to run the gstack browse daemon during testing)
 
 ### Clone and install
