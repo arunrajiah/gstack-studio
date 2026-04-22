@@ -16,55 +16,80 @@ const COMMAND_REFERENCE = [
   {
     category: 'Navigation',
     commands: [
-      { cmd: 'goto',    args: '<url>',     desc: 'Navigate to a URL' },
-      { cmd: 'back',    args: '',          desc: 'Browser back' },
-      { cmd: 'forward', args: '',          desc: 'Browser forward' },
-      { cmd: 'reload',  args: '',          desc: 'Reload current page' },
-      { cmd: 'url',     args: '',          desc: 'Get current page URL' },
-      { cmd: 'title',   args: '',          desc: 'Get page title' },
+      { cmd: 'goto',      args: '<url>',            desc: 'Navigate to a URL' },
+      { cmd: 'back',      args: '',                 desc: 'Browser back' },
+      { cmd: 'forward',   args: '',                 desc: 'Browser forward' },
+      { cmd: 'reload',    args: '',                 desc: 'Reload current page' },
+      { cmd: 'url',       args: '',                 desc: 'Get current page URL' },
+      { cmd: 'title',     args: '',                 desc: 'Get page title' },
+      { cmd: 'load-html', args: '<html>',           desc: 'Load raw HTML via setContent' },
+      { cmd: 'frame',     args: '<selector>',       desc: 'Switch into an iframe context' },
     ]
   },
   {
     category: 'Content',
     commands: [
-      { cmd: 'text',       args: '',           desc: 'Get visible page text' },
-      { cmd: 'html',       args: '',           desc: 'Get full page HTML' },
-      { cmd: 'screenshot', args: '',           desc: 'Take a screenshot (base64)' },
-      { cmd: 'links',      args: '',           desc: 'List all links on the page' },
-      { cmd: 'inputs',     args: '',           desc: 'List all input fields' },
-      { cmd: 'buttons',    args: '',           desc: 'List all buttons' },
-      { cmd: 'select',     args: '<selector>', desc: 'Get text of a CSS element' },
+      { cmd: 'text',             args: '',           desc: 'Get visible page text' },
+      { cmd: 'html',             args: '',           desc: 'Get full page HTML' },
+      { cmd: 'screenshot',       args: '[--selector <css>]', desc: 'Take a screenshot (base64); optionally clip to element' },
+      { cmd: 'prettyscreenshot', args: '',           desc: 'Clean screenshot — removes ads/banners first' },
+      { cmd: 'links',            args: '',           desc: 'List all links on the page' },
+      { cmd: 'inputs',           args: '',           desc: 'List all input fields' },
+      { cmd: 'buttons',          args: '',           desc: 'List all buttons' },
+      { cmd: 'select',           args: '<selector>', desc: 'Get text of a CSS element' },
+      { cmd: 'media',            args: '',           desc: 'All media elements (images, videos, audio) with URLs and dimensions' },
+      { cmd: 'data',             args: '',           desc: 'Structured data: JSON-LD, Open Graph, Twitter Cards, meta tags' },
+      { cmd: 'scrape',           args: '',           desc: 'Bulk download all media assets from the current page' },
+      { cmd: 'archive',          args: '',           desc: 'Save complete page as MHTML via CDP' },
     ]
   },
   {
     category: 'Interaction',
     commands: [
-      { cmd: 'click',      args: '<selector>',      desc: 'Click an element' },
-      { cmd: 'type',       args: '<selector> <text>',desc: 'Type text into an element' },
-      { cmd: 'fill',       args: '<selector> <text>',desc: 'Fill an input field' },
-      { cmd: 'submit',     args: '<selector>',      desc: 'Submit a form' },
-      { cmd: 'hover',      args: '<selector>',      desc: 'Hover over an element' },
-      { cmd: 'scroll',     args: '<amount>',        desc: 'Scroll the page by pixels' },
-      { cmd: 'scroll-to',  args: '<selector>',      desc: 'Scroll element into view' },
+      { cmd: 'click',     args: '<selector>',         desc: 'Click an element' },
+      { cmd: 'type',      args: '<selector> <text>',  desc: 'Type text into an element' },
+      { cmd: 'fill',      args: '<selector> <text>',  desc: 'Fill an input field' },
+      { cmd: 'submit',    args: '<selector>',         desc: 'Submit a form' },
+      { cmd: 'hover',     args: '<selector>',         desc: 'Hover over an element' },
+      { cmd: 'scroll',    args: '<amount>',           desc: 'Scroll the page by pixels' },
+      { cmd: 'scroll-to', args: '<selector>',         desc: 'Scroll element into view' },
+      { cmd: 'style',     args: '<selector> <prop> <value>', desc: 'Set a CSS property on an element (undoable)' },
+      { cmd: 'cleanup',   args: '',                   desc: 'Remove ads, cookie banners, and sticky clutter from the page' },
     ]
   },
   {
     category: 'Tabs',
     commands: [
-      { cmd: 'tabs',        args: '',      desc: 'List all open tabs' },
-      { cmd: 'tab-open',    args: '<url>', desc: 'Open a new tab' },
-      { cmd: 'tab-close',   args: '<id>',  desc: 'Close a tab by ID' },
-      { cmd: 'tab-switch',  args: '<id>',  desc: 'Switch to a tab by ID' },
+      { cmd: 'tabs',       args: '',             desc: 'List all open tabs' },
+      { cmd: 'tab-open',   args: '<url>',        desc: 'Open a new tab' },
+      { cmd: 'tab-close',  args: '<id>',         desc: 'Close a tab by ID' },
+      { cmd: 'tab-switch', args: '<id>',         desc: 'Switch to a tab by ID' },
     ]
   },
   {
     category: 'Storage & Network',
     commands: [
-      { cmd: 'cookies',      args: '',           desc: 'Get all cookies' },
-      { cmd: 'local-storage',args: '',           desc: 'Get localStorage contents' },
-      { cmd: 'network',      args: '',           desc: 'List recent network requests' },
-      { cmd: 'wait',         args: '<ms>',       desc: 'Wait N milliseconds' },
-      { cmd: 'wait-for',     args: '<selector>', desc: 'Wait for element to appear' },
+      { cmd: 'cookies',       args: '',            desc: 'Get all cookies' },
+      { cmd: 'local-storage', args: '',            desc: 'Get localStorage contents' },
+      { cmd: 'network',       args: '',            desc: 'List recent network requests' },
+      { cmd: 'state',         args: '[save|load]', desc: 'Save or restore full browser state (cookies + URLs)' },
+      { cmd: 'wait',          args: '<ms>',        desc: 'Wait N milliseconds' },
+      { cmd: 'wait-for',      args: '<selector>',  desc: 'Wait for element to appear' },
+    ]
+  },
+  {
+    category: 'Inspection',
+    commands: [
+      { cmd: 'inspect',   args: '<selector>', desc: 'Deep CSS inspection via CDP — full rule cascade, box model, computed styles' },
+      { cmd: 'ux-audit',  args: '',           desc: 'Extract page structure for UX behavioural analysis — returns JSON' },
+    ]
+  },
+  {
+    category: 'Session',
+    commands: [
+      { cmd: 'handoff', args: '', desc: 'Open visible Chrome at current page for user takeover' },
+      { cmd: 'resume',  args: '', desc: 'Re-snapshot after user takeover and return control to AI' },
+      { cmd: 'watch',   args: '', desc: 'Passive observation — periodic snapshots while user browses' },
     ]
   },
 ]

@@ -434,7 +434,6 @@ const SKILL_DECORATION: Record<string, { phase: string; icon: string; displayNam
   'design-shotgun':      { phase: 'build',   icon: '🔫', displayName: 'Design Shotgun' },
   'design-html':         { phase: 'build',   icon: '📐', displayName: 'Design HTML' },
   'review':              { phase: 'review',  icon: '🔍', displayName: 'Code Review' },
-  'debug':               { phase: 'review',  icon: '🐛', displayName: 'Debug' },
   'investigate':         { phase: 'review',  icon: '🔎', displayName: 'Investigate' },
   'design-review':       { phase: 'review',  icon: '🎨', displayName: 'Design Review' },
   'devex-review':        { phase: 'review',  icon: '🛠️', displayName: 'DevEx Review' },
@@ -443,6 +442,7 @@ const SKILL_DECORATION: Record<string, { phase: string; icon: string; displayNam
   'qa':                  { phase: 'test',    icon: '🧪', displayName: 'QA' },
   'qa-only':             { phase: 'test',    icon: '📋', displayName: 'QA Report' },
   'benchmark':           { phase: 'test',    icon: '📊', displayName: 'Benchmark' },
+  'benchmark-models':    { phase: 'test',    icon: '🤖', displayName: 'Benchmark Models' },
   'ship':                { phase: 'ship',    icon: '🚀', displayName: 'Ship' },
   'land-and-deploy':     { phase: 'ship',    icon: '🛬', displayName: 'Land & Deploy' },
   'canary':              { phase: 'ship',    icon: '🐦', displayName: 'Canary' },
@@ -461,6 +461,8 @@ const SKILL_DECORATION: Record<string, { phase: string; icon: string; displayNam
   'open-gstack-browser': { phase: 'utils',   icon: '🌐', displayName: 'Open Browser' },
   'setup-browser-cookies': { phase: 'utils', icon: '🍪', displayName: 'Setup Cookies' },
   'setup-deploy':        { phase: 'utils',   icon: '🚢', displayName: 'Setup Deploy' },
+  'make-pdf':            { phase: 'utils',   icon: '📄', displayName: 'Make PDF' },
+  'plan-tune':           { phase: 'plan',    icon: '🎛️', displayName: 'Plan Tune' },
 }
 
 /** Dirs inside the gstack repo that are not skills */

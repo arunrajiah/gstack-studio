@@ -74,7 +74,7 @@
 | **Dashboard** | Daemon health, Start / Stop / Restart controls, workspace quick-switcher with recent paths, Open in Finder button |
 | **Sprint Board** | Visual pipeline (Think → Plan → Build → Review → Test → Ship → Reflect) with all agents — auto-syncs with your local gstack install. Click any card to copy its `/command`; hover for 📖 doc viewer or ▶ run directly in terminal |
 | **Agents** | Searchable skill browser with phase filter + live daemon log stream (stdout/stderr, polls every 2 s); per-skill doc viewer and ▶ run in terminal |
-| **Browse Console** | Live terminal interface to the gstack browse daemon — send any of the 29 HTTP commands and see JSON responses |
+| **Browse Console** | Live terminal interface to the gstack browse daemon — send any of the 44 HTTP commands across 7 categories and see JSON responses |
 | **History** | Per-project learnings with full-text search, stored in `~/.gstack/projects/*/learnings.jsonl` |
 | **Settings** | Workspace path (with native folder picker + Open in Finder), gstack install path, Agent Host selector (auto-detects Claude Code / Codex / OpenClaw / Factory / Kiro), Dark/Light/System theme toggle, auto-start daemon toggle, API keys, recent-workspace list |
 
@@ -162,7 +162,8 @@ Open the **Sprint Board**, find any agent, and click its card. The slash command
 - [x] **v0.6.0** — Dark/light/system theme toggle, dynamic skill loading (auto-syncs with `/gstack-upgrade`)
 - [x] **v0.7.0** — Direct agent execution — ▶ Run any skill in a real terminal; agent host auto-detection (Claude Code, Codex, OpenClaw, Factory, Kiro)
 - [x] **v0.8.0** — gstack auto-install during onboarding (one-click git clone); letter-based "gS" app icon
-- [ ] **v0.9.0** — UX polish: Bun presence check in onboarding wizard; daemon auto-restart on workspace switch; silent daemon-crash notification
+- [x] **v0.9.0** — UX polish: Bun presence check in onboarding wizard; daemon crash notification toast
+- [x] **v0.10.0** — gstack v1.x sync: 3 new skills (benchmark-models, make-pdf, plan-tune); 15 new Browse Console commands; 2 new categories (Inspection, Session); removed orphaned `debug` stub
 - [ ] **v1.0.0** — Windows / macOS code signing for Gatekeeper / SmartScreen-free distribution
 - [ ] **Future** — Embedded terminal panel (xterm.js); run history log per workspace; multi-workspace side-by-side
 

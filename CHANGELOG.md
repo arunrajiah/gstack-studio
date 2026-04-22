@@ -6,6 +6,32 @@ Format: [Semantic Versioning](https://semver.org) — `Added`, `Changed`, `Fixed
 
 ---
 
+## [0.10.0] — 2026-04-22
+
+### gstack v1.x sync — new skills, expanded Browse Console
+
+**Added**
+- **3 new skills** synced from gstack v1.x upstream:
+  - `benchmark-models` (Test phase 🤖) — cross-model benchmark (Claude vs GPT vs Gemini)
+  - `make-pdf` (Utils phase 📄) — markdown → publication-quality PDF via Chromium
+  - `plan-tune` (Plan phase 🎛️) — self-tuning question sensitivity and psychographic profile
+- **15 new Browse Console commands** synced from gstack v1.x browse daemon, across 2 new categories and expansions to existing ones:
+  - Navigation: `load-html` (raw HTML via setContent), `frame` (switch iframe context)
+  - Content: `media`, `data`, `prettyscreenshot`, `scrape`, `archive`
+  - Interaction: `style` (CSS property override, undoable), `cleanup` (remove ads/banners)
+  - Storage & Network: `state` (save/restore browser state)
+  - **Inspection** *(new category)*: `inspect` (CDP full rule cascade), `ux-audit` (UX behavioural JSON)
+  - **Session** *(new category)*: `handoff` (open Chrome for user takeover), `resume` (re-snapshot after handoff), `watch` (passive periodic snapshots)
+- Browse Console command reference now covers **44 commands across 7 categories** (was 29 across 5).
+
+**Removed**
+- `debug` skill entry removed from `SKILL_DECORATION` — this skill does not exist in the gstack upstream repo and was an orphaned stub causing a ghost card when `gstackPath` is unconfigured.
+
+**Changed**
+- `screenshot` command description updated to reflect new `--selector <css>` flag support (gstack v1.1+).
+
+---
+
 ## [0.9.0] — 2026-04-22
 
 ### UX polish — Bun check, daemon crash notification, CHANGELOG fix
@@ -16,7 +42,7 @@ Format: [Semantic Versioning](https://semver.org) — `Added`, `Changed`, `Fixed
 - **Daemon crash notification** — `useDaemon` in `store.ts` now tracks whether the daemon was running on the previous poll. If it disappears between polls without the user having clicked Stop or Restart, a `toast.error` fires: _"Daemon stopped unexpectedly — restart from Dashboard or check logs"_. Explicit user-initiated stops and restarts are excluded via an `intentionalStop` ref.
 
 **Fixed**
-- CHANGELOG v0.4.0 incorrectly stated "30+ browser automation commands" — corrected to 29 with per-category breakdown (Navigation: 6, Content: 7, Interaction: 7, Tabs: 4, Storage & Network: 5).
+- CHANGELOG v0.4.0 incorrectly stated "30+ browser automation commands" — corrected to 29 at the time (Navigation: 6, Content: 7, Interaction: 7, Tabs: 4, Storage & Network: 5). v0.10.0 expands this to 44 across 7 categories.
 
 **Changed**
 - `store.ts` imports `useRef` and `useDaemon` now syncs `wasRunning` and `wasIntentionalStop` refs on every start/stop/restart IPC call in addition to the poll cycle, preventing false-positive crash toasts.
