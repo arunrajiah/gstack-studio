@@ -463,6 +463,8 @@ const SKILL_DECORATION: Record<string, { phase: string; icon: string; displayNam
   'setup-deploy':        { phase: 'utils',   icon: '🚢', displayName: 'Setup Deploy' },
   'make-pdf':            { phase: 'utils',   icon: '📄', displayName: 'Make PDF' },
   'plan-tune':           { phase: 'plan',    icon: '🎛️', displayName: 'Plan Tune' },
+  'landing-report':      { phase: 'ship',    icon: '📋', displayName: 'Landing Report' },
+  'setup-gbrain':        { phase: 'utils',   icon: '🧠', displayName: 'Setup GBrain' },
 }
 
 /** Dirs inside the gstack repo that are not skills */

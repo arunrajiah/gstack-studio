@@ -6,6 +6,18 @@ Format: [Semantic Versioning](https://semver.org) — `Added`, `Changed`, `Fixed
 
 ---
 
+## [0.10.1] — 2026-04-25
+
+### gstack v1.12.x sync — 2 new skills
+
+**Added**
+- **`landing-report`** (Ship phase 📋) — new read-only dashboard skill showing the open PR version queue for workspace-aware shipping (added in gstack v1.11.0.0)
+- **`setup-gbrain`** (Utils phase 🧠) — full onboarding flow for the gbrain cross-machine memory CLI: installs the binary, registers `mcp__gbrain__*` tools in Claude Code, configures per-remote trust tiers (read-write / read-only / deny). Added in gstack v1.12.0.0.
+
+No new browse daemon commands in this window (gstack v1.6.4.0–v1.12.2.0 browse changes were internal security tuning only).
+
+---
+
 ## [0.10.0] — 2026-04-22
 
 ### gstack v1.x sync — new skills, expanded Browse Console

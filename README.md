@@ -164,6 +164,7 @@ Open the **Sprint Board**, find any agent, and click its card. The slash command
 - [x] **v0.8.0** — gstack auto-install during onboarding (one-click git clone); letter-based "gS" app icon
 - [x] **v0.9.0** — UX polish: Bun presence check in onboarding wizard; daemon crash notification toast
 - [x] **v0.10.0** — gstack v1.x sync: 3 new skills (benchmark-models, make-pdf, plan-tune); 15 new Browse Console commands; 2 new categories (Inspection, Session); removed orphaned `debug` stub
+- [x] **v0.10.1** — gstack v1.12.x sync: 2 new skills (landing-report, setup-gbrain)
 - [ ] **v1.0.0** — Windows / macOS code signing for Gatekeeper / SmartScreen-free distribution
 - [ ] **Future** — Embedded terminal panel (xterm.js); run history log per workspace; multi-workspace side-by-side
 
