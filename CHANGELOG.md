@@ -52,6 +52,11 @@ Format: [Semantic Versioning](https://semver.org) — `Added`, `Changed`, `Fixed
 - Entrance animation: `modal-enter` keyframe — scale(0.96) → scale(1) + translateY(8px) → 0 over 160ms cubic-bezier(0.16,1,0.3,1) spring easing
 - Backdrop fades in via `page-fade-in` at 120ms
 
+**Changed — App icon**
+- Replaced the pixel-art "gS" monogram with an **indigo-600 rounded square + white Zap lightning bolt**, directly matching the brand mark shown in the app titlebar
+- Anti-aliased rounded-rect edges and scanline polygon fill for the bolt; renders cleanly at all dock sizes
+- `scripts/generate-icon.mjs` rewritten with polygon fill renderer and layered design (zinc-950 bg → indigo-600 square → white bolt)
+
 **Added — CSS utility system (`globals.css`)**
 - `page-enter` — 180ms fade + translateY(6px) page entrance
 - `modal-enter` — 160ms spring scale + slide entrance for modals
