@@ -76,9 +76,7 @@ export default function Settings() {
     <div className="p-6 max-w-2xl mx-auto space-y-8">
       <div>
         <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">Settings</h1>
-        <p className="text-sm text-zinc-500 mt-0.5">
-          Stored at <code className="font-mono text-zinc-500 dark:text-zinc-400">~/.gstack/studio-config.json</code>
-        </p>
+        <p className="text-sm text-zinc-500 mt-0.5">Configure how gstack Studio works on your machine</p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-7">
@@ -87,8 +85,8 @@ export default function Settings() {
         <section className="space-y-4">
           <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-800 pb-2">Appearance</h2>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Theme</label>
-            <p className="text-xs text-zinc-500">Choose how gstack Studio looks</p>
+            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Colour theme</label>
+            <p className="text-xs text-zinc-500">Choose between dark, light, or match your system setting</p>
             <div className="flex items-center gap-1 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 w-fit">
               {([
                 { value: 'dark',   label: 'Dark',   icon: <Moon size={13} /> },
@@ -121,9 +119,9 @@ export default function Settings() {
 
         {/* Workspace */}
         <section className="space-y-4">
-          <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-800 pb-2">Workspace</h2>
+          <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-800 pb-2">Your project</h2>
 
-          <Field label="Workspace Directory" hint="The project folder you work in — gstack writes .gstack/browse.json here when the daemon starts" error={errors.workspacePath} required>
+          <Field label="Project folder" hint="The folder where your code lives. AI agents run inside this folder." error={errors.workspacePath} required>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -180,7 +178,7 @@ export default function Settings() {
             </div>
           )}
 
-          <Field label="gstack Install Path" hint="Where gstack is installed. Default: ~/.claude/skills/gstack" error={errors.gstackPath} required>
+          <Field label="gstack location" hint="Where the gstack agent library is installed on your computer. Default: ~/.claude/skills/gstack" error={errors.gstackPath} required>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -210,14 +208,14 @@ export default function Settings() {
             </div>
             <div className="flex items-center gap-1.5 text-xs text-zinc-500 mt-1">
               <ExternalLink size={11} />
-              <span>Don't have gstack? Install from <span className="font-mono text-zinc-400">github.com/garrytan/gstack</span></span>
+              <span>Don't have gstack yet? You can install it automatically from the <button onClick={() => {}} className="text-indigo-400 hover:underline">onboarding screen</button> or from <span className="font-mono text-zinc-400">github.com/garrytan/gstack</span></span>
             </div>
           </Field>
         </section>
 
         {/* Daemon */}
         <section className="space-y-4">
-          <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-800 pb-2">Daemon</h2>
+          <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-800 pb-2">AI Browser service</h2>
 
           <label className="flex items-start gap-3 cursor-pointer group">
             <div className="relative mt-0.5 shrink-0">
@@ -237,10 +235,10 @@ export default function Settings() {
             <div>
               <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors flex items-center gap-1.5">
                 <Zap size={13} className="text-indigo-400" />
-                Auto-start daemon on launch
+                Start AI Browser automatically
               </p>
               <p className="text-xs text-zinc-500 mt-0.5">
-                Start the browse server automatically when gstack Studio opens
+                Start the AI browser service as soon as gstack Studio opens — no manual click needed
               </p>
             </div>
           </label>
@@ -249,7 +247,7 @@ export default function Settings() {
         {/* Agent Host */}
         <section className="space-y-4">
           <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2">
-            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">Agent Host</h2>
+            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">AI coding tool</h2>
             <button
               type="button"
               onClick={detectHosts}
@@ -262,7 +260,7 @@ export default function Settings() {
           </div>
 
           <p className="text-xs text-zinc-500">
-            Select which AI coding host to open when you click ▶ on a skill. gstack Studio opens a real terminal window with the command ready to run.
+            Choose which AI coding tool to use when you click ▶ Run on an agent. Studio will open a terminal window with the command pre-filled and ready to go.
           </p>
 
           {/* Detected hosts */}
@@ -310,7 +308,7 @@ export default function Settings() {
           )}
 
           {/* Custom host path override */}
-          <Field label="Custom host path" hint="Override — paste any binary path if your host isn't auto-detected above">
+          <Field label="Custom path" hint="Paste a path here if your AI coding tool isn't listed above (e.g. /usr/local/bin/claude)">
             <div className="flex gap-2">
               <input
                 type="text"
@@ -335,9 +333,9 @@ export default function Settings() {
 
         {/* API Keys */}
         <section className="space-y-4">
-          <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-800 pb-2">API Keys</h2>
+          <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 border-b border-zinc-200 dark:border-zinc-800 pb-2">API keys</h2>
 
-          <Field label="Anthropic API Key" hint="Required for running skills via the Claude API">
+          <Field label="Anthropic API key" hint="Required if you want agents to call Claude directly. Get one at console.anthropic.com.">
             <SecretInput
               value={form.anthropicApiKey}
               onChange={v => setForm(f => ({ ...f, anthropicApiKey: v }))}
@@ -347,7 +345,7 @@ export default function Settings() {
             />
           </Field>
 
-          <Field label="OpenAI API Key" hint="Optional — used by /codex for cross-model review">
+          <Field label="OpenAI API key" hint="Optional — used by the /codex agent for cross-model code review">
             <SecretInput
               value={form.openaiApiKey}
               onChange={v => setForm(f => ({ ...f, openaiApiKey: v }))}

@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
-import { CheckCircle2, FolderOpen, ExternalLink, ChevronRight, Zap, Download, AlertCircle, Loader2 } from 'lucide-react'
+import {
+  CheckCircle2, FolderOpen, ExternalLink, ChevronRight, Zap,
+  Download, AlertCircle, Loader2, Search, GitBranch, Globe, BookOpen
+} from 'lucide-react'
 import { client, AppConfig } from '../lib/gstack-client'
 
 interface Props {
@@ -10,6 +13,33 @@ type Step = 'welcome' | 'configure' | 'done'
 type InstallState = 'idle' | 'checking' | 'installing' | 'success' | 'error'
 
 const DEFAULT_GSTACK_PATH = '~/.claude/skills/gstack'
+
+const FEATURES = [
+  {
+    icon: Search,
+    title: 'Find the right AI agent',
+    desc: 'Browse 70+ agents organised by what you want to do — review code, plan a feature, ship a release, and more.',
+    color: 'text-violet-400 bg-violet-950/30',
+  },
+  {
+    icon: GitBranch,
+    title: 'Run agents in one click',
+    desc: 'Click ▶ on any agent to open it in your AI coding tool, no terminal commands to remember.',
+    color: 'text-cyan-400 bg-cyan-950/30',
+  },
+  {
+    icon: Globe,
+    title: 'Web browser for AI',
+    desc: 'Give AI agents the ability to open websites, read content, and fill forms — all controlled from here.',
+    color: 'text-emerald-400 bg-emerald-950/30',
+  },
+  {
+    icon: BookOpen,
+    title: 'Project memory',
+    desc: 'Every agent session saves what it learned. Review the AI\'s notes from past sessions anytime.',
+    color: 'text-amber-400 bg-amber-950/30',
+  },
+]
 
 export default function Onboarding({ onComplete }: Props) {
   const [step, setStep] = useState<Step>('welcome')
@@ -114,56 +144,72 @@ export default function Onboarding({ onComplete }: Props) {
                 <span className="text-2xl font-bold text-indigo-400">gstack</span>
                 <span className="text-2xl font-bold text-zinc-800 dark:text-zinc-200">Studio</span>
               </div>
-              <p className="text-sm text-zinc-400">Visual command centre for the gstack AI agent framework</p>
+              <p className="text-sm text-zinc-400">Your visual control panel for AI engineering agents</p>
             </div>
 
-            <div className="space-y-3">
-              {[
-                { icon: '🗺️', title: 'Sprint Board',    desc: 'Browse all AI agents and copy slash commands instantly' },
-                { icon: '🤖', title: 'Agents',          desc: 'Search skills and stream live daemon output' },
-                { icon: '🌐', title: 'Browse Console',  desc: 'Send HTTP commands to the gstack browse daemon' },
-                { icon: '📖', title: 'History',         desc: 'Review per-project learnings with search' },
-              ].map(f => (
-                <div key={f.title} className="flex items-start gap-3 p-3 rounded-xl bg-zinc-200/50 dark:bg-zinc-800/50">
-                  <span className="text-lg">{f.icon}</span>
-                  <div>
-                    <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{f.title}</p>
-                    <p className="text-xs text-zinc-500">{f.desc}</p>
+            <div className="space-y-2">
+              {FEATURES.map(f => {
+                const Icon = f.icon
+                return (
+                  <div key={f.title} className="flex items-start gap-3 p-3 rounded-xl bg-zinc-200/50 dark:bg-zinc-800/50">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${f.color}`}>
+                      <Icon size={15} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{f.title}</p>
+                      <p className="text-xs text-zinc-500 leading-snug mt-0.5">{f.desc}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
 
-            <div className="bg-amber-950/30 border border-amber-800/40 rounded-xl p-3 text-xs text-zinc-400 space-y-2">
-              <p className="font-medium text-amber-300">Prerequisites</p>
+            {/* Prerequisites check */}
+            <div className="bg-zinc-200/60 dark:bg-zinc-800/60 border border-zinc-300 dark:border-zinc-700 rounded-xl p-3 text-xs space-y-2">
+              <p className="font-medium text-zinc-700 dark:text-zinc-300">Quick system check</p>
+
               {/* Bun status */}
               <div className="flex items-center justify-between">
-                <p>
-                  <a onClick={() => client.shell.openUrl('https://bun.sh')} className="text-indigo-400 cursor-pointer hover:underline">Bun</a>
-                  {' '}— required to run the browse daemon
-                </p>
+                <div>
+                  <span className="text-zinc-600 dark:text-zinc-400">Bun runtime </span>
+                  <span className="text-zinc-500">(needed to run the AI browser service)</span>
+                </div>
                 {bunFound === null ? (
                   <span className="text-zinc-500 flex items-center gap-1"><Loader2 size={10} className="animate-spin" /> checking…</span>
                 ) : bunFound ? (
-                  <span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 size={11} /> found</span>
+                  <span className="text-emerald-400 flex items-center gap-1 shrink-0"><CheckCircle2 size={11} /> ready</span>
                 ) : (
-                  <span className="text-red-400 flex items-center gap-1"><AlertCircle size={11} /> not found</span>
+                  <span className="text-red-400 flex items-center gap-1 shrink-0"><AlertCircle size={11} /> missing</span>
                 )}
               </div>
+
+              {/* Bun missing — show install steps clearly */}
               {bunFound === false && (
-                <p className="text-red-400/80">
-                  Install Bun first:{' '}
-                  <code className="font-mono text-zinc-300">curl -fsSL https://bun.sh/install | bash</code>
-                </p>
+                <div className="pt-1 space-y-1.5 border-t border-zinc-300 dark:border-zinc-700">
+                  <p className="text-zinc-500">Install Bun first (takes about 30 seconds):</p>
+                  <code className="block font-mono text-zinc-300 bg-zinc-900/50 px-2 py-1.5 rounded-lg">
+                    curl -fsSL https://bun.sh/install | bash
+                  </code>
+                  <button
+                    onClick={() => client.shell.openUrl('https://bun.sh')}
+                    className="flex items-center gap-1 text-indigo-400 hover:underline"
+                  >
+                    <ExternalLink size={10} /> Open bun.sh for instructions
+                  </button>
+                  <p className="text-zinc-600">Once installed, restart this app and the check will pass.</p>
+                </div>
               )}
-              <p className="text-zinc-500">gstack can be installed automatically in the next step.</p>
+
+              <p className="text-zinc-600">
+                The gstack agent library can be installed automatically in the next step.
+              </p>
             </div>
 
             <button
               onClick={() => setStep('configure')}
               className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-sm font-medium transition-colors"
             >
-              Let's get started <ChevronRight size={14} />
+              Get started <ChevronRight size={14} />
             </button>
           </div>
         )}
@@ -172,8 +218,8 @@ export default function Onboarding({ onComplete }: Props) {
         {step === 'configure' && (
           <div className="p-6 space-y-5">
             <div>
-              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Configure your setup</h2>
-              <p className="text-xs text-zinc-500 mt-0.5">Tell Studio where gstack is installed and which project to work in</p>
+              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Two quick things to set up</h2>
+              <p className="text-xs text-zinc-500 mt-0.5">Tell Studio where gstack lives and which project you're working on</p>
             </div>
 
             {/* Bun missing warning */}
@@ -181,13 +227,15 @@ export default function Onboarding({ onComplete }: Props) {
               <div className="flex items-start gap-2 p-3 rounded-xl bg-red-950/20 border border-red-800/40 text-xs text-red-400">
                 <AlertCircle size={13} className="shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
-                  <p className="font-medium">Bun is not installed</p>
-                  <p className="text-red-400/70">The daemon requires Bun to run. Install it before starting:</p>
-                  <code className="font-mono text-zinc-300 block mt-1">curl -fsSL https://bun.sh/install | bash</code>
+                  <p className="font-medium">Bun isn't installed yet</p>
+                  <p className="text-red-400/70">The AI browser service needs Bun to run. Install it to continue:</p>
+                  <code className="font-mono text-zinc-300 block mt-1 bg-zinc-900/40 px-2 py-1 rounded">curl -fsSL https://bun.sh/install | bash</code>
                   <button
                     onClick={() => client.shell.openUrl('https://bun.sh')}
-                    className="text-indigo-400 hover:underline mt-1 block"
-                  >bun.sh →</button>
+                    className="text-indigo-400 hover:underline mt-1 flex items-center gap-1 block"
+                  >
+                    <ExternalLink size={10} /> bun.sh
+                  </button>
                 </div>
               </div>
             )}
@@ -196,9 +244,12 @@ export default function Onboarding({ onComplete }: Props) {
               {/* gstack path */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  gstack Install Path <span className="text-red-400">*</span>
+                  Where is gstack installed? <span className="text-red-400">*</span>
                 </label>
-                <p className="text-xs text-zinc-500">Default: <code className="font-mono text-zinc-400">~/.claude/skills/gstack</code></p>
+                <p className="text-xs text-zinc-500">
+                  gstack is the AI agent library. Default location:{' '}
+                  <code className="font-mono text-zinc-400">~/.claude/skills/gstack</code>
+                </p>
                 <div className="flex gap-2">
                   <input
                     value={gstackPath}
@@ -209,25 +260,26 @@ export default function Onboarding({ onComplete }: Props) {
                   <button
                     type="button"
                     onClick={() => browsePath('gstack')}
+                    title="Browse for folder"
                     className="px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-950 hover:border-zinc-300 dark:hover:border-zinc-600 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
                   >
                     <FolderOpen size={15} />
                   </button>
                 </div>
 
-                {/* Status / auto-detected feedback */}
+                {/* Status feedback */}
                 {autoDetected && gstackFound !== false && (
                   <p className="text-xs text-emerald-400 flex items-center gap-1">
-                    <CheckCircle2 size={11} /> Auto-detected from previous session
+                    <CheckCircle2 size={11} /> Found from last session
                   </p>
                 )}
                 {gstackPath.trim() && gstackFound === true && !autoDetected && (
                   <p className="text-xs text-emerald-400 flex items-center gap-1">
-                    <CheckCircle2 size={11} /> gstack found at this path
+                    <CheckCircle2 size={11} /> gstack found
                   </p>
                 )}
 
-                {/* Install panel — shown when path is empty OR gstack not found there */}
+                {/* Install panel */}
                 {((!gstackPath.trim() && installState === 'idle') ||
                   (gstackFound === false && installState !== 'success')) && (
                   <div className="mt-2 p-3 rounded-xl bg-zinc-200/60 dark:bg-zinc-800/60 border border-zinc-300 dark:border-zinc-700 space-y-2">
@@ -236,8 +288,8 @@ export default function Onboarding({ onComplete }: Props) {
                         <p className="text-xs text-zinc-400 flex items-center gap-1.5">
                           <AlertCircle size={12} className="text-amber-400 shrink-0" />
                           {gstackFound === false
-                            ? `gstack not found at that path.`
-                            : `gstack not configured yet.`}
+                            ? 'gstack wasn\'t found at that path.'
+                            : 'gstack isn\'t set up yet — no problem, we can install it for you.'}
                         </p>
                         <button
                           onClick={handleInstall}
@@ -246,33 +298,32 @@ export default function Onboarding({ onComplete }: Props) {
                           <Download size={12} />
                           Install gstack automatically
                           <span className="text-indigo-300 ml-1 font-normal">
-                            ({gstackPath.trim() || DEFAULT_GSTACK_PATH})
+                            → {gstackPath.trim() || DEFAULT_GSTACK_PATH}
                           </span>
                         </button>
                       </>
                     ) : installState === 'installing' ? (
                       <div className="flex items-center gap-2 text-xs text-zinc-400">
                         <Loader2 size={13} className="animate-spin text-indigo-400 shrink-0" />
-                        <span>Installing gstack — cloning from GitHub…</span>
+                        <span>Installing gstack — downloading from GitHub, this takes about 30 seconds…</span>
                       </div>
                     ) : installState === 'error' ? (
                       <>
                         <p className="text-xs text-red-400 flex items-start gap-1.5">
                           <AlertCircle size={12} className="shrink-0 mt-0.5" />
-                          {installError || 'Installation failed.'}
+                          {installError || 'Installation failed. Check your internet connection and try again.'}
                         </p>
                         <button
                           onClick={handleInstall}
                           className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-zinc-600 text-xs text-zinc-400 hover:text-zinc-200 hover:border-zinc-400 transition-colors"
                         >
-                          Retry
+                          Try again
                         </button>
                       </>
                     ) : null}
                   </div>
                 )}
 
-                {/* Success banner */}
                 {installState === 'success' && (
                   <p className="text-xs text-emerald-400 flex items-center gap-1">
                     <CheckCircle2 size={11} /> gstack installed successfully
@@ -283,9 +334,11 @@ export default function Onboarding({ onComplete }: Props) {
               {/* Workspace path */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Workspace Directory <span className="text-red-400">*</span>
+                  Which project folder are you working on? <span className="text-red-400">*</span>
                 </label>
-                <p className="text-xs text-zinc-500">Your project folder — daemon writes <code className="font-mono text-zinc-400">.gstack/browse.json</code> here</p>
+                <p className="text-xs text-zinc-500">
+                  This is the folder where your code lives. AI agents will run inside this folder.
+                </p>
                 <div className="flex gap-2">
                   <input
                     value={workspacePath}
@@ -296,6 +349,7 @@ export default function Onboarding({ onComplete }: Props) {
                   <button
                     type="button"
                     onClick={() => browsePath('workspace')}
+                    title="Browse for folder"
                     className="px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-950 hover:border-zinc-300 dark:hover:border-zinc-600 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
                   >
                     <FolderOpen size={15} />
@@ -335,7 +389,7 @@ export default function Onboarding({ onComplete }: Props) {
               </div>
               <div>
                 <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">You're all set!</h2>
-                <p className="text-xs text-zinc-500 mt-1">Studio will start the daemon and take you to the Dashboard</p>
+                <p className="text-xs text-zinc-500 mt-1">gstack Studio will start your AI browser and take you to the dashboard</p>
               </div>
             </div>
 
@@ -343,17 +397,22 @@ export default function Onboarding({ onComplete }: Props) {
               <div className="flex items-start gap-2 p-3 rounded-xl bg-zinc-200/50 dark:bg-zinc-800/50">
                 <CheckCircle2 size={13} className="text-emerald-400 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-zinc-700 dark:text-zinc-300 font-medium">gstack path</p>
+                  <p className="text-zinc-700 dark:text-zinc-300 font-medium">Agent library</p>
                   <p className="text-zinc-500 font-mono truncate">{gstackPath}</p>
                 </div>
               </div>
               <div className="flex items-start gap-2 p-3 rounded-xl bg-zinc-200/50 dark:bg-zinc-800/50">
                 <CheckCircle2 size={13} className="text-emerald-400 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-zinc-700 dark:text-zinc-300 font-medium">Workspace</p>
+                  <p className="text-zinc-700 dark:text-zinc-300 font-medium">Project folder</p>
                   <p className="text-zinc-500 font-mono truncate">{workspacePath}</p>
                 </div>
               </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-indigo-950/20 border border-indigo-800/30 text-xs text-zinc-400 space-y-1">
+              <p className="font-medium text-indigo-300">What happens next</p>
+              <p>You'll land on the Dashboard. Click <strong className="text-zinc-300">Start AI Browser</strong> to activate web browsing for agents, then head to the <strong className="text-zinc-300">Agent Board</strong> to pick your first task.</p>
             </div>
 
             <div className="flex gap-3">

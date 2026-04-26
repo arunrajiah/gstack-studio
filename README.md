@@ -1,6 +1,7 @@
 <div align="center">
   <h1>gstack Studio</h1>
-  <p><strong>A visual desktop app for <a href="https://github.com/garrytan/gstack">gstack</a> — run every AI engineering agent without touching the CLI.</strong></p>
+  <p><strong>A visual desktop app for <a href="https://github.com/garrytan/gstack">gstack</a> — discover, run, and monitor AI agents without touching the CLI.</strong></p>
+  <p><em>Built for everyone: developers, PMs, designers, and anyone working alongside AI-powered engineering teams.</em></p>
 
   <p>
     <a href="https://github.com/arunrajiah/gstack-studio/releases/latest"><img src="https://img.shields.io/github/v/release/arunrajiah/gstack-studio?style=flat-square&label=latest&color=6366f1" alt="Latest Release" /></a>
@@ -26,7 +27,9 @@
 ---
 
 > **gstack Studio is a companion app for [gstack](https://github.com/garrytan/gstack).**
-> It does not replace gstack — it wraps it in a polished GUI so you can discover agents, copy slash commands, monitor the browse daemon, and review project history, all without memorising CLI commands.
+> It does not replace gstack — it wraps it in a polished GUI so you can discover agents, copy slash commands, monitor the AI browser service, and review project history, all without memorising CLI commands.
+>
+> **You don't need to be a developer to use it.** Product managers, designers, and founders can browse agents, understand what each one does, and trigger AI-powered workflows from a clean visual interface.
 
 ---
 
@@ -35,32 +38,32 @@
 <table>
   <tr>
     <td align="center" width="50%">
-      <img src="docs/screenshots/dashboard.png" alt="Dashboard — daemon controls, workspace switcher, quick actions" />
-      <br /><sub><b>Dashboard</b> — daemon health, Start/Stop/Restart, quick actions</sub>
+      <img src="docs/screenshots/dashboard.png" alt="Dashboard — gradient AI Browser hero card, Start/Stop/Restart, guided task panel, workspace switcher" />
+      <br /><sub><b>Dashboard</b> — AI Browser status, Start/Stop/Restart, "What would you like to do?" guided tasks</sub>
     </td>
     <td align="center" width="50%">
-      <img src="docs/screenshots/sprint.png" alt="Sprint Board — all agents organised by phase, click to copy or run in terminal" />
-      <br /><sub><b>Sprint Board</b> — agents by phase, click to copy command or ▶ run in terminal</sub>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="50%">
-      <img src="docs/screenshots/agents.png" alt="Agents — searchable skill browser with live daemon log stream and run button" />
-      <br /><sub><b>Agents</b> — skill browser with live daemon log stream, ▶ run any skill</sub>
-    </td>
-    <td align="center" width="50%">
-      <img src="docs/screenshots/browse.png" alt="Browse Console — live HTTP terminal for the gstack browse daemon" />
-      <br /><sub><b>Browse Console</b> — Terminal & Script modes for browser automation</sub>
+      <img src="docs/screenshots/sprint.png" alt="Agent Board — phase-coloured cards with left accent border, phase pipeline strip, search, phase explainer" />
+      <br /><sub><b>Agent Board</b> — 40+ agents by phase, phase-coloured cards, click to copy or ▶ run in terminal</sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <img src="docs/screenshots/settings.png" alt="Settings — workspace, gstack path, agent host auto-detection, API keys" />
-      <br /><sub><b>Settings</b> — workspace, gstack path, agent host picker, API keys</sub>
+      <img src="docs/screenshots/agents.png" alt="Activity — searchable skill browser with phase filter and live AI browser log stream" />
+      <br /><sub><b>Activity</b> — searchable skill browser with live AI browser log stream, ▶ run any agent</sub>
     </td>
     <td align="center" width="50%">
-      <img src="docs/screenshots/command-palette.png" alt="Command Palette — ⌘K to instantly search pages and skills" />
-      <br /><sub><b>Command Palette (⌘K)</b> — instant search across pages and all skills</sub>
+      <img src="docs/screenshots/browse.png" alt="Browser Automation — Tasks, Terminal, and Script modes for headless browser control" />
+      <br /><sub><b>Browser Automation</b> — Tasks (form-based), Terminal, and Script modes; 44 commands</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="docs/screenshots/settings.png" alt="Settings — project folder, gstack location, AI Browser service, AI coding tool picker, theme toggle" />
+      <br /><sub><b>Settings</b> — project folder, gstack location, AI coding tool picker, dark/light/system theme</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="docs/screenshots/command-palette.png" alt="Command Palette — ⌘K to instantly search all pages and agents" />
+      <br /><sub><b>Command Palette (⌘K)</b> — instant search across all pages and agents</sub>
     </td>
   </tr>
 </table>
@@ -71,25 +74,32 @@
 
 | Page | What it does |
 |------|-------------|
-| **Dashboard** | Daemon health, Start / Stop / Restart controls, workspace quick-switcher with recent paths, Open in Finder button |
-| **Sprint Board** | Visual pipeline (Think → Plan → Build → Review → Test → Ship → Reflect) with all agents — auto-syncs with your local gstack install. Click any card to copy its `/command`; hover for 📖 doc viewer or ▶ run directly in terminal |
-| **Agents** | Searchable skill browser with phase filter + live daemon log stream (stdout/stderr, polls every 2 s); per-skill doc viewer and ▶ run in terminal |
-| **Browse Console** | Live terminal interface to the gstack browse daemon — send any of the 44 HTTP commands across 7 categories and see JSON responses |
-| **History** | Per-project learnings with full-text search, stored in `~/.gstack/projects/*/learnings.jsonl` |
-| **Settings** | Workspace path (with native folder picker + Open in Finder), gstack install path, Agent Host selector (auto-detects Claude Code / Codex / OpenClaw / Factory / Kiro), Dark/Light/System theme toggle, auto-start daemon toggle, API keys, recent-workspace list |
+| **Dashboard** | AI Browser health with gradient status card, Start / Stop / Restart, "What would you like to do today?" guided task panel, quick action cards with outcome descriptions, workspace switcher |
+| **Agent Board** | 40+ AI agents organised by phase (Think → Plan → Build → Review → Test → Ship → Reflect) — phase-coloured left-accent cards, plain-English phase descriptions, audience badges, "What are phases?" explainer. Click any card to copy its `/command`; ▶ run directly in terminal |
+| **Activity** | Searchable agent browser with phase filter + live AI browser log stream; per-agent doc viewer (renders SKILL.md) and ▶ run in terminal |
+| **Browser Automation** | Three modes: **Tasks** (form-based, no syntax needed), **Terminal** (raw command input), **Script** (multi-line batch). Covers 44 browser commands across 7 categories |
+| **History** | Per-project AI learnings with timeline design, full-text search, and export (JSON / Markdown), stored in `~/.gstack/projects/*/learnings.jsonl` |
+| **Settings** | Project folder, gstack location, AI coding tool auto-detection (Claude Code / Codex / OpenClaw / Factory / Kiro), colour theme (dark / light / system), auto-start toggle, API keys |
+
+### Designed for everyone
+
+- **Non-coders**: plain-English labels throughout, outcome-focused descriptions, guided task panel, form-based browser automation, labelled sidebar navigation
+- **Developers**: full terminal mode, script runner, command history, phase-organised agent grid, live log streaming, SKILL.md doc viewer
+- **New users**: onboarding wizard auto-installs gstack with one click, Bun check with clear install instructions, "What happens next" guidance after setup
 
 ### Additional capabilities
 
-- **Direct agent execution** — ▶ Run button on every skill opens a real interactive terminal with `claude /skill` (or codex / OpenClaw / Factory / Kiro) — no copy-paste
-- **Agent host auto-detection** — Settings scans common install paths and `$PATH` for all supported hosts; click to select, custom path override available
-- **First-launch onboarding wizard** — guided 3-step setup with **one-click gstack auto-install**: if gstack isn't found, the Configure step offers to clone it from GitHub automatically
+- **Direct agent execution** — ▶ Run button on every skill opens a real interactive terminal with `claude /skill` (or codex / OpenClaw / Factory / Kiro) — no copy-paste required
+- **AI coding tool auto-detection** — Settings scans common install paths and `$PATH` for all supported tools; click to select, custom path override available
+- **First-launch onboarding wizard** — guided 3-step setup with **one-click gstack auto-install**: if gstack isn't found, the Configure step clones it from GitHub automatically
 - **Skill documentation viewer** — reads each skill's `SKILL.md` and renders it inline (headings, bold, code blocks) with a Copy Command button
 - **Auto-update** — checks GitHub Releases on startup; shows a download banner in the title bar when a new version is available
+- **Labelled navigation sidebar** — every nav item shows its icon + text label (not icon-only), so the app is navigable without hover or prior knowledge
 - **Custom window chrome** (Windows / Linux) — native Min / Max / Close buttons integrated in the app title bar
 - **Error boundary** — each page catches React errors and shows a graceful fallback UI
 
 ### What gstack Studio is NOT
-- It does not replace the Claude Code CLI — agents still run inside your chosen AI coding host (Claude Code, Codex, etc.). The ▶ Run button simply opens a pre-filled terminal for you
+- It does not replace the Claude Code CLI — agents still run inside your chosen AI coding tool (Claude Code, Codex, etc.). The ▶ Run button simply opens a pre-filled terminal for you
 - It does not modify gstack in any way — zero changes to the gstack codebase (Layer 1 integration only)
 - It is not a standalone AI coding assistant
 
@@ -112,13 +122,14 @@ Or build from source — see [Development](#-development).
 
 ## 🔑 Prerequisites
 
-1. **[Bun](https://bun.sh)** — required to run the gstack browse daemon (`brew install bun`)
+1. **[Bun](https://bun.sh)** — required to run the AI browser service (`curl -fsSL https://bun.sh/install | bash` or `brew install bun`)
 2. **[git](https://git-scm.com)** — required if you want the onboarding wizard to auto-install gstack
-3. An **Anthropic API key** if you plan to run agents programmatically
+3. An **AI coding tool** — Claude Code, Codex, OpenClaw, Factory, or Kiro (for running agents)
+4. An **Anthropic API key** — optional, only needed if running agents programmatically via the API
 
-> gstack is **required** — without it there are no agents, no daemon, and no Browse Console. However, you don't need to install it before launching the app. If gstack isn't already present, the onboarding wizard installs it for you with one click.
+> **gstack** is required — without it there are no agents, no AI browser service, and no Browser Automation page. However, you don't need to install it before launching the app. If gstack isn't present, the onboarding wizard installs it for you with one click.
 >
-> gstack Studio works on macOS, Windows, and Linux, but the gstack browse daemon currently requires Bun, which must be installed separately.
+> gstack Studio works on macOS, Windows, and Linux. The AI browser service requires Bun; the onboarding wizard checks for Bun and shows clear install instructions if it's missing.
 
 ---
 
@@ -141,13 +152,15 @@ You can also configure paths at any time in **Settings**:
 - **gstack Install Path** — where gstack is installed (default: `~/.claude/skills/gstack`).
 - **Anthropic API Key** — optional, stored locally in `~/.gstack/studio-config.json`.
 
-### 3. Start the daemon
+### 3. Start the AI Browser
 
-Go to **Dashboard** and click **Start Daemon**. The status dot turns green when the browse server is live.
+Go to **Dashboard** and click **Start AI Browser**. The status dot turns green when the service is live and agents can use the web.
 
-### 4. Copy slash commands
+### 4. Pick an agent and run it
 
-Open the **Sprint Board**, find any agent, and click its card. The slash command (e.g. `/review`) is copied to your clipboard — paste it straight into Claude Code.
+Open the **Agent Board**, find any agent, and click its card to copy the command (e.g. `/review`). Paste it into Claude Code, or click ▶ to open a pre-filled terminal automatically.
+
+Not sure where to start? The Dashboard shows a **"What would you like to do today?"** panel with 5 common starting tasks and plain-English descriptions.
 
 ---
 
@@ -162,11 +175,13 @@ Open the **Sprint Board**, find any agent, and click its card. The slash command
 - [x] **v0.6.0** — Dark/light/system theme toggle, dynamic skill loading (auto-syncs with `/gstack-upgrade`)
 - [x] **v0.7.0** — Direct agent execution — ▶ Run any skill in a real terminal; agent host auto-detection (Claude Code, Codex, OpenClaw, Factory, Kiro)
 - [x] **v0.8.0** — gstack auto-install during onboarding (one-click git clone); letter-based "gS" app icon
-- [x] **v0.9.0** — UX polish: Bun presence check in onboarding wizard; daemon crash notification toast
-- [x] **v0.10.0** — gstack v1.x sync: 3 new skills (benchmark-models, make-pdf, plan-tune); 15 new Browse Console commands; 2 new categories (Inspection, Session); removed orphaned `debug` stub
+- [x] **v0.9.0** — UX polish: Bun presence check in onboarding wizard; AI browser crash notification toast
+- [x] **v0.10.0** — gstack v1.x sync: 3 new skills (benchmark-models, make-pdf, plan-tune); 15 new Browser Automation commands; 2 new categories (Inspection, Session); removed orphaned `debug` stub
 - [x] **v0.10.1** — gstack v1.12.x sync: 2 new skills (landing-report, setup-gbrain)
+- [x] **v0.11.0** — UX overhaul for everyone: plain-English labels throughout, "What would you like to do today?" Dashboard panel, phase descriptions + audience badges, Browser Automation Task mode (form-based, no command syntax), labelled sidebar, outcome-first agent cards, improved onboarding copy
+- [x] **v0.12.0** — Visual polish: frosted-glass titlebar, gradient-text brand, Linear-style sidebar with active indicator, phase-coloured left-accent agent cards with skeleton loading, gradient AI Browser hero card with glow status dot, History timeline design with animated dot markers, SkillDocModal spring-entrance animation with deep backdrop blur
 - [ ] **v1.0.0** — Windows / macOS code signing for Gatekeeper / SmartScreen-free distribution
-- [ ] **Future** — Embedded terminal panel (xterm.js); run history log per workspace; multi-workspace side-by-side
+- [ ] **Future** — Embedded terminal panel (xterm.js); run history log per workspace; multi-workspace side-by-side; Bun auto-install in onboarding; Cursor AI coding tool support
 
 ---
 

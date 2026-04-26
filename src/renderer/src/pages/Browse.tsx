@@ -1,5 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
-import { Send, Terminal, Trash2, Copy, Check, ChevronDown, ChevronUp, BookOpen, Play, Square, FileCode } from 'lucide-react'
+import {
+  Send, Terminal, Trash2, Copy, Check, ChevronDown, ChevronUp,
+  BookOpen, Play, Square, FileCode, Globe, MousePointer,
+  Type, Camera, Link2, List, ArrowLeft, ArrowRight, RotateCw
+} from 'lucide-react'
 import { client } from '../lib/gstack-client'
 import { useDaemon } from '../lib/store'
 import { toast } from '../lib/toast'
@@ -10,6 +14,101 @@ interface LogEntry {
   text: string
   time: string
 }
+
+// Task mode: common browser tasks as form inputs — no command syntax required
+const TASK_PRESETS = [
+  {
+    id: 'goto',
+    label: 'Go to a website',
+    icon: Globe,
+    description: 'Open a URL in the AI browser',
+    fields: [{ key: 'url', label: 'Website address (URL)', placeholder: 'https://example.com', type: 'text' }],
+    buildCommand: (vals: Record<string, string>) => ({ cmd: 'goto', args: [vals.url] }),
+  },
+  {
+    id: 'screenshot',
+    label: 'Take a screenshot',
+    icon: Camera,
+    description: 'Capture what the AI browser currently sees',
+    fields: [],
+    buildCommand: () => ({ cmd: 'screenshot', args: [] }),
+  },
+  {
+    id: 'read-text',
+    label: 'Read page text',
+    icon: Type,
+    description: 'Get all the visible text content from the current page',
+    fields: [],
+    buildCommand: () => ({ cmd: 'text', args: [] }),
+  },
+  {
+    id: 'get-links',
+    label: 'List all links',
+    icon: Link2,
+    description: 'Show every link on the current page',
+    fields: [],
+    buildCommand: () => ({ cmd: 'links', args: [] }),
+  },
+  {
+    id: 'click',
+    label: 'Click an element',
+    icon: MousePointer,
+    description: 'Click a button or link on the page using its CSS selector',
+    fields: [{ key: 'selector', label: 'Element to click (CSS selector or text)', placeholder: 'button.submit  or  #login-btn', type: 'text' }],
+    buildCommand: (vals: Record<string, string>) => ({ cmd: 'click', args: [vals.selector] }),
+  },
+  {
+    id: 'fill-form',
+    label: 'Fill in a form field',
+    icon: Type,
+    description: 'Type text into an input field on the page',
+    fields: [
+      { key: 'selector', label: 'Field selector', placeholder: 'input[name="email"]  or  #search', type: 'text' },
+      { key: 'text',     label: 'Text to type',   placeholder: 'hello@example.com',                type: 'text' },
+    ],
+    buildCommand: (vals: Record<string, string>) => ({ cmd: 'fill', args: [vals.selector, vals.text] }),
+  },
+  {
+    id: 'get-html',
+    label: 'Get page HTML',
+    icon: FileCode,
+    description: 'Download the full HTML source of the current page',
+    fields: [],
+    buildCommand: () => ({ cmd: 'html', args: [] }),
+  },
+  {
+    id: 'list-tabs',
+    label: 'Show open tabs',
+    icon: List,
+    description: 'See all currently open browser tabs',
+    fields: [],
+    buildCommand: () => ({ cmd: 'tabs', args: [] }),
+  },
+  {
+    id: 'back',
+    label: 'Go back',
+    icon: ArrowLeft,
+    description: 'Navigate to the previous page',
+    fields: [],
+    buildCommand: () => ({ cmd: 'back', args: [] }),
+  },
+  {
+    id: 'forward',
+    label: 'Go forward',
+    icon: ArrowRight,
+    description: 'Navigate to the next page',
+    fields: [],
+    buildCommand: () => ({ cmd: 'forward', args: [] }),
+  },
+  {
+    id: 'reload',
+    label: 'Reload page',
+    icon: RotateCw,
+    description: 'Refresh the current page',
+    fields: [],
+    buildCommand: () => ({ cmd: 'reload', args: [] }),
+  },
+]
 
 // Full reference of gstack browse daemon commands
 const COMMAND_REFERENCE = [
@@ -98,7 +197,9 @@ let seq = 0
 
 export default function Browse() {
   const { state } = useDaemon()
-  const [mode, setMode] = useState<'terminal' | 'script'>('terminal')
+  const [mode, setMode] = useState<'task' | 'terminal' | 'script'>(
+    () => (localStorage.getItem('browse-mode') as 'task' | 'terminal' | 'script') ?? 'terminal'
+  )
   const [input, setInput] = useState('')
   const [script, setScript] = useState('')
   const [logs, setLogs] = useState<LogEntry[]>([])
@@ -106,6 +207,10 @@ export default function Browse() {
   const [showRef, setShowRef] = useState(false)
   const [copiedLogs, setCopiedLogs] = useState(false)
   const [scriptProgress, setScriptProgress] = useState<{ done: number; total: number } | null>(null)
+
+  // Task mode state
+  const [selectedTask, setSelectedTask] = useState<string | null>(null)
+  const [taskFields, setTaskFields] = useState<Record<string, string>>({})
 
   // Command history
   const historyRef = useRef<string[]>([])
@@ -128,7 +233,6 @@ export default function Browse() {
     const [cmd, ...args] = parts
     if (!cmd) return
 
-    // Add to history (deduplicated, newest first)
     historyRef.current = [raw.trim(), ...historyRef.current.filter(h => h !== raw.trim())].slice(0, 100)
     historyPosRef.current = -1
 
@@ -144,6 +248,14 @@ export default function Browse() {
     } finally {
       setRunning(false)
     }
+  }
+
+  async function runTaskPreset() {
+    const preset = TASK_PRESETS.find(t => t.id === selectedTask)
+    if (!preset) return
+    const { cmd, args } = preset.buildCommand(taskFields)
+    const raw = [cmd, ...args].join(' ')
+    await runCommand(raw)
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -213,19 +325,30 @@ export default function Browse() {
     setTimeout(() => setCopiedLogs(false), 2000)
   }
 
+  const activeTask = TASK_PRESETS.find(t => t.id === selectedTask)
+  const taskIsReady = activeTask && activeTask.fields.every(f => taskFields[f.key]?.trim())
+
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="px-6 py-4 border-b border-zinc-200/60 dark:border-zinc-800/60 flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">Browse Console</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">Browser automation via the gstack daemon</p>
+          <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">Browser Automation</h1>
+          <p className="text-sm text-zinc-500 mt-0.5">Control a headless web browser — navigate, read, and interact with any website</p>
         </div>
         <div className="flex items-center gap-2">
           {/* Mode tabs */}
           <div className="flex items-center rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden text-xs">
             <button
-              onClick={() => setMode('terminal')}
+              onClick={() => { setMode('task'); localStorage.setItem('browse-mode', 'task') }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 transition-colors ${
+                mode === 'task' ? 'bg-zinc-300 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200' : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+              }`}
+            >
+              <Globe size={12} /> Tasks
+            </button>
+            <button
+              onClick={() => { setMode('terminal'); localStorage.setItem('browse-mode', 'terminal') }}
               className={`flex items-center gap-1.5 px-3 py-1.5 transition-colors ${
                 mode === 'terminal' ? 'bg-zinc-300 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200' : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
@@ -233,7 +356,7 @@ export default function Browse() {
               <Terminal size={12} /> Terminal
             </button>
             <button
-              onClick={() => setMode('script')}
+              onClick={() => { setMode('script'); localStorage.setItem('browse-mode', 'script') }}
               className={`flex items-center gap-1.5 px-3 py-1.5 transition-colors ${
                 mode === 'script' ? 'bg-zinc-300 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200' : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
@@ -241,23 +364,25 @@ export default function Browse() {
               <FileCode size={12} /> Script
             </button>
           </div>
-          <button
-            onClick={() => setShowRef(v => !v)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs transition-colors ${
-              showRef
-                ? 'border-indigo-700/60 bg-indigo-900/20 text-indigo-300'
-                : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:border-zinc-300 dark:hover:border-zinc-600'
-            }`}
-          >
-            <BookOpen size={12} />
-            {showRef ? 'Hide' : 'Commands'}
-            {showRef ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
-          </button>
+          {mode !== 'task' && (
+            <button
+              onClick={() => setShowRef(v => !v)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs transition-colors ${
+                showRef
+                  ? 'border-indigo-700/60 bg-indigo-900/20 text-indigo-300'
+                  : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:border-zinc-300 dark:hover:border-zinc-600'
+              }`}
+            >
+              <BookOpen size={12} />
+              {showRef ? 'Hide' : 'Commands'}
+              {showRef ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Command reference panel */}
-      {showRef && (
+      {/* Command reference panel (terminal/script modes) */}
+      {showRef && mode !== 'task' && (
         <div className="border-b border-zinc-200/60 dark:border-zinc-800/60 px-6 py-4 overflow-y-auto max-h-72 bg-zinc-100/30 dark:bg-zinc-900/30">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {COMMAND_REFERENCE.map(group => (
@@ -287,39 +412,17 @@ export default function Browse() {
         </div>
       )}
 
-      {/* Quick examples */}
-      {!showRef && (
-        <div className="px-6 py-2.5 border-b border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-2 overflow-x-auto">
-          <span className="text-xs text-zinc-600 shrink-0">Quick:</span>
-          {[
-            { cmd: 'goto', args: ['https://example.com'] },
-            { cmd: 'screenshot' },
-            { cmd: 'text' },
-            { cmd: 'links' },
-            { cmd: 'tabs' },
-            { cmd: 'url' },
-          ].map(ex => (
-            <button
-              key={ex.cmd}
-              disabled={!state.running}
-              onClick={() => runCommand([ex.cmd, ...(ex.args ?? [])].join(' '))}
-              className="shrink-0 px-2.5 py-1 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-mono"
-            >
-              {ex.cmd}
-            </button>
-          ))}
-        </div>
-      )}
-
       {/* Log output */}
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2 font-mono text-xs">
         {logs.length === 0 && (
           <div className="flex flex-col items-center justify-center h-48 text-zinc-600 gap-3">
-            <Terminal size={28} />
+            <Globe size={28} />
             <p className="text-center">
               {state.running
-                ? 'Type a command below or pick a quick action above.\nUse ↑/↓ to cycle through history.'
-                : 'Start the daemon on the Dashboard, then run browser commands here.'
+                ? mode === 'task'
+                  ? 'Pick a task below to get started.'
+                  : 'Type a command below or pick a quick action above.\nUse ↑/↓ to cycle through history.'
+                : 'Start the AI Browser on the Dashboard first, then control it here.'
               }
             </p>
           </div>
@@ -345,52 +448,160 @@ export default function Browse() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input area — Terminal or Script mode */}
-      {mode === 'terminal' ? (
-        <form onSubmit={handleSubmit} className="px-6 py-4 border-t border-zinc-200/60 dark:border-zinc-800/60 flex gap-3">
-          <div className="flex-1 flex items-center gap-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 focus-within:border-indigo-600 transition-colors">
-            <span className="text-zinc-500 dark:text-zinc-600 font-mono text-sm">❯</span>
-            <input
-              ref={inputRef}
-              value={input}
-              onChange={e => { setInput(e.target.value); historyPosRef.current = -1 }}
-              onKeyDown={handleKeyDown}
-              placeholder={state.running ? 'goto https://… · screenshot · text   (↑/↓ history)' : 'Start the daemon first'}
-              disabled={!state.running}
-              className="flex-1 bg-transparent text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-500 dark:placeholder:text-zinc-600 outline-none font-mono"
-            />
-          </div>
-          <div className="flex gap-2">
-            {logs.length > 0 && (
+      {/* ── Task mode ──────────────────────────────────────────────────── */}
+      {mode === 'task' && (
+        <div className="border-t border-zinc-200/60 dark:border-zinc-800/60 p-4 space-y-3">
+          {/* Task picker */}
+          {!selectedTask ? (
+            <>
+              <p className="text-xs text-zinc-500 font-medium">Choose a task:</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {TASK_PRESETS.map(task => {
+                  const Icon = task.icon
+                  return (
+                    <button
+                      key={task.id}
+                      disabled={!state.running}
+                      onClick={() => { setSelectedTask(task.id); setTaskFields({}) }}
+                      className="flex items-start gap-2 p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-indigo-700/50 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60 disabled:opacity-40 disabled:cursor-not-allowed transition-all text-left group"
+                    >
+                      <Icon size={13} className="text-indigo-400 mt-0.5 shrink-0" />
+                      <div>
+                        <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white">{task.label}</p>
+                        <p className="text-xs text-zinc-500 leading-snug mt-0.5">{task.description}</p>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+              {!state.running && (
+                <p className="text-xs text-zinc-600 text-center">Start the AI Browser on the Dashboard to enable tasks</p>
+              )}
+            </>
+          ) : (
+            /* Task form */
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => { setSelectedTask(null); setTaskFields({}) }}
+                  className="text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors flex items-center gap-1"
+                >
+                  ← Back
+                </button>
+                <span className="text-xs text-zinc-600">·</span>
+                <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{activeTask?.label}</p>
+              </div>
+
+              {activeTask?.fields.map(field => (
+                <div key={field.key} className="space-y-1">
+                  <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{field.label}</label>
+                  <input
+                    type={field.type}
+                    value={taskFields[field.key] ?? ''}
+                    onChange={e => setTaskFields(prev => ({ ...prev, [field.key]: e.target.value }))}
+                    placeholder={field.placeholder}
+                    className="w-full bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-500 dark:placeholder:text-zinc-600 focus:outline-none focus:border-indigo-600 transition-colors"
+                  />
+                </div>
+              ))}
+
+              {activeTask?.fields.length === 0 && (
+                <p className="text-xs text-zinc-500">{activeTask.description} — no parameters needed.</p>
+              )}
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setSelectedTask(null); setTaskFields({}) }}
+                  className="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={runTaskPreset}
+                  disabled={!state.running || running || !taskIsReady}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium transition-colors"
+                >
+                  {running ? <><Square size={12} className="animate-pulse" /> Running…</> : <><Play size={12} /> Run task</>}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Terminal mode ──────────────────────────────────────────────── */}
+      {mode === 'terminal' && (
+        <>
+          {/* Quick examples */}
+          {!showRef && (
+            <div className="px-6 py-2.5 border-b border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-2 overflow-x-auto">
+              <span className="text-xs text-zinc-600 shrink-0">Quick:</span>
+              {[
+                { cmd: 'goto', args: ['https://example.com'] },
+                { cmd: 'screenshot' },
+                { cmd: 'text' },
+                { cmd: 'links' },
+                { cmd: 'tabs' },
+                { cmd: 'url' },
+              ].map(ex => (
+                <button
+                  key={ex.cmd}
+                  disabled={!state.running}
+                  onClick={() => runCommand([ex.cmd, ...(ex.args ?? [])].join(' '))}
+                  className="shrink-0 px-2.5 py-1 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-mono"
+                >
+                  {ex.cmd}
+                </button>
+              ))}
+            </div>
+          )}
+          <form onSubmit={handleSubmit} className="px-6 py-4 border-t border-zinc-200/60 dark:border-zinc-800/60 flex gap-3">
+            <div className="flex-1 flex items-center gap-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 focus-within:border-indigo-600 transition-colors">
+              <span className="text-zinc-500 dark:text-zinc-600 font-mono text-sm">❯</span>
+              <input
+                ref={inputRef}
+                value={input}
+                onChange={e => { setInput(e.target.value); historyPosRef.current = -1 }}
+                onKeyDown={handleKeyDown}
+                placeholder={state.running ? 'goto https://… · screenshot · text   (↑/↓ history)' : 'Start the AI Browser first'}
+                disabled={!state.running}
+                className="flex-1 bg-transparent text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-500 dark:placeholder:text-zinc-600 outline-none font-mono"
+              />
+            </div>
+            <div className="flex gap-2">
+              {logs.length > 0 && (
+                <button
+                  type="button"
+                  onClick={copyLogs}
+                  title="Copy all logs"
+                  className="px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+                >
+                  {copiedLogs ? <Check size={15} className="text-emerald-400" /> : <Copy size={15} />}
+                </button>
+              )}
               <button
                 type="button"
-                onClick={copyLogs}
-                title="Copy all logs"
+                onClick={() => setLogs([])}
+                title="Clear log"
                 className="px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
               >
-                {copiedLogs ? <Check size={15} className="text-emerald-400" /> : <Copy size={15} />}
+                <Trash2 size={15} />
               </button>
-            )}
-            <button
-              type="button"
-              onClick={() => setLogs([])}
-              title="Clear log"
-              className="px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
-            >
-              <Trash2 size={15} />
-            </button>
-            <button
-              type="submit"
-              disabled={!state.running || !input.trim() || running}
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium transition-colors flex items-center gap-2"
-            >
-              <Send size={14} />
-              Run
-            </button>
-          </div>
-        </form>
-      ) : (
-        /* Script mode */
+              <button
+                type="submit"
+                disabled={!state.running || !input.trim() || running}
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                <Send size={14} />
+                Run
+              </button>
+            </div>
+          </form>
+        </>
+      )}
+
+      {/* ── Script mode ────────────────────────────────────────────────── */}
+      {mode === 'script' && (
         <div className="border-t border-zinc-200/60 dark:border-zinc-800/60 p-4 flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <p className="text-xs text-zinc-500">

@@ -6,6 +6,124 @@ Format: [Semantic Versioning](https://semver.org) — `Added`, `Changed`, `Fixed
 
 ---
 
+## [0.12.0] — 2026-04-26
+
+### Visual polish — Linear/Vercel-quality UI throughout
+
+**Changed — Titlebar**
+- Background: `bg-white/80 dark:bg-zinc-950/80` frosted glass with `backdrop-blur-md`
+- Brand: Zap icon in indigo-600 square + `gradient-text` "gstack" logotype (indigo → violet gradient via background-clip)
+- Status chip: `border border-emerald-500/20` with inner glow dot (`shadow-[0_0_6px_#34d399]`) when AI Browser is running
+- All interactive elements gain `btn-press` scale(0.97) micro-animation on active
+
+**Changed — Sidebar**
+- Active state: left indicator bar (`w-0.5 h-6 rounded-r-full bg-indigo-500`) replaces full-width fill — Linear-style
+- Icon `strokeWidth` transitions between 1.8 (resting) and 2.2 (active) for crisp visual feedback
+- Active background: `bg-indigo-50 dark:bg-indigo-950/40` (subtle, not heavy)
+
+**Changed — Agent Board (Sprint)**
+- Agent cards: `card-lift` hover lift (translateY −1px + layered box-shadow), `border-l-[3px]` phase-accent left border per phase colour
+- Phase section headers show inline descriptions, always visible (not collapsed)
+- Skeleton loading: 3 × 4 shimmer cards with animated gradient sweep while skills load
+- Empty search state: Search icon + "No agents match" message + "Clear search" button
+- `page-enter` fade-in + translateY(6px) animation on page load
+
+**Changed — Dashboard**
+- AI Browser hero card: conditional gradient background — emerald glow (`from-emerald-950/30`) when running, zinc gradient when stopped
+- Running state outer glow: `shadow-[0_0_32px_rgba(52,211,153,0.08)]` on card border
+- Status icon: `glow-green` box-shadow on the icon container when running; green dot with `shadow-[0_0_6px_#34d399]` + border-2 badge overlay
+- Quick Action cards: `card-lift` + `bg-white dark:bg-zinc-900`; icon in rounded-lg coloured background
+- Project cards: `card-lift` + folder icon in tinted rounded-lg
+- All buttons gain `btn-press` + shadow accents
+
+**Changed — History**
+- Timeline design: vertical line connecting entries (`absolute left-[7px] w-px bg-zinc-200 dark:bg-zinc-800/80`)
+- Per-entry: 14px dot marker that glows indigo (`shadow-[0_0_6px_rgba(99,102,241,0.4)]`) when the card is expanded; card border shifts to `border-indigo-200/60 dark:border-indigo-800/40`
+- Timestamp: 10px monospace with clock icon above the preview line
+- Skill badge: `/{skill}` monospace in indigo pill
+- Preview text: 2-line `line-clamp-2`; highlighted amber when matching search query
+- Project sidebar: Linear-style left indicator (matches Sidebar.tsx pattern); Sparkles badge for learning-enabled projects
+- Skeleton loading: 4-row shimmer (dot + bar) while fetching entries
+- Empty states: icon-in-box design with helpful copy for both no-project and no-results cases
+
+**Changed — SkillDocModal**
+- Backdrop: `bg-black/40 dark:bg-black/60 backdrop-blur-md` (stronger depth than before)
+- Card shadow: `shadow-[0_32px_64px_rgba(0,0,0,0.20),0_8px_24px_rgba(0,0,0,0.12)]` layered; darker in dark mode
+- Entrance animation: `modal-enter` keyframe — scale(0.96) → scale(1) + translateY(8px) → 0 over 160ms cubic-bezier(0.16,1,0.3,1) spring easing
+- Backdrop fades in via `page-fade-in` at 120ms
+
+**Added — CSS utility system (`globals.css`)**
+- `page-enter` — 180ms fade + translateY(6px) page entrance
+- `modal-enter` — 160ms spring scale + slide entrance for modals
+- `card-lift` — 150ms hover lift with layered box-shadow (dark-mode variant)
+- `gradient-text` — indigo-818cf8 → indigo-6366f1 → violet-a78bfa background-clip gradient
+- `glow-green` / `glow-indigo` — ambient glow box-shadows
+- `skeleton` — 200% background-size sweep shimmer animation (1.4s)
+- `phase-think/plan/build/review/test/ship/reflect/utils` — left border colour classes per phase
+- `btn-press` — scale(0.97) + opacity(0.9) on `:active`
+- Custom scrollbar: 5px, `border-radius: 99px`, themed per dark/light mode
+- `focus-visible` indigo ring (2px, offset 2px) across all interactive elements
+
+---
+
+## [0.11.0] — 2026-04-26
+
+### UX overhaul — accessible to everyone, not just coders
+
+**Changed — Plain-English UI throughout**
+- Replaced "daemon" with "AI Browser" in all user-facing labels across Dashboard, Settings, and Agents page — technical internal identifiers unchanged
+- "Start Daemon" button → **"Start AI Browser"** with a plain-English subtitle: _"Start the AI Browser so agents can navigate and read websites"_
+- "Live Daemon Output" panel → **"Live Activity"** with subtitle: _"Real-time output from the AI browser service"_
+- "Browse Console" renamed to **"Browser Automation"** throughout Sidebar, page heading, and documentation
+- "Daemon" Settings section → **"AI Browser service"**
+- "Agent Host" Settings section → **"AI coding tool"** with improved description
+- "Workspace Directory" Settings field → **"Project folder"**
+- "gstack Install Path" Settings field → **"gstack location"**
+- "Sprint Board" → **"Agent Board"** in page heading; sidebar label shortened to "Agents"
+- Sidebar icons now show **text labels** beneath each icon (was icon-only) so every nav item is identifiable without hover
+- Sprint Board phase badges now always show a plain-English **phase description** ("Check the work — code review, security scan, quality check") next to the phase label — no longer hidden
+- "good for everyone" badge added to agent phases accessible to non-coders (Think, Plan, Review, Reflect)
+- Settings page subtitle changed from a raw file path to "Configure how gstack Studio works on your machine"
+- Projects section on Dashboard: "no data yet" → "no history yet", "learnings" → "AI learnings saved"
+
+**Added — Onboarding improvements**
+- Onboarding feature cards redesigned with outcome-first language and icon-backed descriptions (was plain text with emoji)
+- "Prerequisites" box renamed to **"Quick system check"** with clearer Bun install instructions:
+  - Shows the install command in a styled code block
+  - Adds "Open bun.sh for instructions" external link
+  - Explains that restarting the app will re-run the check
+- Configure step field labels rewritten: "gstack Install Path" → "Where is gstack installed?", "Workspace Directory" → "Which project folder are you working on?"
+- Error messages use natural language ("gstack wasn't found at that path") instead of terse codes
+- Done step adds a **"What happens next"** info card explaining the first actions after setup
+
+**Added — Dashboard "What would you like to do today?"**
+- When the AI Browser is stopped, a new **guided task panel** replaces the empty state — 5 starter tasks (Review my code, Check project health, Plan a new feature, Run quality checks, Ship my changes) with descriptions and icons. Clicking any task navigates to the Agent Board.
+- Quick Action cards now show an **outcome description** ("AI reviews your code for bugs and improvements") below the skill name — always visible, not just on hover
+- Quick Action cards show a **"everyone" badge** on skills accessible to non-developers
+- Dashboard subtitle updated: "Your AI engineering team, ready to sprint" → "Your AI engineering team, ready to work"
+- Workspace menu "Recent workspaces" → "Recent projects"
+
+**Added — Agent Board phase explainer**
+- New **"What are phases?" toggle** in the Agent Board header expands a grid explaining all 8 phases in plain English — helps new users understand the workflow without CLI experience
+- Phase descriptions appear inline next to phase badges in the skill grid, always visible
+- "Filter skills…" placeholder → "Search agents…"
+
+**Added — Browser Automation Task mode**
+- New **"Tasks" mode** tab (shown by default) presents common browser operations as form inputs — no command syntax required:
+  - Go to a website (URL field)
+  - Take a screenshot (one click)
+  - Read page text
+  - List all links
+  - Click an element (selector field)
+  - Fill in a form field (selector + text fields)
+  - Get page HTML
+  - Show open tabs
+  - Go back / Go forward / Reload
+- Each task shows a plain-English description
+- Terminal and Script modes remain unchanged for advanced users
+
+---
+
 ## [0.10.1] — 2026-04-25
 
 ### gstack v1.12.x sync — 2 new skills

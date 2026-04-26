@@ -38,10 +38,10 @@ export default function SkillDocModal({ skill, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-zinc-100/80 dark:bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-6"
+      className="fixed inset-0 z-50 bg-black/40 dark:bg-black/60 backdrop-blur-md flex items-center justify-center p-6 animate-[page-fade-in_120ms_ease-out]"
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="w-full max-w-2xl max-h-[80vh] bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      <div className="w-full max-w-2xl max-h-[80vh] bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-700/50 rounded-2xl shadow-[0_32px_64px_rgba(0,0,0,0.20),0_8px_24px_rgba(0,0,0,0.12)] dark:shadow-[0_32px_64px_rgba(0,0,0,0.60),0_8px_24px_rgba(0,0,0,0.40)] flex flex-col overflow-hidden animate-[modal-enter_160ms_cubic-bezier(0.16,1,0.3,1)]">
 
         {/* Header */}
         <div className="flex items-start justify-between px-5 py-4 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
