@@ -29,6 +29,11 @@ function createWindow(): void {
 
   mainWindow.on('ready-to-show', () => mainWindow!.show())
 
+  // Set Dock icon on macOS in dev mode (packaged builds use the .icns from electron-builder)
+  if (process.platform === 'darwin' && is.dev) {
+    app.dock?.setIcon(join(__dirname, '../../build/icon.png'))
+  }
+
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
     return { action: 'deny' }
