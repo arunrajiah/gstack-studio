@@ -33,42 +33,6 @@
 
 ---
 
-## 📸 Screenshots
-
-<table>
-  <tr>
-    <td align="center" width="50%">
-      <img src="docs/screenshots/dashboard.png" alt="Dashboard — gradient AI Browser hero card, Start/Stop/Restart, guided task panel, workspace switcher" />
-      <br /><sub><b>Dashboard</b> — AI Browser status, Start/Stop/Restart, "What would you like to do?" guided tasks</sub>
-    </td>
-    <td align="center" width="50%">
-      <img src="docs/screenshots/sprint.png" alt="Agent Board — phase-coloured cards with left accent border, phase pipeline strip, search, phase explainer" />
-      <br /><sub><b>Agent Board</b> — 40+ agents by phase, phase-coloured cards, click to copy or ▶ run in terminal</sub>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="50%">
-      <img src="docs/screenshots/agents.png" alt="Activity — searchable skill browser with phase filter and live AI browser log stream" />
-      <br /><sub><b>Activity</b> — searchable skill browser with live AI browser log stream, ▶ run any agent</sub>
-    </td>
-    <td align="center" width="50%">
-      <img src="docs/screenshots/browse.png" alt="Browser Automation — Tasks, Terminal, and Script modes for headless browser control" />
-      <br /><sub><b>Browser Automation</b> — Tasks (form-based), Terminal, and Script modes; 44 commands</sub>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="50%">
-      <img src="docs/screenshots/settings.png" alt="Settings — project folder, gstack location, AI Browser service, AI coding tool picker, theme toggle" />
-      <br /><sub><b>Settings</b> — project folder, gstack location, AI coding tool picker, dark/light/system theme</sub>
-    </td>
-    <td align="center" width="50%">
-      <img src="docs/screenshots/command-palette.png" alt="Command Palette — ⌘K to instantly search all pages and agents" />
-      <br /><sub><b>Command Palette (⌘K)</b> — instant search across all pages and agents</sub>
-    </td>
-  </tr>
-</table>
-
----
 
 ## ✨ Features
 
