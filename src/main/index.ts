@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, session } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { autoUpdater } from 'electron-updater'
@@ -21,7 +21,7 @@ function createWindow(): void {
     backgroundColor: '#09090b',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false,
+      sandbox: true,           // preload only uses contextBridge/ipcRenderer — no Node access needed
       contextIsolation: true,
       nodeIntegration: false
     }
@@ -34,8 +34,10 @@ function createWindow(): void {
     app.dock?.setIcon(join(__dirname, '../../build/icon.png'))
   }
 
+  // Block all new window / navigation attempts from the renderer
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url)
+    // Only open safe external URLs in the system browser
+    if (/^https?:\/\//i.test(url)) shell.openExternal(url)
     return { action: 'deny' }
   })
 
@@ -86,6 +88,30 @@ app.whenReady().then(async () => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
+
+  // ── Content Security Policy ───────────────────────────────────────────────
+  // Applied in production only — dev server (vite HMR) needs relaxed rules.
+  if (!is.dev) {
+    session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+      callback({
+        responseHeaders: {
+          ...details.responseHeaders,
+          'Content-Security-Policy': [
+            [
+              "default-src 'self'",
+              "script-src 'self'",
+              "style-src 'self' 'unsafe-inline'",   // Tailwind inline styles
+              "img-src 'self' data: blob:",
+              "font-src 'self' data:",
+              "connect-src 'self' http://127.0.0.1:*",  // local browse daemon
+              "object-src 'none'",
+              "base-uri 'self'",
+            ].join('; ')
+          ]
+        }
+      })
+    })
+  }
 
   registerIpcHandlers(ipcMain, daemon)
   registerWindowControls()

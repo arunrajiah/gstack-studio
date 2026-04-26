@@ -1,9 +1,36 @@
 import { IpcMain, net, clipboard, dialog, shell, app } from 'electron'
 import { existsSync, readFileSync, mkdirSync, writeFileSync } from 'fs'
-import { join, dirname } from 'path'
+import { join, dirname, resolve, sep } from 'path'
 import { homedir, platform } from 'os'
-import { execFile, exec, spawn } from 'child_process'
+import { execFile, execFileSync, spawn } from 'child_process'
 import { GStackDaemon } from './daemon'
+
+// ── Input validation helpers ──────────────────────────────────────────────────
+
+/** Reject strings that contain path-traversal sequences or null bytes. */
+function isSafePathSegment(s: string): boolean {
+  if (!s || typeof s !== 'string') return false
+  if (s.includes('\0')) return false
+  if (s.includes('..')) return false
+  if (s.includes('/') || s.includes('\\')) return false
+  return true
+}
+
+/** Ensure a resolved absolute path stays within a trusted root directory. */
+function isWithinRoot(filePath: string, root: string): boolean {
+  const rel = filePath.startsWith(root + sep) || filePath === root
+  return rel
+}
+
+/** Only allow https / http URLs in shell.openExternal. */
+function isSafeUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url)
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:'
+  } catch {
+    return false
+  }
+}
 
 export function registerIpcHandlers(ipcMain: IpcMain, daemon: GStackDaemon): void {
 
@@ -43,7 +70,11 @@ export function registerIpcHandlers(ipcMain: IpcMain, daemon: GStackDaemon): voi
   })
 
   ipcMain.handle('gstack:learnings', async (_event, slug: string) => {
-    const file = join(homedir(), '.gstack', 'projects', slug, 'learnings.jsonl')
+    // Prevent path traversal — slug must be a single safe directory name
+    if (!isSafePathSegment(slug) || !/^[a-zA-Z0-9._-]+$/.test(slug)) return []
+    const projectsRoot = join(homedir(), '.gstack', 'projects')
+    const file = resolve(projectsRoot, slug, 'learnings.jsonl')
+    if (!isWithinRoot(file, projectsRoot)) return []
     if (!existsSync(file)) return []
     return readFileSync(file, 'utf8')
       .split('\n')
@@ -94,19 +125,26 @@ export function registerIpcHandlers(ipcMain: IpcMain, daemon: GStackDaemon): voi
   /** Open a path in Finder / Explorer / Files */
   ipcMain.handle('shell:open-path', async (_event, p: string) => shell.openPath(p))
 
-  /** Open a URL in the default browser */
-  ipcMain.handle('shell:open-url', async (_event, url: string) => shell.openExternal(url))
+  /** Open a URL in the default browser — only http/https allowed */
+  ipcMain.handle('shell:open-url', async (_event, url: string) => {
+    if (!isSafeUrl(url)) return
+    return shell.openExternal(url)
+  })
 
   /** Read a skill's SKILL.md template and return its content */
   ipcMain.handle('skill:read-doc', async (_event, skillId: string) => {
     const gstackPath = daemon.gstackPath
     if (!gstackPath) return null
-    // Try common locations for skill docs
+    // Validate skillId — only alphanumeric, hyphens, underscores (no traversal)
+    if (!skillId || !/^[a-zA-Z0-9_-]+$/.test(skillId)) return null
     const candidates = [
-      join(gstackPath, skillId, 'SKILL.md'),
-      join(gstackPath, skillId.replace(/-/g, '/'), 'SKILL.md'),
+      resolve(gstackPath, skillId, 'SKILL.md'),
+      // Replace hyphens with path separator for nested skill dirs only if safe
+      resolve(gstackPath, ...skillId.split('-'), 'SKILL.md'),
     ]
     for (const p of candidates) {
+      // Ensure the resolved path stays within the gstack install directory
+      if (!isWithinRoot(p, gstackPath)) continue
       if (existsSync(p)) return readFileSync(p, 'utf8')
     }
     return null
@@ -139,7 +177,16 @@ export function registerIpcHandlers(ipcMain: IpcMain, daemon: GStackDaemon): voi
   ipcMain.handle('config:get', async () => getConfig())
 
   ipcMain.handle('config:set', async (_event, updates: Record<string, unknown>) => {
-    const merged = { ...getConfig(), ...updates } as AppConfig
+    // Whitelist — only known config keys accepted; arbitrary keys are dropped
+    const ALLOWED: ReadonlyArray<keyof AppConfig> = [
+      'anthropicApiKey', 'gstackPath', 'workspacePath', 'openaiApiKey',
+      'recentWorkspaces', 'autoStartDaemon', 'theme', 'hostBin',
+    ]
+    const safe: Partial<AppConfig> = {}
+    for (const k of ALLOWED) {
+      if (k in updates) (safe as Record<string, unknown>)[k] = updates[k]
+    }
+    const merged = { ...getConfig(), ...safe } as AppConfig
     saveConfig(merged)
     return merged
   })
@@ -156,8 +203,7 @@ export function registerIpcHandlers(ipcMain: IpcMain, daemon: GStackDaemon): voi
       if (existsSync(b)) return { found: true, path: b }
     }
     try {
-      const { execSync } = require('child_process') as typeof import('child_process')
-      const result = execSync('which bun 2>/dev/null', { encoding: 'utf8' }).trim()
+      const result = execFileSync('which', ['bun'], { encoding: 'utf8' }).trim()
       if (result) return { found: true, path: result }
     } catch { /* not in PATH */ }
     return { found: false, path: null }
@@ -338,10 +384,9 @@ function resolveHostBin(bins: string[]): string | null {
   for (const b of bins) {
     if (b !== bins[bins.length - 1] && existsSync(b)) return b
   }
-  // For the bare name, check PATH via `which`
+  // For the bare name, check PATH via `which` — use execFile to avoid shell injection
   try {
-    const { execSync } = require('child_process') as typeof import('child_process')
-    const result = execSync(`which ${bins[bins.length - 1]} 2>/dev/null`, { encoding: 'utf8' }).trim()
+    const result = execFileSync('which', [bins[bins.length - 1]], { encoding: 'utf8' }).trim()
     if (result) return result
   } catch { /* not in PATH */ }
   return null
@@ -367,7 +412,7 @@ function openTerminalWithCommand(cwd: string, hostBin: string, skillCmd: string)
 
   return new Promise((resolve, reject) => {
     if (p === 'darwin') {
-      // Try iTerm2 first, fall back to Terminal.app
+      // Build the AppleScript — pass it via execFile (not exec) to avoid shell injection
       const script = `
         set cmd to "cd '${escShell(cwd)}' && '${escShell(hostBin)}' '${escShell(skillCmd)}'"
         tell application "System Events"
@@ -386,12 +431,15 @@ function openTerminalWithCommand(cwd: string, hostBin: string, skillCmd: string)
           end tell
         end if
       `
-      exec(`osascript -e '${script.replace(/'/g, "'\\''")}'`, err => {
+      // Use execFile so the script is passed as a direct arg, not through the shell
+      execFile('osascript', ['-e', script], err => {
         if (err) { reject(err) } else { resolve() }
       })
     } else if (p === 'win32') {
-      const winCmd = `cd /d "${cwd}" && "${hostBin}" "${skillCmd}"`
-      exec(`start cmd.exe /K "${winCmd}"`, err => {
+      // Escape double quotes inside each value before embedding in the cmd string
+      const esc = (s: string) => s.replace(/"/g, '\\"')
+      const winCmd = `cd /d "${esc(cwd)}" && "${esc(hostBin)}" "${esc(skillCmd)}"`
+      execFile('cmd.exe', ['/K', winCmd], err => {
         if (err) { reject(err) } else { resolve() }
       })
     } else {
