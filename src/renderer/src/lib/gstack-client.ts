@@ -19,6 +19,8 @@ declare global {
       checkGstack:   (path: string) => Promise<boolean>
       installGstack: (targetPath: string) => Promise<{ success: boolean; path: string; error?: string }>
       checkBun:      () => Promise<{ found: boolean; path: string | null }>
+      installBun:    () => Promise<{ success: boolean; error?: string }>
+      checkGit:      () => Promise<{ found: boolean }>
       workspace: {
         browse:  () => Promise<string | null>
         recents: () => Promise<string[]>
@@ -124,6 +126,8 @@ export const client = {
   checkGstack:   (path: string) => window.gstack.checkGstack(path),
   installGstack: (targetPath: string) => window.gstack.installGstack(targetPath),
   checkBun:      () => window.gstack.checkBun(),
+  installBun:    () => window.gstack.installBun(),
+  checkGit:      () => window.gstack.checkGit(),
   workspace: {
     browse:  () => window.gstack.workspace.browse(),
     recents: () => window.gstack.workspace.recents(),

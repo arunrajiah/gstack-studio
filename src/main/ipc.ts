@@ -196,17 +196,74 @@ export function registerIpcHandlers(ipcMain: IpcMain, daemon: GStackDaemon): voi
   ipcMain.handle('bun:check', async () => {
     const bunPaths = [
       join(homedir(), '.bun', 'bin', 'bun'),
+      join(homedir(), '.bun', 'bin', 'bun.exe'),   // Windows
       '/usr/local/bin/bun',
       '/opt/homebrew/bin/bun',
     ]
     for (const b of bunPaths) {
       if (existsSync(b)) return { found: true, path: b }
     }
+    // Fall back to PATH lookup (which / where)
+    const lookup = platform() === 'win32' ? 'where' : 'which'
     try {
-      const result = execFileSync('which', ['bun'], { encoding: 'utf8' }).trim()
+      const result = execFileSync(lookup, ['bun'], { encoding: 'utf8' }).trim()
       if (result) return { found: true, path: result }
     } catch { /* not in PATH */ }
     return { found: false, path: null }
+  })
+
+  // ── Bun auto-install ───────────────────────────────────────────────────────
+  /**
+   * Install Bun using the official install script for the current platform.
+   * macOS / Linux: `curl -fsSL https://bun.sh/install | bash`
+   * Windows:       `powershell -Command "irm bun.sh/install.ps1 | iex"`
+   */
+  ipcMain.handle('bun:install', async () => {
+    return new Promise<{ success: boolean; error?: string }>(resolve => {
+      const p = platform()
+      let child
+
+      if (p === 'win32') {
+        child = spawn(
+          'powershell',
+          ['-NoProfile', '-NonInteractive', '-Command', 'irm bun.sh/install.ps1 | iex'],
+          { stdio: 'pipe', env: { ...process.env } }
+        )
+      } else {
+        child = spawn(
+          'bash',
+          ['-c', 'curl -fsSL https://bun.sh/install | bash'],
+          { stdio: 'pipe', env: { ...process.env, HOME: homedir() } }
+        )
+      }
+
+      const outBuf: string[] = []
+      const errBuf: string[] = []
+      child.stdout?.on('data', (d: Buffer) => outBuf.push(d.toString()))
+      child.stderr?.on('data', (d: Buffer) => errBuf.push(d.toString()))
+      child.on('close', code => {
+        if (code === 0) {
+          resolve({ success: true })
+        } else {
+          const errMsg = errBuf.join('').trim() || outBuf.join('').trim() || `Installer exited with code ${code}`
+          resolve({ success: false, error: errMsg })
+        }
+      })
+      child.on('error', err => {
+        resolve({ success: false, error: err.message })
+      })
+    })
+  })
+
+  // ── Git check ─────────────────────────────────────────────────────────────
+  /** Check whether git is installed (needed for gstack auto-install). */
+  ipcMain.handle('git:check', async () => {
+    try {
+      execFileSync('git', ['--version'], { encoding: 'utf8', timeout: 5000 })
+      return { found: true }
+    } catch {
+      return { found: false }
+    }
   })
 
   // ── gstack install helpers ────────────────────────────────────────────────

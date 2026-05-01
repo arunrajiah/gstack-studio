@@ -182,6 +182,7 @@ Not sure where to start? The Dashboard shows a **"What would you like to do toda
 - [x] **v0.11.0** — UX overhaul for everyone: plain-English labels throughout, "What would you like to do today?" Dashboard panel, phase descriptions + audience badges, Browser Automation Task mode (form-based, no command syntax), labelled sidebar, outcome-first agent cards, improved onboarding copy
 - [x] **v0.12.0** — Visual polish: frosted-glass titlebar, gradient-text brand, Linear-style sidebar with active indicator, phase-coloured left-accent agent cards with skeleton loading, gradient AI Browser hero card with glow status dot, History timeline design with animated dot markers, SkillDocModal spring-entrance animation with deep backdrop blur
 - [x] **v0.13.0** — gstack v1.13–v1.21 sync: 2 new skills (scrape, skillify); 5 new agent hosts (OpenCode, Cursor, Slate, Hermes, GBrain); NON_SKILL_DIRS updated for browser-skills runtime and claude helper dirs
+- [x] **v0.14.0** — Zero-friction cross-platform setup: one-click Bun auto-install (no terminal needed), git check with platform-aware guidance (winget/Homebrew/apt), Windows `.exe` Bun detection fix
 - [ ] **v1.0.0** — Windows / macOS code signing for Gatekeeper / SmartScreen-free distribution
 - [ ] **Future** — Embedded terminal panel (xterm.js); run history log per workspace; multi-workspace side-by-side; Bun auto-install in onboarding
 

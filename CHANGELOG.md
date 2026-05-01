@@ -6,6 +6,39 @@ Format: [Semantic Versioning](https://semver.org) — `Added`, `Changed`, `Fixed
 
 ---
 
+## [0.14.0] — 2026-05-01
+
+### Zero-friction cross-platform setup
+
+**Added — Bun auto-install (no terminal needed)**
+- New `bun:install` IPC handler runs the official Bun install script silently in the background
+  - macOS / Linux: `curl -fsSL https://bun.sh/install | bash`
+  - Windows: `powershell -Command "irm bun.sh/install.ps1 | iex"`
+- Welcome step shows an **Install** button next to the Bun row — one click installs Bun and re-verifies automatically (no app restart required)
+- Install progress, success, and error states shown inline; "Try again" + "Manual install at bun.sh" fallback on failure
+
+**Added — Git check with platform-aware guidance**
+- New `git:check` IPC handler detects whether Git is available on PATH
+- Git row in the system requirements panel shows:
+  - **Windows**: "Download Git for Windows" button (git-scm.com) + `winget install --id Git.Git -e` command
+  - **macOS**: `git --version` trigger-prompt instructions + Homebrew fallback
+  - **Linux**: `apt` / `dnf` install commands
+- "Install gstack automatically" button is disabled (with explanation) when Git is missing
+
+**Fixed — Windows Bun detection**
+- `bun:check` now also checks `~/.bun/bin/bun.exe` (Windows executable) and uses `where` instead of `which` on Windows
+
+**Changed — Onboarding welcome step**
+- System requirements panel replaced the raw `curl` command block with a checklist UI:
+  - Status badge per dependency (checking / Ready / Not installed)
+  - One-click Install button per missing item
+  - Re-check button to refresh all statuses without restarting
+- "Get started" button is always reachable (labelled "Continue anyway" when requirements incomplete) so users aren't hard-blocked
+- Carry-over warning on the Configure step reminds users of unmet deps with a "go back" link
+- gstack auto-install button is disabled (with message) when Git is missing
+
+---
+
 ## [0.13.0] — 2026-05-01
 
 ### gstack v1.13–v1.21 sync

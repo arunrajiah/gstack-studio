@@ -22,6 +22,8 @@ contextBridge.exposeInMainWorld('gstack', {
   checkGstack:   (path: string) => ipcRenderer.invoke('gstack:check', path),
   installGstack: (targetPath: string) => ipcRenderer.invoke('gstack:install', targetPath),
   checkBun:      () => ipcRenderer.invoke('bun:check'),
+  installBun:    () => ipcRenderer.invoke('bun:install'),
+  checkGit:      () => ipcRenderer.invoke('git:check'),
 
   // ── Workspace ─────────────────────────────────────────────────────────────
   workspace: {
