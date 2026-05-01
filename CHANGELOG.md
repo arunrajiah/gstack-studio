@@ -6,6 +6,26 @@ Format: [Semantic Versioning](https://semver.org) — `Added`, `Changed`, `Fixed
 
 ---
 
+## [0.13.0] — 2026-05-01
+
+### gstack v1.13–v1.21 sync
+
+**Added — New skills**
+- `scrape` — read-only web data extraction; converts scrape patterns into permanent browser-scripts
+- `skillify` — codify prior scrape flows into reusable browser-scripts
+
+**Added — AI coding tool detection (5 new hosts)**
+- **OpenCode** — open-source terminal AI coding agent
+- **Cursor** — AI-first IDE with slash-command support
+- **Slate** — Slate AI coding agent
+- **Hermes** — Hermes AI coding agent
+- **GBrain** — gstack-brain knowledge-base agent
+
+**Fixed — Skill scanning**
+- Added `browser-skills` and `claude` to `NON_SKILL_DIRS` so the new gstack v1.20 runtime directory and outside-voice helper are not treated as user skills
+
+---
+
 ## [0.12.0] — 2026-04-26
 
 ### Visual polish — Linear/Vercel-quality UI throughout

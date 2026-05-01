@@ -91,7 +91,7 @@
 ### Additional capabilities
 
 - **Direct agent execution** — ▶ Run button on every skill opens a real interactive terminal with `claude /skill` (or codex / OpenClaw / Factory / Kiro) — no copy-paste required
-- **AI coding tool auto-detection** — Settings scans common install paths and `$PATH` for all supported tools; click to select, custom path override available
+- **AI coding tool auto-detection** — Settings scans common install paths and `$PATH` for all 10 supported tools (Claude Code, Codex, OpenClaw, Factory, Kiro, OpenCode, Cursor, Slate, Hermes, GBrain); click to select, custom path override available
 - **First-launch onboarding wizard** — guided 3-step setup with **one-click gstack auto-install**: if gstack isn't found, the Configure step clones it from GitHub automatically
 - **Skill documentation viewer** — reads each skill's `SKILL.md` and renders it inline (headings, bold, code blocks) with a Copy Command button
 - **Auto-update** — checks GitHub Releases on startup; shows a download banner in the title bar when a new version is available
@@ -181,8 +181,9 @@ Not sure where to start? The Dashboard shows a **"What would you like to do toda
 - [x] **v0.10.1** — gstack v1.12.x sync: 2 new skills (landing-report, setup-gbrain)
 - [x] **v0.11.0** — UX overhaul for everyone: plain-English labels throughout, "What would you like to do today?" Dashboard panel, phase descriptions + audience badges, Browser Automation Task mode (form-based, no command syntax), labelled sidebar, outcome-first agent cards, improved onboarding copy
 - [x] **v0.12.0** — Visual polish: frosted-glass titlebar, gradient-text brand, Linear-style sidebar with active indicator, phase-coloured left-accent agent cards with skeleton loading, gradient AI Browser hero card with glow status dot, History timeline design with animated dot markers, SkillDocModal spring-entrance animation with deep backdrop blur
+- [x] **v0.13.0** — gstack v1.13–v1.21 sync: 2 new skills (scrape, skillify); 5 new agent hosts (OpenCode, Cursor, Slate, Hermes, GBrain); NON_SKILL_DIRS updated for browser-skills runtime and claude helper dirs
 - [ ] **v1.0.0** — Windows / macOS code signing for Gatekeeper / SmartScreen-free distribution
-- [ ] **Future** — Embedded terminal panel (xterm.js); run history log per workspace; multi-workspace side-by-side; Bun auto-install in onboarding; Cursor AI coding tool support
+- [ ] **Future** — Embedded terminal panel (xterm.js); run history log per workspace; multi-workspace side-by-side; Bun auto-install in onboarding
 
 ---
 
