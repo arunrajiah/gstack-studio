@@ -619,13 +619,15 @@ const SKILL_DECORATION: Record<string, { phase: string; icon: string; displayNam
   'setup-gbrain':        { phase: 'utils',   icon: '🧠', displayName: 'Setup GBrain' },
   'scrape':              { phase: 'utils',   icon: '🕷️', displayName: 'Scrape' },
   'skillify':            { phase: 'utils',   icon: '⚡', displayName: 'Skillify' },
+  'document-generate':   { phase: 'reflect', icon: '📖', displayName: 'Document Generate' },
+  'sync-gbrain':         { phase: 'utils',   icon: '🔄', displayName: 'Sync GBrain' },
 }
 
 /** Dirs inside the gstack repo that are not skills */
 const NON_SKILL_DIRS = new Set([
   '.github', 'agents', 'bin', 'browse', 'browser-skills', 'claude', 'contrib',
-  'docs', 'extension', 'hosts', 'lib', 'model-overlays', 'openclaw', 'scripts',
-  'supabase', 'test', 'plan', 'design',
+  'docs', 'extension', 'gstack', 'hosts', 'lib', 'model-overlays', 'openclaw',
+  'scripts', 'supabase', 'test', 'plan', 'design',
 ])
 
 /** Pull the first non-empty line out of a YAML multiline `|` block */

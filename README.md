@@ -183,8 +183,20 @@ Not sure where to start? The Dashboard shows a **"What would you like to do toda
 - [x] **v0.12.0** — Visual polish: frosted-glass titlebar, gradient-text brand, Linear-style sidebar with active indicator, phase-coloured left-accent agent cards with skeleton loading, gradient AI Browser hero card with glow status dot, History timeline design with animated dot markers, SkillDocModal spring-entrance animation with deep backdrop blur
 - [x] **v0.13.0** — gstack v1.13–v1.21 sync: 2 new skills (scrape, skillify); 5 new agent hosts (OpenCode, Cursor, Slate, Hermes, GBrain); NON_SKILL_DIRS updated for browser-skills runtime and claude helper dirs
 - [x] **v0.14.0** — Zero-friction cross-platform setup: one-click Bun auto-install (no terminal needed), git check with platform-aware guidance (winget/Homebrew/apt), Windows `.exe` Bun detection fix
+- [x] **v0.15.0** — gstack v1.22–v1.39 sync: 2 new skills (document-generate, sync-gbrain); `gstack/` llms.txt directory excluded from skill scan
 - [ ] **v1.0.0** — Windows / macOS code signing for Gatekeeper / SmartScreen-free distribution
 - [ ] **Future** — Embedded terminal panel (xterm.js); run history log per workspace; multi-workspace side-by-side; Bun auto-install in onboarding
+
+### Studio — depth features
+- [ ] **Visual workflow builder** — chain skills into saved pipelines (e.g. `autoplan → build → review → ship`) and run them in one click
+- [ ] **Project memory timeline** — rich history view showing AI learnings, decisions, and past runs per project, with full-text search and export
+- [ ] **Team dashboard** — shared view of agent runs, skill usage, and project health across a team workspace
+
+### Editor integrations
+- [ ] **VS Code / Cursor extension** — run gstack skills from the Command Palette, sidebar panel showing daemon status and quick-run buttons, "Open in gstack Studio" deep link for full session detail; targets the 30M+ VS Code / Cursor users where developers spend most of their day
+
+### Out of scope (intentionally not pursued)
+- **Warp terminal MCP** — Warp is a direct competitor building their own agent/skill system; integrating would make gstack invisible infrastructure on a rival platform with low conversion to Studio
 
 ---
 

@@ -6,6 +6,26 @@ Format: [Semantic Versioning](https://semver.org) — `Added`, `Changed`, `Fixed
 
 ---
 
+## [0.15.0] — 2026-05-17
+
+### gstack v1.22–v1.39 sync
+
+**Added — New skills**
+- `document-generate` (v1.35) — generate missing documentation from scratch using the Diataxis framework (tutorial / how-to / reference / explanation); also invoked automatically by `/document-release` when it finds coverage gaps
+- `sync-gbrain` (v1.26.3) — sync the gbrain knowledge base with your repo's code index and refresh agent search guidance in CLAUDE.md; re-runnable and idempotent
+
+**Fixed — Skill scanning**
+- Added `gstack` to `NON_SKILL_DIRS` — the new `gstack/llms.txt` file (added in v1.28) lives inside a top-level `gstack/` directory that is not a skill
+
+**Notable upstream changes (informational)**
+- Browse daemon gained `--headed`, `--proxy`, and `--navigate` startup flags (v1.28)
+- gbrain grew a split-engine architecture: remote MCP brain + local PGLite for code (v1.37)
+- gstack is now consumable as a git submodule with a factory-export API (v1.34)
+- All plan-mode review skills have an EXIT PLAN MODE gate to enforce review completion (v1.39.1)
+- Windows install hardening across multiple fix waves (v1.24, v1.30, v1.38)
+
+---
+
 ## [0.14.0] — 2026-05-01
 
 ### Zero-friction cross-platform setup
