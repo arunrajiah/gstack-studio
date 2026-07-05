@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/logo.svg" alt="GStack Studio logo" width="96" height="96">
+</p>
+
 <div align="center">
   <h1>gstack Studio</h1>
   <p><strong>A visual desktop app for <a href="https://github.com/garrytan/gstack">gstack</a> — discover, run, and monitor AI agents without touching the CLI.</strong></p>
